@@ -51,7 +51,7 @@ from config import load_config
 
 
 def insert_vendor(vendor_name):
-    """ Insert a new vendor into the vendors table """
+    """Insert a new vendor into the vendors table"""
 
     sql = """INSERT INTO vendors(vendor_name)
              VALUES(%s) RETURNING vendor_id;"""
@@ -60,8 +60,8 @@ def insert_vendor(vendor_name):
     config = load_config()
 
     try:
-        with  psycopg2.connect(**config) as conn:
-            with  conn.cursor() as cur:
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
                 # execute the INSERT statement
                 cur.execute(sql, (vendor_name,))
 
@@ -78,7 +78,7 @@ def insert_vendor(vendor_name):
         return vendor_id
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     insert_vendor("3M Co.")
 ```
 
@@ -94,13 +94,13 @@ For example, the following defines `insert_many_vendors()` function that inserts
 
 ```python
 def insert_many_vendors(vendor_list):
-    """ Insert multiple vendors into the vendors table  """
+    """Insert multiple vendors into the vendors table"""
 
     sql = "INSERT INTO vendors(vendor_name) VALUES(%s) RETURNING *"
     config = load_config()
     try:
-        with  psycopg2.connect(**config) as conn:
-            with  conn.cursor() as cur:
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
                 # execute the INSERT statement
                 cur.executemany(sql, vendor_list)
 
@@ -113,17 +113,19 @@ def insert_many_vendors(vendor_list):
 The following uses the `insert_vendor()` and `insert_many_vendors()` functions to insert one and multiple rows into the `vendors` table:
 
 ```python
-if __name__ == '__main__':
+if __name__ == "__main__":
     insert_vendor("3M Co.")
 
-    insert_many_vendors([
-        ('AKM Semiconductor Inc.',),
-        ('Asahi Glass Co Ltd.',),
-        ('Daikin Industries Ltd.',),
-        ('Dynacast International Inc.',),
-        ('Foster Electric Co. Ltd.',),
-        ('Murata Manufacturing Co. Ltd.',)
-    ])
+    insert_many_vendors(
+        [
+            ("AKM Semiconductor Inc.",),
+            ("Asahi Glass Co Ltd.",),
+            ("Daikin Industries Ltd.",),
+            ("Dynacast International Inc.",),
+            ("Foster Electric Co. Ltd.",),
+            ("Murata Manufacturing Co. Ltd.",),
+        ]
+    )
 ```
 
 ### 3\) Execute the insert.py module

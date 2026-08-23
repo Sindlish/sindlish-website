@@ -180,10 +180,12 @@ The following examples are provided for reference only and are not guaranteed to
    parsed = urlparse(NEON_AUTH_BASE_URL)
    ORIGIN = f"{parsed.scheme}://{parsed.netloc}"
 
+
    def get_jwks():
        response = requests.get(NEON_JWKS_URL)
        response.raise_for_status()
        return response.json()
+
 
    def get_signing_key(token, jwks):
        unverified_header = jwt.get_unverified_header(token)
@@ -196,6 +198,7 @@ The following examples are provided for reference only and are not guaranteed to
                return Ed25519PublicKey.from_public_bytes(public_key_bytes)
 
        raise ValueError("Matching JWK not found")
+
 
    def validate_neon_token(token: str):
        try:

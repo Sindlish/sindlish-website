@@ -176,8 +176,7 @@ console.log(response.data.branch);
 
 ```python
 branch = neon.branch_create(
-    project_id="spring-example-302709",
-    branch={"name": "dev-branch"}
+    project_id="spring-example-302709", branch={"name": "dev-branch"}
 )
 print(branch)
 ```

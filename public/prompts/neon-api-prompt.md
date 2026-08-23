@@ -138,10 +138,7 @@ console.log(response.data.branch);
 
 **Python SDK:**
 ```python
-branch = neon.branch_create(
-    project_id="project-id-here",
-    branch={"name": "dev-branch"}
-)
+branch = neon.branch_create(project_id="project-id-here", branch={"name": "dev-branch"})
 print(branch)
 ```
 

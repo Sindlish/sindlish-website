@@ -38,6 +38,7 @@ await client.connect();
 
 ```python
 import psycopg2
+
 conn = psycopg2.connect(os.environ["DATABASE_URL"])
 ```
 

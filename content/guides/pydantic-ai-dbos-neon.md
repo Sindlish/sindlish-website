@@ -146,6 +146,7 @@ base_agent = Agent(
 # 4. Wrap the agent with DBOS for Durable Execution
 durable_agent = DBOSAgent(base_agent)
 
+
 # 5. Define Tool 1: Reliable API call
 # Wrapped in @DBOS.step so its result is durably checkpointed in Neon.
 @base_agent.tool
@@ -153,9 +154,10 @@ durable_agent = DBOSAgent(base_agent)
 async def fetch_company_overview(ctx: RunContext, company_name: str) -> str:
     """Fetch general overview data for a company."""
     print(f"🏢 [Tool 1] Fetching overview for {company_name}...")
-    await asyncio.sleep(1) # Simulate API latency
+    await asyncio.sleep(1)  # Simulate API latency
     print(f"✅ [Tool 1] Overview fetched successfully.")
     return f"{company_name} is a leading technology company founded in 2010."
+
 
 # 6. Define Tool 2: Flaky API call with delay
 @base_agent.tool
@@ -172,6 +174,7 @@ async def fetch_financial_metrics(ctx: RunContext, company_name: str) -> str:
     print("✅ [Tool 2] Financial metrics fetched successfully.")
     return f"{company_name} reported a Q3 revenue of $4.2 Billion with a 15% profit margin."
 
+
 # 7. Define the main entry point
 async def main():
     # Launch DBOS to ensure database connections are ready
@@ -186,6 +189,7 @@ async def main():
 
     print("\n📝 Final Report:")
     print(result.output)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

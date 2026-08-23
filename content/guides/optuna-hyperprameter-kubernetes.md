@@ -70,6 +70,7 @@ import sklearn.ensemble
 import sklearn.model_selection
 import sklearn.svm
 
+
 def objective(trial):
     iris = sklearn.datasets.load_iris()
     x, y = iris.data, iris.target
@@ -84,7 +85,9 @@ def objective(trial):
             max_depth=rf_max_depth, n_estimators=10
         )
 
-    score = sklearn.model_selection.cross_val_score(classifier_obj, x, y, n_jobs=-1, cv=3)
+    score = sklearn.model_selection.cross_val_score(
+        classifier_obj, x, y, n_jobs=-1, cv=3
+    )
     accuracy = score.mean()
     return accuracy
 
@@ -145,11 +148,17 @@ def objective(trial):
         param["eta"] = trial.suggest_float("eta", 1e-8, 1.0, log=True)
         # defines how selective algorithm is.
         param["gamma"] = trial.suggest_float("gamma", 1e-8, 1.0, log=True)
-        param["grow_policy"] = trial.suggest_categorical("grow_policy", ["depthwise", "lossguide"])
+        param["grow_policy"] = trial.suggest_categorical(
+            "grow_policy", ["depthwise", "lossguide"]
+        )
 
     if param["booster"] == "dart":
-        param["sample_type"] = trial.suggest_categorical("sample_type", ["uniform", "weighted"])
-        param["normalize_type"] = trial.suggest_categorical("normalize_type", ["tree", "forest"])
+        param["sample_type"] = trial.suggest_categorical(
+            "sample_type", ["uniform", "weighted"]
+        )
+        param["normalize_type"] = trial.suggest_categorical(
+            "normalize_type", ["tree", "forest"]
+        )
         param["rate_drop"] = trial.suggest_float("rate_drop", 1e-8, 1.0, log=True)
         param["skip_drop"] = trial.suggest_float("skip_drop", 1e-8, 1.0, log=True)
 
@@ -158,6 +167,7 @@ def objective(trial):
     pred_labels = np.rint(preds)
     accuracy = sklearn.metrics.accuracy_score(valid_y, pred_labels)
     return accuracy
+
 
 if __name__ == "__main__":
     study = optuna.create_study(
@@ -216,7 +226,9 @@ def define_model(trial):
 
 def get_mnist():
     train_loader = torch.utils.data.DataLoader(
-        datasets.FashionMNIST(DIR, train=True, download=True, transform=transforms.ToTensor()),
+        datasets.FashionMNIST(
+            DIR, train=True, download=True, transform=transforms.ToTensor()
+        ),
         batch_size=BATCHSIZE,
         shuffle=True,
     )
@@ -310,8 +322,12 @@ def objective(trial):
 
     (x_train, y_train), (x_valid, y_valid) = mnist.load_data()
     img_x, img_y = x_train.shape[1], x_train.shape[2]
-    x_train = x_train.reshape(-1, img_x, img_y, 1)[:N_TRAIN_EXAMPLES].astype("float32") / 255
-    x_valid = x_valid.reshape(-1, img_x, img_y, 1)[:N_VALID_EXAMPLES].astype("float32") / 255
+    x_train = (
+        x_train.reshape(-1, img_x, img_y, 1)[:N_TRAIN_EXAMPLES].astype("float32") / 255
+    )
+    x_valid = (
+        x_valid.reshape(-1, img_x, img_y, 1)[:N_VALID_EXAMPLES].astype("float32") / 255
+    )
     y_train = y_train[:N_TRAIN_EXAMPLES]
     y_valid = y_valid[:N_VALID_EXAMPLES]
     input_shape = (img_x, img_y, 1)
@@ -348,6 +364,7 @@ def objective(trial):
 
     score = model.evaluate(x_valid, y_valid, verbose=0)
     return score[1]
+
 
 if __name__ == "__main__":
     study = optuna.create_study(

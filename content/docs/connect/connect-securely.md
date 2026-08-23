@@ -58,13 +58,13 @@ If the client application uses a popular Postgres client library, such as `psyco
 import psycopg2
 
 conn = psycopg2.connect(
-    dbname='dbname',
-    user='alex',
-    password='AbC123dEf',
-    host='ep-cool-darkness-123456.us-east-2.aws.neon.tech',
-    port='5432',
-    sslmode='verify-full',
-    sslrootcert='/path/to/your/root.crt'
+    dbname="dbname",
+    user="alex",
+    password="AbC123dEf",
+    host="ep-cool-darkness-123456.us-east-2.aws.neon.tech",
+    port="5432",
+    sslmode="verify-full",
+    sslrootcert="/path/to/your/root.crt",
 )
 ```
 

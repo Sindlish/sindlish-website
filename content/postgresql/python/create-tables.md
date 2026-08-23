@@ -48,8 +48,9 @@ Second, define a new function called `create_tables()` in the `create_tables.py`
 import psycopg2
 from config import load_config
 
+
 def create_tables():
-    """ Create tables in the PostgreSQL database"""
+    """Create tables in the PostgreSQL database"""
     commands = (
         """
         CREATE TABLE vendors (
@@ -84,7 +85,8 @@ def create_tables():
                     REFERENCES parts (part_id)
                     ON UPDATE CASCADE ON DELETE CASCADE
         )
-        """)
+        """,
+    )
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
@@ -95,7 +97,8 @@ def create_tables():
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     create_tables()
 ```
 
@@ -133,7 +136,7 @@ Finally, iterate over the command in the `commands` list and execute each of the
 
 ```python
 for command in commands:
-   cur.execute(command)
+    cur.execute(command)
 ```
 
 The `create_tables()` function will create four tables in the `suppliers` database:

@@ -105,12 +105,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Settings(BaseSettings):
     database_url: str
     webhook_secret: str
 
     class Config:
         env_file = ".env"
+
 
 settings = Settings()
 ```
@@ -139,10 +141,12 @@ db_user = parsed_url.username
 db_password = parsed_url.password
 db_host = parsed_url.hostname
 db_port = parsed_url.port or 5432
-db_name = parsed_url.path.lstrip('/')
+db_name = parsed_url.path.lstrip("/")
 
 # Create an async database URL without the query parameters
-ASYNC_DATABASE_URL = f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+ASYNC_DATABASE_URL = (
+    f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+)
 
 # Create an async SQLAlchemy engine with SSL configuration
 engine = create_async_engine(
@@ -153,18 +157,15 @@ engine = create_async_engine(
     pool_timeout=30,
     pool_recycle=1800,
     pool_pre_ping=True,
-    echo=False
+    echo=False,
 )
 
 # Create a session factory for creating database sessions
-async_session = sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
+async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 # Create a base class for declarative models
 Base = declarative_base()
+
 
 # Dependency to get an async database session
 async def get_db():
@@ -188,6 +189,7 @@ Now let's create our database models (`app/models.py`) which will represent the 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, JSON
 from sqlalchemy.sql import func
 from app.database import Base
+
 
 class WebhookEvent(Base):
     __tablename__ = "webhook_events"
@@ -226,22 +228,28 @@ from app.config import settings
 
 app = FastAPI(title="Webhook Receiver")
 
+
 # Create database tables if they don't exist
 @app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+
 @app.get("/")
 async def root():
     return {"message": "Webhook Receiver is running"}
 
+
 @app.get("/webhooks/events")
 async def view_webhook_events(limit: int = 10, db: AsyncSession = Depends(get_db)):
     """View recent webhook events - useful for debugging."""
-    result = await db.execute(select(WebhookEvent).order_by(WebhookEvent.created_at.desc()).limit(limit))
+    result = await db.execute(
+        select(WebhookEvent).order_by(WebhookEvent.created_at.desc()).limit(limit)
+    )
     events = result.scalars().all()
     return events
+
 
 @app.post("/webhooks/github")
 async def github_webhook(
@@ -249,7 +257,7 @@ async def github_webhook(
     x_github_event: str = Header(None),
     x_github_delivery: str = Header(None),
     x_hub_signature_256: str = Header(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     # Read the request body
     body = await request.body()
@@ -258,8 +266,7 @@ async def github_webhook(
     is_valid = verify_signature(body, x_hub_signature_256)
     if not is_valid:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid signature"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signature"
         )
 
     # Parse the JSON payload
@@ -267,8 +274,7 @@ async def github_webhook(
         payload = json.loads(body)
     except json.JSONDecodeError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid JSON payload"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid JSON payload"
         )
 
     # Store the webhook event in the database
@@ -277,7 +283,7 @@ async def github_webhook(
         delivery_id=x_github_delivery,
         signature=x_hub_signature_256,
         payload=payload,
-        processed=False
+        processed=False,
     )
 
     db.add(webhook_event)
@@ -289,10 +295,12 @@ async def github_webhook(
 
     return {"status": "success", "event_id": webhook_event.id}
 
+
 # Placeholder functions to be implemented
 def verify_signature(body, signature):
     # We'll implement this next
     return True
+
 
 async def process_webhook_event(event_id, db):
     # We'll implement this later
@@ -357,6 +365,7 @@ async def process_webhook_event(event_id, db):
     except Exception as e:
         print(f"Error processing webhook event {event_id}: {e}")
 
+
 async def process_push_event(event):
     """Process a GitHub push event."""
     payload = event.payload
@@ -367,6 +376,7 @@ async def process_push_event(event):
     print(f"Push to {repo_name} on {ref} with {len(commits)} commits")
     # Handle the push event based on the commits
 
+
 async def process_pull_request_event(event):
     """Process a GitHub pull request event."""
     payload = event.payload
@@ -376,6 +386,7 @@ async def process_pull_request_event(event):
 
     print(f"Pull request #{pr_number} {action} in {repo_name}")
     # Handle the pull request based on the action (opened, closed, etc.)
+
 
 async def process_issue_event(event):
     """Process a GitHub issue event."""

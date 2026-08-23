@@ -296,7 +296,7 @@ await client.query(query);
 ```python
 cur = conn.cursor()
 query = "SELECT * FROM users WHERE username = %s;"
-cur.execute(query, ('alice',), prepare=True)
+cur.execute(query, ("alice",), prepare=True)
 results = cur.fetchall()
 ```
 

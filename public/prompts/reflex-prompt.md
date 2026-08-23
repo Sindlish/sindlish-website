@@ -88,9 +88,9 @@ Modify the `rxconfig.py` file to use the database connection string from the env
     load_dotenv()
 
     config = rx.Config(
-        app_name="my_reflex_app", # Or the existing app name
+        app_name="my_reflex_app",  # Or the existing app name
         plugins=[...],  # Existing plugins
-        db_url=os.environ.get("DATABASE_URL")
+        db_url=os.environ.get("DATABASE_URL"),
     )
     ```
 

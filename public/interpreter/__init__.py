@@ -5,16 +5,17 @@ Provides the Interpreter facade class that encapsulates the full
 pipeline: lex → parse → resolve → compile → execute.
 """
 
-from .frontend.lexer import Lexer
-from .frontend.parser import Parser
-from .frontend.tokens import TokenType
+import sys
+
 from .analysis.resolver import Resolver
 from .backend.compiler import Compiler
 from .backend.vm import VM
-from .runtime.env import Environment
-from .runtime.builtins import SimpleBuiltins
 from .errors import ErrorReporter, SindhiBaseError
-import sys
+from .frontend.lexer import Lexer
+from .frontend.parser import Parser
+from .frontend.tokens import TokenType
+from .runtime.builtins import SimpleBuiltins
+from .runtime.env import Environment
 
 
 class Interpreter:
@@ -65,7 +66,9 @@ class Interpreter:
 
             # 5. Execute
             vm = VM(
-                code, instructions, constants,
+                code,
+                instructions,
+                constants,
                 self._globals_env,
                 getattr(ast, "slot_count", 0),
                 resolver.slot_metadata,
@@ -77,12 +80,12 @@ class Interpreter:
             ErrorReporter.report(e)
             if not is_repl:
                 sys.exit(1)
-            raise e
+            raise
         except Exception as e:
             print(f"Internal Error: {e}")
             if not is_repl:
                 sys.exit(1)
-            raise e
+            raise
 
 
 __all__ = ["Interpreter"]

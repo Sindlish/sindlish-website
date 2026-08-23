@@ -211,7 +211,6 @@ async def close_postgres() -> None:
             raise
     else:
         logger.warning("PostgreSQL connection pool was not initialized.")
-
 ```
 
 `init_postgres` is responsible for opening the connection pool to the `PostgreSQL` database and `close_postgres` is responsible for gracefully closing all connections in the pool when the `FastAPI` app shuts down to properly manage the lifecycle of the database.
@@ -382,7 +381,6 @@ async def chat(query: QueryRequest, pool: asyncpg.Pool = Depends(get_postgres)):
         raise HTTPException(
             status_code=500, detail=f"Failed to process chat request: {e}"
         )
-
 ```
 
 In the `chat` route, the chatbot is sent the text obtained from RAG and the user questions, but is also sent a system message that sets the context for the chatbot. You can customize this message to provide additional context or instructions to the chatbot, and to guide the chatbot's responses to your liking.
@@ -421,7 +419,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 ```
 
 Since you will be connecting your application from the frontend, you will need to allow CORS (Cross Origin Resource Sharing). The `CORSMiddleware` is added such that the API can accept requests from any origin, including your React app.

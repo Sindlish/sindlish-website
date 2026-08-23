@@ -105,6 +105,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -134,6 +135,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from database import Base
 
+
 class Speaker(Base):
     __tablename__ = "speakers"
 
@@ -143,6 +145,7 @@ class Speaker(Base):
     company = Column(String)
 
     talks = relationship("Talk", back_populates="speaker")
+
 
 class Talk(Base):
     __tablename__ = "talks"
@@ -166,14 +169,17 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
 
+
 class TalkBase(BaseModel):
     title: str
     description: str
     start_time: datetime
     end_time: datetime
 
+
 class TalkCreate(TalkBase):
     speaker_id: int
+
 
 class Talk(TalkBase):
     id: int
@@ -182,13 +188,16 @@ class Talk(TalkBase):
     class Config:
         orm_mode = True
 
+
 class SpeakerBase(BaseModel):
     name: str
     bio: str
     company: str
 
+
 class SpeakerCreate(SpeakerBase):
     pass
+
 
 class Speaker(SpeakerBase):
     id: int
@@ -196,6 +205,7 @@ class Speaker(SpeakerBase):
 
     class Config:
         orm_mode = True
+
 
 class SpeakerWithTalks(Speaker):
     talks: List[Talk]
@@ -223,6 +233,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
 @app.post("/speakers/", response_model=schemas.Speaker)
 def create_speaker(speaker: schemas.SpeakerCreate, db: Session = Depends(get_db)):
     db_speaker = models.Speaker(**speaker.dict())
@@ -231,17 +242,22 @@ def create_speaker(speaker: schemas.SpeakerCreate, db: Session = Depends(get_db)
     db.refresh(db_speaker)
     return db_speaker
 
+
 @app.get("/speakers/", response_model=List[schemas.Speaker])
 def read_speakers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     speakers = db.query(models.Speaker).offset(skip).limit(limit).all()
     return speakers
 
+
 @app.get("/speakers/{speaker_id}", response_model=schemas.SpeakerWithTalks)
 def read_speaker(speaker_id: int, db: Session = Depends(get_db)):
-    db_speaker = db.query(models.Speaker).filter(models.Speaker.id == speaker_id).first()
+    db_speaker = (
+        db.query(models.Speaker).filter(models.Speaker.id == speaker_id).first()
+    )
     if db_speaker is None:
         raise HTTPException(status_code=404, detail="Speaker not found")
     return db_speaker
+
 
 @app.post("/talks/", response_model=schemas.Talk)
 def create_talk(talk: schemas.TalkCreate, db: Session = Depends(get_db)):
@@ -251,10 +267,12 @@ def create_talk(talk: schemas.TalkCreate, db: Session = Depends(get_db)):
     db.refresh(db_talk)
     return db_talk
 
+
 @app.get("/talks/", response_model=List[schemas.Talk])
 def read_talks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     talks = db.query(models.Talk).offset(skip).limit(limit).all()
     return talks
+
 
 @app.get("/talks/{talk_id}", response_model=schemas.Talk)
 def read_talk(talk_id: int, db: Session = Depends(get_db)):

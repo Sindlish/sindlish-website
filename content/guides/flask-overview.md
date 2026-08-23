@@ -98,16 +98,18 @@ load_dotenv()
 db = SQLAlchemy()
 migrate = Migrate()
 
+
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
     migrate.init_app(app, db)
 
     # Register blueprints here
     from app.routes import user_routes
+
     app.register_blueprint(user_routes.user_bp)
 
     return app
@@ -129,6 +131,7 @@ As an example of a typical model definition, let's create a `User` model in `app
 from app import db
 from datetime import datetime
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -136,14 +139,14 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f"<User {self.username}>"
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'username': self.username,
-            'email': self.email,
-            'created_at': self.created_at.isoformat()
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "created_at": self.created_at.isoformat(),
         }
 ```
 
@@ -165,37 +168,42 @@ from app.models.user import User
 from app import db
 
 # Create a blueprint named 'user' with a URL prefix '/user'
-user_bp = Blueprint('user', __name__, url_prefix='/user')
+user_bp = Blueprint("user", __name__, url_prefix="/user")
+
 
 # Route for creating a new user (HTML form submission)
-@user_bp.route('/create', methods=['POST'])
+@user_bp.route("/create", methods=["POST"])
 def create_user():
     data = request.form
-    new_user = User(username=data['username'], email=data['email'])
+    new_user = User(username=data["username"], email=data["email"])
     db.session.add(new_user)
     db.session.commit()
-    return redirect(url_for('user.list_users'))
+    return redirect(url_for("user.list_users"))
+
 
 # Route for displaying all users (HTML)
-@user_bp.route('/list', methods=['GET'])
+@user_bp.route("/list", methods=["GET"])
 def list_users():
     users = User.query.all()
-    return render_template('users.html', users=users)
+    return render_template("users.html", users=users)
+
 
 # API route for retrieving all users (JSON)
-@user_bp.route('/api/list', methods=['GET'])
+@user_bp.route("/api/list", methods=["GET"])
 def get_users_api():
     users = User.query.all()
     return jsonify([user.to_dict() for user in users])
 
+
 # Route for displaying a single user (HTML)
-@user_bp.route('/<int:user_id>', methods=['GET'])
+@user_bp.route("/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     user = User.query.get_or_404(user_id)
-    return render_template('user_detail.html', user=user)
+    return render_template("user_detail.html", user=user)
+
 
 # API route for retrieving a single user (JSON)
-@user_bp.route('/api/<int:user_id>', methods=['GET'])
+@user_bp.route("/api/<int:user_id>", methods=["GET"])
 def get_user_api(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify(user.to_dict())
@@ -388,7 +396,9 @@ Besides the above steps, as your Flask application grows, you can consider a few
 
    ```python
    # Update your DATABASE_URL to use the pooled connection string
-   app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@pooler.address:5432/database'
+   app.config["SQLALCHEMY_DATABASE_URI"] = (
+       "postgresql://user:password@pooler.address:5432/database"
+   )
    ```
 
    Refer to the [Neon documentation on connection pooling](/docs/connect/connection-pooling) for detailed instructions.
@@ -402,13 +412,15 @@ Besides the above steps, as your Flask application grows, you can consider a few
 
    cache = Cache()
 
+
    def create_app():
        # ... previous code ...
-       cache.init_app(app, config={'CACHE_TYPE': 'simple'})
+       cache.init_app(app, config={"CACHE_TYPE": "simple"})
 
        return app
 
-   @user_bp.route('/api/users', methods=['GET'])
+
+   @user_bp.route("/api/users", methods=["GET"])
    @cache.cached(timeout=60)  # Cache for 60 seconds
    def get_users_api():
        users = User.query.all()
@@ -430,16 +442,19 @@ Besides the above steps, as your Flask application grows, you can consider a few
 
    celery = Celery(__name__)
 
+
    def create_app():
        # ... previous code ...
        celery.conf.update(app.config)
 
        return app
 
+
    @celery.task
    def send_email(user_id):
        user = User.query.get(user_id)
        # Send email to user
+
 
    # To call the task
    send_email.delay(user_id)
@@ -457,13 +472,15 @@ Besides the above steps, as your Flask application grows, you can consider a few
 
    limiter = Limiter(key_func=get_remote_address)
 
+
    def create_app():
        # ... previous code ...
        limiter.init_app(app)
 
        return app
 
-   @user_bp.route('/api/users', methods=['GET'])
+
+   @user_bp.route("/api/users", methods=["GET"])
    @limiter.limit("5 per minute")
    def get_users_api():
        users = User.query.all()

@@ -224,6 +224,7 @@ load_dotenv()
 NEON_DB_URL = os.getenv("NEON_DB_CONNECTION_STRING")
 db_engine = create_engine(NEON_DB_URL)
 
+
 # Define the billing anomaly detection function
 def billing_anomaly_summary(
     tenant_id: str,
@@ -265,6 +266,7 @@ def billing_anomaly_summary(
     df["anomaly"] = df["pct_change_api"].abs() > 1.5
 
     return df.to_json(orient="records")
+
 
 # Register this in a list to be used by FunctionTool
 user_functions = [billing_anomaly_summary]
@@ -353,7 +355,6 @@ pprint(messages["data"][0]["content"][0]["text"]["value"])
 # Optional cleanup:
 # project_client.agents.delete_agent(agent.id)
 # print("Deleted agent")
-
 ```
 
 ## Run the agent

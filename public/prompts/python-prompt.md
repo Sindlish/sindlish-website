@@ -77,7 +77,7 @@ import os
 from dotenv import load_dotenv
 
 # --- Use the import for your chosen driver ---
-import psycopg # For psycopg v3
+import psycopg  # For psycopg v3
 # import psycopg2 as psycopg # For psycopg2 v2
 
 # Load environment variables from .env file
@@ -97,7 +97,7 @@ try:
             # Fetch and print the result
             db_version = cur.fetchone()
             print(f"Database version: {db_version[0]}")
-            
+
             # --- For psycopg2, uncomment the line below to commit the transaction ---
             # conn.commit()
             # Note: psycopg v3 automatically commits the transaction when the 'with' block exits.
@@ -118,6 +118,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+
 async def run():
     # Get the connection string from the environment variable
     conn_string = os.getenv("DATABASE_URL")
@@ -135,6 +136,7 @@ async def run():
     finally:
         if conn:
             await conn.close()
+
 
 # Run the asynchronous function
 if __name__ == "__main__":

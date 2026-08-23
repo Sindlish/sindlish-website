@@ -88,17 +88,17 @@ Alternatively, you can open a predefined Google Colab notebook for this guide by
 1. Add a code block to create a table and insert data:
 
    ```python shouldWrap
-   create_table_sql = '''
+   create_table_sql = """
    CREATE TABLE items (
    id BIGSERIAL PRIMARY KEY,
    embedding VECTOR(3)
    );
-   '''
+   """
 
    # Insert data
-   insert_data_sql = '''
+   insert_data_sql = """
    INSERT INTO items (embedding) VALUES ('[1,2,3]'), ('[4,5,6]'), ('[7,8,9]');
-   '''
+   """
 
    # Execute the SQL statements
    cursor.execute(create_table_sql)

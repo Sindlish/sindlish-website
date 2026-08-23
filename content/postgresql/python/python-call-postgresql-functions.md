@@ -45,7 +45,7 @@ cur = conn.cursor()
 Then, pass the name of the function and the optionally pass values to the `callproc()` method of the `cursor` object:
 
 ```python
-cur.callproc('function_name', (value1,value2))
+cur.callproc("function_name", (value1, value2))
 ```
 
 Internally, the `callproc()` method translates the function call and input values into the following statement:
@@ -57,7 +57,7 @@ SELECT * FROM function_name(value1,value2);
 Therefore, you can use the `execute()` method of the `cursor` object to call a function as follows:
 
 ```python
-cur.execute("SELECT * FROM function_name( %s,%s); ",(value1,value2))
+cur.execute("SELECT * FROM function_name( %s,%s); ", (value1, value2))
 ```
 
 Both statements have the same effect.
@@ -116,17 +116,17 @@ from config import load_config
 
 
 def get_parts(vendor_id):
-    """ Get parts provided by a vendor specified by the vendor_id """
+    """Get parts provided by a vendor specified by the vendor_id"""
     parts = []
     # read database configuration
     params = load_config()
     try:
         # connect to the PostgreSQL database
-        with  psycopg2.connect(**params) as conn:
+        with psycopg2.connect(**params) as conn:
             with conn.cursor() as cur:
                 # create a cursor object for execution
                 cur = conn.cursor()
-                cur.callproc('get_parts_by_vendor', (vendor_id,))
+                cur.callproc("get_parts_by_vendor", (vendor_id,))
 
                 # process the result set
                 row = cur.fetchone()
@@ -139,7 +139,8 @@ def get_parts(vendor_id):
     finally:
         return parts
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     parts = get_parts(1)
     print(parts)
 ```

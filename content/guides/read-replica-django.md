@@ -47,17 +47,17 @@ In `django_notes/settings.py`, add the following:
 ```python
 INSTALLED_APPS = [
     # ... other apps
-    'notes',
+    "notes",
 ]
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_neon_database_name',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'your_neon_host',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "your_neon_database_name",
+        "USER": "your_username",
+        "PASSWORD": "your_password",
+        "HOST": "your_neon_host",
+        "PORT": "5432",
     }
 }
 ```
@@ -70,6 +70,7 @@ In `notes/models.py`, add:
 
 ```python
 from django.db import models
+
 
 class Note(models.Model):
     title = models.CharField(max_length=200)
@@ -91,24 +92,27 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Note
 from django.views.decorators.http import require_http_methods
 
+
 @require_http_methods(["GET", "POST"])
 def create_note(request):
     if request.method == "POST":
-        title = request.POST.get('title')
-        content = request.POST.get('content')
+        title = request.POST.get("title")
+        content = request.POST.get("content")
         Note.objects.create(title=title, content=content)
-        return redirect('list_notes')
-    return render(request, 'notes/create_note.html')
+        return redirect("list_notes")
+    return render(request, "notes/create_note.html")
+
 
 def list_notes(request):
-    notes = Note.objects.all().order_by('-created_at')
-    return render(request, 'notes/list_notes.html', {'notes': notes})
+    notes = Note.objects.all().order_by("-created_at")
+    return render(request, "notes/list_notes.html", {"notes": notes})
+
 
 @require_http_methods(["POST"])
 def delete_note(request, note_id):
     note = get_object_or_404(Note, id=note_id)
     note.delete()
-    return redirect('list_notes')
+    return redirect("list_notes")
 ```
 
 Three views are defined here:
@@ -126,9 +130,9 @@ from django.urls import path
 from notes import views
 
 urlpatterns = [
-    path('', views.list_notes, name='list_notes'),
-    path('create/', views.create_note, name='create_note'),
-    path('delete/<int:note_id>/', views.delete_note, name='delete_note'),
+    path("", views.list_notes, name="list_notes"),
+    path("create/", views.create_note, name="create_note"),
+    path("delete/<int:note_id>/", views.delete_note, name="delete_note"),
 ]
 ```
 
@@ -287,10 +291,10 @@ Create a new file `notes/db_router.py`:
 ```python
 class PrimaryReplicaRouter:
     def db_for_read(self, model, **hints):
-        return 'replica'
+        return "replica"
 
     def db_for_write(self, model, **hints):
-        return 'default'
+        return "default"
 
     def allow_relation(self, obj1, obj2, **hints):
         return True
@@ -305,25 +309,25 @@ Update `django_notes/settings.py`:
 
 ```python
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_database_name',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'your_primary_host',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "your_database_name",
+        "USER": "your_username",
+        "PASSWORD": "your_password",
+        "HOST": "your_primary_host",
+        "PORT": "5432",
     },
-    'replica': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_database_name',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'your_read_replica_host',
-        'PORT': '5432',
-    }
+    "replica": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "your_database_name",
+        "USER": "your_username",
+        "PASSWORD": "your_password",
+        "HOST": "your_read_replica_host",
+        "PORT": "5432",
+    },
 }
 
-DATABASE_ROUTERS = ['notes.db_router.PrimaryReplicaRouter']
+DATABASE_ROUTERS = ["notes.db_router.PrimaryReplicaRouter"]
 ```
 
 In the `settings.py` file, we define two database connections: `'default'` for the primary database and `'replica'` for the read replica. Both use the PostgreSQL engine and share the same database name, but have different host addresses. The `DATABASE_ROUTERS` setting tells Django to use our custom `PrimaryReplicaRouter` for database routing decisions.

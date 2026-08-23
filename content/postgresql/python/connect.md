@@ -102,7 +102,8 @@ Second, create a new file called `config.py` in the project directory and define
 ```python
 from configparser import ConfigParser
 
-def load_config(filename='database.ini', section='postgresql'):
+
+def load_config(filename="database.ini", section="postgresql"):
     parser = ConfigParser()
     parser.read(filename)
 
@@ -113,11 +114,14 @@ def load_config(filename='database.ini', section='postgresql'):
         for param in params:
             config[param[0]] = param[1]
     else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+        raise Exception(
+            "Section {0} not found in the {1} file".format(section, filename)
+        )
 
     return config
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     config = load_config()
     print(config)
 ```
@@ -138,18 +142,19 @@ Third, create a new file called `connect.py` that uses the `config.py` module to
 import psycopg2
 from config import load_config
 
+
 def connect(config):
-    """ Connect to the PostgreSQL database server """
+    """Connect to the PostgreSQL database server"""
     try:
         # connecting to the PostgreSQL server
         with psycopg2.connect(**config) as conn:
-            print('Connected to the PostgreSQL server.')
+            print("Connected to the PostgreSQL server.")
             return conn
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     config = load_config()
     connect(config)
 ```
@@ -168,10 +173,7 @@ Alternatively, you can use keyword arguments:
 
 ```python
 conn = psycopg2.connect(
-    host="localhost",
-    database="suppliers",
-    user="YourUsername",
-    password="YourPassword"
+    host="localhost", database="suppliers", user="YourUsername", password="YourPassword"
 )
 ```
 

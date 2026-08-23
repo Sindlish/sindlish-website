@@ -239,7 +239,6 @@ async def close_postgres() -> None:
             raise
     else:
         logger.warning("PostgreSQL connection pool was not initialized.")
-
 ```
 
 `init_postgres` is responsible for opening the connection pool to the `PostgreSQL` database and `close_postgres` is responsible for gracefully closing all connections in the pool when the `FastAPI` app shuts down to properly manage the lifecycle of the database.
@@ -464,7 +463,6 @@ async def get_sensor_daily_avg(
         )
         for row in rows
     ]
-
 ```
 
 The code defines endpoints for:

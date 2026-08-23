@@ -103,7 +103,7 @@ from psycopg2 import connect
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import os
 
-DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 conn = psycopg2.connect(DATABASE_URL, connect_timeout=10)
 ```

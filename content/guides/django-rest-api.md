@@ -66,13 +66,13 @@ Open the `settings.py` file to configure the database connection. By default, Dj
 
 ```python
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_database_name',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'your_neon_hostname',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "your_database_name",
+        "USER": "your_username",
+        "PASSWORD": "your_password",
+        "HOST": "your_neon_hostname",
+        "PORT": "5432",
     }
 }
 ```
@@ -104,8 +104,8 @@ Add the new app to `INSTALLED_APPS` in `settings.py`, this essentially registers
 ```python
 INSTALLED_APPS = [
     # ... (existing apps)
-    'rest_framework',
-    'models_api',
+    "rest_framework",
+    "models_api",
 ]
 ```
 
@@ -114,6 +114,7 @@ Now, let's define our models in `models_api/models.py`:
 ```python
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 class ModelAuthor(models.Model):
     name = models.CharField(max_length=200)
@@ -124,18 +125,19 @@ class ModelAuthor(models.Model):
     def __str__(self):
         return self.name
 
+
 class AIModel(models.Model):
     MODEL_TYPES = [
-        ('NLP', 'Natural Language Processing'),
-        ('CV', 'Computer Vision'),
-        ('RL', 'Reinforcement Learning'),
-        ('OTHER', 'Other'),
+        ("NLP", "Natural Language Processing"),
+        ("CV", "Computer Vision"),
+        ("RL", "Reinforcement Learning"),
+        ("OTHER", "Other"),
     ]
     FRAMEWORKS = [
-        ('PT', 'PyTorch'),
-        ('TF', 'TensorFlow'),
-        ('KRS', 'Keras'),
-        ('OTHER', 'Other'),
+        ("PT", "PyTorch"),
+        ("TF", "TensorFlow"),
+        ("KRS", "Keras"),
+        ("OTHER", "Other"),
     ]
     name = models.CharField(max_length=200)
     model_type = models.CharField(max_length=5, choices=MODEL_TYPES)
@@ -145,10 +147,13 @@ class AIModel(models.Model):
     download_url = models.URLField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     tags = models.JSONField()
-    author = models.ForeignKey(ModelAuthor, on_delete=models.CASCADE, related_name='models_uploaded')
+    author = models.ForeignKey(
+        ModelAuthor, on_delete=models.CASCADE, related_name="models_uploaded"
+    )
 
     def __str__(self):
         return f"{self.name} - {self.version}"
+
 
 class ModelPurchase(models.Model):
     user = models.CharField(max_length=200)  # Simplified for this example
@@ -161,8 +166,11 @@ class ModelPurchase(models.Model):
     def __str__(self):
         return f"{self.user} - {self.ai_model.name}"
 
+
 class UsageScenario(models.Model):
-    ai_model = models.ForeignKey(AIModel, on_delete=models.CASCADE, related_name='usage_scenarios')
+    ai_model = models.ForeignKey(
+        AIModel, on_delete=models.CASCADE, related_name="usage_scenarios"
+    )
     title = models.CharField(max_length=200)
     description = models.TextField()
     code_snippet = models.TextField()
@@ -171,8 +179,11 @@ class UsageScenario(models.Model):
     def __str__(self):
         return f"{self.ai_model.name} - {self.title}"
 
+
 class ModelBenchmark(models.Model):
-    ai_model = models.ForeignKey(AIModel, on_delete=models.CASCADE, related_name='benchmarks')
+    ai_model = models.ForeignKey(
+        AIModel, on_delete=models.CASCADE, related_name="benchmarks"
+    )
     metric_name = models.CharField(max_length=100)
     value = models.FloatField()
     benchmark_date = models.DateTimeField(auto_now_add=True)
@@ -245,36 +256,74 @@ Start by creating a new file `models_api/serializers.py`:
 from rest_framework import serializers
 from .models import ModelAuthor, AIModel, ModelPurchase, UsageScenario, ModelBenchmark
 
+
 class ModelAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelAuthor
-        fields = ['id', 'name', 'bio', 'contact_info', 'rating']
+        fields = ["id", "name", "bio", "contact_info", "rating"]
+
 
 class AIModelSerializer(serializers.ModelSerializer):
     author = ModelAuthorSerializer(read_only=True)
     author_id = serializers.PrimaryKeyRelatedField(
-        queryset=ModelAuthor.objects.all(), source='author', write_only=True
+        queryset=ModelAuthor.objects.all(), source="author", write_only=True
     )
 
     class Meta:
         model = AIModel
-        fields = ['id', 'name', 'model_type', 'description', 'framework', 'version',
-                  'download_url', 'price', 'tags', 'author', 'author_id']
+        fields = [
+            "id",
+            "name",
+            "model_type",
+            "description",
+            "framework",
+            "version",
+            "download_url",
+            "price",
+            "tags",
+            "author",
+            "author_id",
+        ]
+
 
 class ModelPurchaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelPurchase
-        fields = ['id', 'user', 'ai_model', 'purchase_date', 'price_paid', 'license_key', 'download_link']
+        fields = [
+            "id",
+            "user",
+            "ai_model",
+            "purchase_date",
+            "price_paid",
+            "license_key",
+            "download_link",
+        ]
+
 
 class UsageScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsageScenario
-        fields = ['id', 'ai_model', 'title', 'description', 'code_snippet', 'usage_frequency']
+        fields = [
+            "id",
+            "ai_model",
+            "title",
+            "description",
+            "code_snippet",
+            "usage_frequency",
+        ]
+
 
 class ModelBenchmarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelBenchmark
-        fields = ['id', 'ai_model', 'metric_name', 'value', 'benchmark_date', 'hardware_used']
+        fields = [
+            "id",
+            "ai_model",
+            "metric_name",
+            "value",
+            "benchmark_date",
+            "hardware_used",
+        ]
 ```
 
 Let's break down each serializer to better understand their purpose:
@@ -319,45 +368,55 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import ModelAuthor, AIModel, ModelPurchase, UsageScenario, ModelBenchmark
-from .serializers import (ModelAuthorSerializer, AIModelSerializer, ModelPurchaseSerializer,
-                          UsageScenarioSerializer, ModelBenchmarkSerializer)
+from .serializers import (
+    ModelAuthorSerializer,
+    AIModelSerializer,
+    ModelPurchaseSerializer,
+    UsageScenarioSerializer,
+    ModelBenchmarkSerializer,
+)
+
 
 class ModelAuthorViewSet(viewsets.ModelViewSet):
     queryset = ModelAuthor.objects.all()
     serializer_class = ModelAuthorSerializer
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def models(self, request, pk=None):
         author = self.get_object()
         models = author.models_uploaded.all()
         serializer = AIModelSerializer(models, many=True)
         return Response(serializer.data)
 
+
 class AIModelViewSet(viewsets.ModelViewSet):
     queryset = AIModel.objects.all()
     serializer_class = AIModelSerializer
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def usage_scenarios(self, request, pk=None):
         model = self.get_object()
         scenarios = model.usage_scenarios.all()
         serializer = UsageScenarioSerializer(scenarios, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def benchmarks(self, request, pk=None):
         model = self.get_object()
         benchmarks = model.benchmarks.all()
         serializer = ModelBenchmarkSerializer(benchmarks, many=True)
         return Response(serializer.data)
 
+
 class ModelPurchaseViewSet(viewsets.ModelViewSet):
     queryset = ModelPurchase.objects.all()
     serializer_class = ModelPurchaseSerializer
 
+
 class UsageScenarioViewSet(viewsets.ModelViewSet):
     queryset = UsageScenario.objects.all()
     serializer_class = UsageScenarioSerializer
+
 
 class ModelBenchmarkViewSet(viewsets.ModelViewSet):
     queryset = ModelBenchmark.objects.all()
@@ -373,18 +432,23 @@ Create a new file `models_api/urls.py` to define the URL patterns for our API:
 ```python
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import (ModelAuthorViewSet, AIModelViewSet, ModelPurchaseViewSet,
-                    UsageScenarioViewSet, ModelBenchmarkViewSet)
+from .views import (
+    ModelAuthorViewSet,
+    AIModelViewSet,
+    ModelPurchaseViewSet,
+    UsageScenarioViewSet,
+    ModelBenchmarkViewSet,
+)
 
 router = DefaultRouter()
-router.register(r'authors', ModelAuthorViewSet)
-router.register(r'models', AIModelViewSet)
-router.register(r'purchases', ModelPurchaseViewSet)
-router.register(r'usage-scenarios', UsageScenarioViewSet)
-router.register(r'benchmarks', ModelBenchmarkViewSet)
+router.register(r"authors", ModelAuthorViewSet)
+router.register(r"models", AIModelViewSet)
+router.register(r"purchases", ModelPurchaseViewSet)
+router.register(r"usage-scenarios", UsageScenarioViewSet)
+router.register(r"benchmarks", ModelBenchmarkViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]
 ```
 
@@ -397,10 +461,9 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     # Include the API URLs:
-    path('api/', include('models_api.urls')),
+    path("api/", include("models_api.urls")),
 ]
 ```
 

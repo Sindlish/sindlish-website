@@ -189,7 +189,7 @@ def run_sql_query(connection_uri: str, query: str) -> str:
 available_tools = [create_database, run_sql_query]
 
 system_prompt = SystemMessage(
-    f"You are a helpful AI assistant. You will be assisting users with all of your available tools. You can help users by using the following tools: {', '.join([f"\n{tool.name}: {tool.description}" for tool in available_tools])}."
+    f"You are a helpful AI assistant. You will be assisting users with all of your available tools. You can help users by using the following tools: {', '.join([f'\n{tool.name}: {tool.description}' for tool in available_tools])}."
 )
 
 model = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
@@ -303,7 +303,7 @@ Similarily, `run_sql_query` decorated with LangChain's `@tool`, executes an SQL 
 available_tools = [create_database, run_sql_query]
 
 system_prompt = SystemMessage(
-    f"You are a helpful AI assistant. You will be assisting users with all of your available tools. You can help users by using the following tools: {', '.join([f"\n{tool.name}: {tool.description}" for tool in available_tools])}."
+    f"You are a helpful AI assistant. You will be assisting users with all of your available tools. You can help users by using the following tools: {', '.join([f'\n{tool.name}: {tool.description}' for tool in available_tools])}."
 )
 
 model = ChatGoogleGenerativeAI(model="gemini-2.0-flash")

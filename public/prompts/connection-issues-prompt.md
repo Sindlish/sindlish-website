@@ -124,13 +124,19 @@ async function queryWithRetry(fn) {
 
 ```python
 from psycopg.errors import OperationalError
-from tenacity import retry, stop_after_attempt, wait_random_exponential, retry_if_exception
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+    retry_if_exception,
+)
 # other imports...
+
 
 @retry(
     retry=retry_if_exception_type(OperationalError),
     stop=stop_after_attempt(5),
-    wait=wait_random_exponential(multiplier=1, max=16)
+    wait=wait_random_exponential(multiplier=1, max=16),
 )
 def run_resilient_query(cursor, query, params):
     cursor.execute(query, params)

@@ -66,7 +66,7 @@ db_params = {
     "user": "neondb_owner",
     "password": "...",
     "host": "ep-...us-east-2.aws.neon.tech",
-    "port": 5432
+    "port": 5432,
 }
 
 tableName = "my_table"
@@ -81,10 +81,15 @@ try:
     cur = conn.cursor()
 
     for chunk in chunk_files:
-        with open(chunk, 'r') as f:
+        with open(chunk, "r") as f:
             print(f"Processing {chunk}...")
             try:
-                cur.copy_expert(sql.SQL("COPY {} FROM STDIN WITH CSV").format(sql.Identifier(tableName)), f)
+                cur.copy_expert(
+                    sql.SQL("COPY {} FROM STDIN WITH CSV").format(
+                        sql.Identifier(tableName)
+                    ),
+                    f,
+                )
                 # Commit after successfully processing the chunk
                 conn.commit()
                 print(f"Successfully loaded {chunk}")

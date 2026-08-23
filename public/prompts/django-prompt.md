@@ -76,19 +76,19 @@ Modify the project's main `settings.py` file to use these environment variables 
 
     ```python
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'HOST': os.getenv('PGHOST'),
-            'NAME': os.getenv('PGDATABASE'),
-            'USER': os.getenv('PGUSER'),
-            'PASSWORD': os.getenv('PGPASSWORD'),
-            'PORT': os.getenv('PGPORT', 5432),
-            'OPTIONS': {
-                'sslmode': 'require',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": os.getenv("PGHOST"),
+            "NAME": os.getenv("PGDATABASE"),
+            "USER": os.getenv("PGUSER"),
+            "PASSWORD": os.getenv("PGPASSWORD"),
+            "PORT": os.getenv("PGPORT", 5432),
+            "OPTIONS": {
+                "sslmode": "require",
             },
-            'DISABLE_SERVER_SIDE_CURSORS': True,
+            "DISABLE_SERVER_SIDE_CURSORS": True,
             # Enable health checks to prevent errors from idle connections
-            'CONN_HEALTH_CHECKS': True,
+            "CONN_HEALTH_CHECKS": True,
         }
     }
     ```
@@ -105,15 +105,14 @@ To provide a clear way to verify the setup, create a simple view, template, and 
     from django.shortcuts import render
     from django.db import connection
 
+
     def index(request):
         with connection.cursor() as cursor:
             cursor.execute("SELECT version();")
             db_version = cursor.fetchone()[0]
-        
-        context = {
-            'db_version': db_version
-        }
-        return render(request, 'index.html', context)
+
+        context = {"db_version": db_version}
+        return render(request, "index.html", context)
     ```
 
 2.  **Create a template:**
@@ -146,10 +145,10 @@ To provide a clear way to verify the setup, create a simple view, template, and 
       ```python
       TEMPLATES = [
           {
-              'BACKEND': 'django.template.backends.django.DjangoTemplates',
-              'DIRS': [os.path.join(BASE_DIR, 'templates')], # Add this line
-              'APP_DIRS': True,
-              'OPTIONS': {
+              "BACKEND": "django.template.backends.django.DjangoTemplates",
+              "DIRS": [os.path.join(BASE_DIR, "templates")],  # Add this line
+              "APP_DIRS": True,
+              "OPTIONS": {
                   # ...
               },
           },
@@ -159,11 +158,11 @@ To provide a clear way to verify the setup, create a simple view, template, and 
       ```python title="<project_name>/urls.py"
       from django.contrib import admin
       from django.urls import path
-      from . import views # Import the new views
+      from . import views  # Import the new views
 
       urlpatterns = [
-          path('admin/', admin.site.urls),
-          path('', views.index, name='index'), # Add this route for the homepage
+          path("admin/", admin.site.urls),
+          path("", views.index, name="index"),  # Add this route for the homepage
       ]
       ```
 

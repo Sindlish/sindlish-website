@@ -75,7 +75,7 @@ try:
     cur.close()
 except psycopg2.DatabaseError as error:
     if conn:
-       conn.rollback()
+        conn.rollback()
     print(error)
 finally:
     if conn:
@@ -151,7 +151,7 @@ def add_part(part_name, vendor_list):
                 if row:
                     part_id = row[0]
                 else:
-                    raise Exception('Could not get the part id')
+                    raise Exception("Could not get the part id")
 
                 # assign parts provided by vendors
                 for vendor_id in vendor_list:
@@ -165,13 +165,14 @@ def add_part(part_name, vendor_list):
 
         print(error)
 
-if __name__ == '__main__':
-    add_part('SIM Tray', (1, 2))
-    add_part('Speaker', (3, 4))
-    add_part('Vibrator', (5, 6))
-    add_part('Antenna', (6, 7))
-    add_part('Home Button', (1, 5))
-    add_part('LTE Modem', (1, 5))
+
+if __name__ == "__main__":
+    add_part("SIM Tray", (1, 2))
+    add_part("Speaker", (3, 4))
+    add_part("Vibrator", (5, 6))
+    add_part("Antenna", (6, 7))
+    add_part("Home Button", (1, 5))
+    add_part("LTE Modem", (1, 5))
 ```
 
 ### 2\) Execute the transaction.py module
@@ -245,9 +246,9 @@ Let’s insert another part, but this time, we intentionally use an invalid vend
 The program should not add a new part without assigning it to a vendor.
 
 ```python
-if __name__ == '__main__':
+if __name__ == "__main__":
     # no rows inserted into the parts and vendor_parts tables
-    add_part('Power Amplifier', (99,))
+    add_part("Power Amplifier", (99,))
 ```
 
 An exception occurred.

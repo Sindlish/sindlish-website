@@ -6,8 +6,6 @@ within the VM, holding its own instruction stream, local variable slots,
 and instruction pointer.
 """
 
-from ..runtime.env import Environment
-
 
 class BytecodeFrame:
     """
@@ -20,11 +18,26 @@ class BytecodeFrame:
     - ip: instruction pointer
     """
 
-    __slots__ = ('name', 'instructions', 'constants', 'line_col_map',
-                 'slots', 'slot_metadata', 'ip', 'call_metadata')
+    __slots__ = (
+        "call_metadata",
+        "constants",
+        "instructions",
+        "ip",
+        "line_col_map",
+        "name",
+        "slot_metadata",
+        "slots",
+    )
 
-    def __init__(self, name: str, instructions: list, constants: list,
-                 line_col_map: dict, slot_count: int, slot_metadata: dict):
+    def __init__(
+        self,
+        name: str,
+        instructions: list,
+        constants: list,
+        line_col_map: dict,
+        slot_count: int,
+        slot_metadata: dict,
+    ):
         self.name = name
         self.instructions = instructions
         self.constants = constants

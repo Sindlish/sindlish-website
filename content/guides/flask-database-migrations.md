@@ -92,16 +92,17 @@ load_dotenv()
 app = Flask(__name__)
 
 # Configure the database URI using the environment variable
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 
 # Disable SQLAlchemy modification tracking for better performance
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize SQLAlchemy with the Flask app
 db = SQLAlchemy(app)
 
 # Initialize Flask-Migrate with the Flask app and SQLAlchemy instance
 migrate = Migrate(app, db)
+
 
 # Define the User model
 class User(db.Model):
@@ -116,10 +117,11 @@ class User(db.Model):
 
     # String representation of the User object
     def __repr__(self):
-        return f'<User {self.name}>'
+        return f"<User {self.name}>"
+
 
 # Run the Flask application in debug mode if this file is executed directly
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
 ```
 
@@ -205,7 +207,7 @@ class User(db.Model):
     age = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'<User {self.name}>'
+        return f"<User {self.name}>"
 ```
 
 With the new `age` field added to the `User` model, we need to create a new migration to apply this change.
@@ -254,11 +256,13 @@ Open the generated migration file and modify it:
 from alembic import op
 import sqlalchemy as sa
 
+
 def upgrade():
-    op.alter_column('user', 'age', new_column_name='years_old')
+    op.alter_column("user", "age", new_column_name="years_old")
+
 
 def downgrade():
-    op.alter_column('user', 'years_old', new_column_name='age')
+    op.alter_column("user", "years_old", new_column_name="age")
 ```
 
 3. Apply the migration:
@@ -286,7 +290,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
 
     def __repr__(self):
-        return f'<User {self.name}>'
+        return f"<User {self.name}>"
 ```
 
 Create a new migration with a descriptive migration message:
@@ -299,9 +303,9 @@ Review the generated migration script, it should contain an `op.create_index` op
 
 ```python {4}
 def upgrade():
-    with op.batch_alter_table('user', schema=None) as batch_op:
-        batch_op.drop_constraint('user_email_key', type_='unique')
-        batch_op.create_index(batch_op.f('ix_user_email'), ['email'], unique=True)
+    with op.batch_alter_table("user", schema=None) as batch_op:
+        batch_op.drop_constraint("user_email_key", type_="unique")
+        batch_op.create_index(batch_op.f("ix_user_email"), ["email"], unique=True)
 ```
 
 Finally, apply the newly created migration:

@@ -100,6 +100,7 @@ As we briefly mentioned earlier, you can use SQLAlchemy for database operations 
 
    db = SQLAlchemy()
 
+
    class Question(db.Model):
        id = db.Column(db.Integer, primary_key=True)
        title = db.Column(db.String(100), nullable=False)
@@ -124,14 +125,16 @@ In your main Flask application file, add a route to handle fetching questions fr
 from flask import jsonify
 from models import Question
 
-@app.route('/questions')
+
+@app.route("/questions")
 def get_questions():
     questions = Question.query.all()
-    return jsonify([{
-        'id': q.id,
-        'title': q.title,
-        'description': q.description
-    } for q in questions])
+    return jsonify(
+        [
+            {"id": q.id, "title": q.title, "description": q.description}
+            for q in questions
+        ]
+    )
 ```
 
 This route fetches all questions from the database and returns them as JSON. You can expand this route to include additional functionality as needed.
@@ -157,9 +160,10 @@ import pytest
 from app import app, db
 from models import Question
 
+
 @pytest.fixture
 def client():
-    app.config['TESTING'] = True
+    app.config["TESTING"] = True
     with app.test_client() as client:
         with app.app_context():
             db.create_all()
@@ -167,17 +171,18 @@ def client():
             db.session.remove()
             db.drop_all()
 
+
 def test_get_questions(client):
     # Add a test question
-    question = Question(title='Test Question', description='This is a test')
+    question = Question(title="Test Question", description="This is a test")
     db.session.add(question)
     db.session.commit()
 
-    response = client.get('/questions')
+    response = client.get("/questions")
     assert response.status_code == 200
     data = response.get_json()
     assert len(data) == 1
-    assert data[0]['title'] == 'Test Question'
+    assert data[0]["title"] == "Test Question"
 ```
 
 Here we define a test fixture to set up and tear down the test environment. The `test_get_questions` function tests the `/questions` route by adding a test question to the database, making a request to the route, and asserting the response. This simple test verifies that the route returns the expected data.
@@ -234,10 +239,10 @@ Go back to your Flask project and integrate the Neon branch into your testing se
      from dotenv import load_dotenv
 
      # Load test environment variables
-     load_dotenv('.env.test')
+     load_dotenv(".env.test")
 
      # Use the DATABASE_URL from the test environment
-     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
      ```
 
 3. **Run Tests:**

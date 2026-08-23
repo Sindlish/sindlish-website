@@ -120,6 +120,7 @@ dotenv.load_dotenv()
 
 conn_pool: Optional[asyncpg.Pool] = None
 
+
 async def init_postgres() -> None:
     """
     Initialize the PostgreSQL connection pool and create the products table if it doesn't exist.
@@ -189,7 +190,6 @@ async def get_postgres() -> asyncpg.Pool:
         raise
 
 
-
 async def close_postgres() -> None:
     """
     Close the PostgreSQL connection pool.
@@ -231,6 +231,7 @@ class Product(BaseModel):
     """
     Represents the product table in the database.
     """
+
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
@@ -243,6 +244,7 @@ class ProductCreate(BaseModel):
     """
     Represents the required fields to create a new product.
     """
+
     name: str
     price: float = Field(..., ge=0)
     quantity: int = Field(..., ge=0)
@@ -254,6 +256,7 @@ class ProductUpdate(BaseModel):
     Represents optional fields to update an existing product.
     Allows partial updates.
     """
+
     name: Optional[str] = None
     price: Optional[float] = Field(None, ge=0)
     quantity: Optional[int] = Field(None, ge=0)
@@ -264,6 +267,7 @@ class ProductStockUpdate(BaseModel):
     """
     Represents the stock update for a product's quantity.
     """
+
     quantity: int = Field(..., ge=0)
 ```
 
@@ -286,7 +290,12 @@ The common database flow goes as follows :
 
 ```python
 from fastapi import HTTPException, Query, Path, Body, APIRouter, Depends
-from models.product_models import Product, ProductCreate, ProductUpdate, ProductStockUpdate
+from models.product_models import (
+    Product,
+    ProductCreate,
+    ProductUpdate,
+    ProductStockUpdate,
+)
 from database.postgres import get_postgres
 from typing import List
 import asyncpg
@@ -464,8 +473,7 @@ async def update_product(
 
 @product_router.delete("/products/{id}")
 async def delete_product(
-    id: int = Path(..., ge=1),
-    db_pool: asyncpg.Pool = Depends(get_postgres)
+    id: int = Path(..., ge=1), db_pool: asyncpg.Pool = Depends(get_postgres)
 ) -> dict:
     """
     Delete a product by its ID.
@@ -618,12 +626,13 @@ async def lifespan(app: FastAPI):
     await close_postgres()
 
 
-app: FastAPI = FastAPI(lifespan=lifespan, title="Async FastAPI PostgreSQL Inventory Manager")
+app: FastAPI = FastAPI(
+    lifespan=lifespan, title="Async FastAPI PostgreSQL Inventory Manager"
+)
 app.include_router(product_router)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
-
 ```
 
 To run the application, use the following command:

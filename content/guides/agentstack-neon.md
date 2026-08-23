@@ -309,7 +309,6 @@ class WebscraperCrew:
             process=Process.sequential,
             verbose=True,
         )
-
 ```
 
 ### Configure API keys in `.env`

@@ -7,10 +7,10 @@ dedicated methods for multi-character / complex tokens.
 """
 
 import codecs
-from .tokens import Token, TokenType
-from .keywords import KEYWORDS
-from ..errors import LikhaiJeGhalti
 
+from ..errors import LikhaiJeGhalti
+from .keywords import KEYWORDS
+from .tokens import Token, TokenType
 
 # ── Single-character token dispatch table ───────────────────────
 _SINGLE_CHAR_TOKENS: dict[str, TokenType] = {
@@ -42,7 +42,7 @@ class Lexer:
     Tracks line and column for accurate error reporting.
     """
 
-    __slots__ = ('code', 'pos', 'line', 'column')
+    __slots__ = ("code", "column", "line", "pos")
 
     def __init__(self, code: str):
         self.code = code
@@ -102,11 +102,9 @@ class Lexer:
         start_line = self.line
 
         # Check for triple-quote
-        is_multiline = False
         if self._peek() == quote and self._peek_ahead() == quote:
             self._advance()
             self._advance()
-            is_multiline = True
 
         string_content = ""
 
@@ -295,7 +293,9 @@ class Lexer:
                 continue
 
             # ── Unknown character ──
-            raise LikhaiJeGhalti(f"Illegal akhar {char}.", self.line, self.column, self.code)
+            raise LikhaiJeGhalti(
+                f"Illegal akhar {char}.", self.line, self.column, self.code
+            )
 
         tokens.append(Token(TokenType.EOF, None, self.line, self.column))
         return tokens

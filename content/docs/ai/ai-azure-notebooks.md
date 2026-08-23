@@ -46,6 +46,7 @@ To view the location and version of the active Python kernel, you can create a c
 ```python
 import os
 import sys
+
 print(sys.version_info)
 print(os.path.dirname(sys.executable))
 ```
@@ -120,17 +121,17 @@ Install the `psycopg` adapter by adding and executing the following code cell:
 1. Add a code block to create a table and insert data:
 
    ```python shouldWrap
-   create_table_sql = '''
+   create_table_sql = """
    CREATE TABLE items (
    id BIGSERIAL PRIMARY KEY,
    embedding VECTOR(3)
    );
-   '''
+   """
 
    # Insert data
-   insert_data_sql = '''
+   insert_data_sql = """
    INSERT INTO items (embedding) VALUES ('[1,2,3]'), ('[4,5,6]'), ('[7,8,9]');
-   '''
+   """
 
    # Execute the SQL statements
    cursor.execute(create_table_sql)

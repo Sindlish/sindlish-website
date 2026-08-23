@@ -80,16 +80,15 @@ try:
     # Connect to the database and execute a query
     with engine.connect() as connection:
         print("Connection to Neon successful!")
-        
+
         # Execute a simple query to get the database version
         result = connection.execute(text("SELECT version();"))
         db_version = result.scalar_one()
-        
+
         print(f"PostgreSQL Version: {db_version}")
 
 except Exception as e:
     print(f"An error occurred: {e}")
-
 ```
 
 ---

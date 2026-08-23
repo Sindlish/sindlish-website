@@ -50,7 +50,7 @@ $ pip install neon-api
 from neon_api import NeonAPI
 
 # Initialize the client.
-neon = NeonAPI(api_key='your_api_key')
+neon = NeonAPI(api_key="your_api_key")
 ```
 
 ## Documentation

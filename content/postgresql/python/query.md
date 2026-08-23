@@ -45,7 +45,7 @@ cur = conn.cursor()
 Then, execute a `SELECT` statement by calling the `execute()` method. If you want to pass values to the `SELECT` statement, you use the placeholder  ( `%s`) in the `SELECT` statement and bind the input values when calling the `execute()` method:
 
 ```python
-cur.execute(sql, (value1,value2))
+cur.execute(sql, (value1, value2))
 ```
 
 After that, process the result set returned by the SELECT statement using the `fetchone()`,  `fetchall()`, or `fetchmany()` method.
@@ -73,13 +73,16 @@ For the demonstration purposes, we will use the `parts`, `vendors`, and `vendor_
 import psycopg2
 from config import load_config
 
+
 def get_vendors():
-    """ Retrieve data from the vendors table """
-    config  = load_config()
+    """Retrieve data from the vendors table"""
+    config = load_config()
     try:
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT vendor_id, vendor_name FROM vendors ORDER BY vendor_name")
+                cur.execute(
+                    "SELECT vendor_id, vendor_name FROM vendors ORDER BY vendor_name"
+                )
                 print("The number of parts: ", cur.rowcount)
                 row = cur.fetchone()
 
@@ -90,7 +93,8 @@ def get_vendors():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     get_vendors()
 ```
 
@@ -116,13 +120,16 @@ The following `get_parts()` function uses the `fetchall()` method of the cursor 
 import psycopg2
 from config import load_config
 
+
 def get_vendors():
-    """ Retrieve data from the vendors table """
-    config  = load_config()
+    """Retrieve data from the vendors table"""
+    config = load_config()
     try:
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT vendor_id, vendor_name FROM vendors ORDER BY vendor_name")
+                cur.execute(
+                    "SELECT vendor_id, vendor_name FROM vendors ORDER BY vendor_name"
+                )
                 rows = cur.fetchall()
 
                 print("The number of parts: ", cur.rowcount)
@@ -132,7 +139,8 @@ def get_vendors():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     get_vendors()
 ```
 
@@ -156,6 +164,7 @@ The following `get_suppliers()` function selects parts and vendor data using the
 import psycopg2
 from config import load_config
 
+
 def iter_row(cursor, size=10):
     while True:
         rows = cursor.fetchmany(size)
@@ -164,9 +173,10 @@ def iter_row(cursor, size=10):
         for row in rows:
             yield row
 
+
 def get_part_vendors():
-    """ Retrieve data from the vendors table """
-    config  = load_config()
+    """Retrieve data from the vendors table"""
+    config = load_config()
     try:
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
@@ -182,7 +192,8 @@ def get_part_vendors():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     get_part_vendors()
 ```
 

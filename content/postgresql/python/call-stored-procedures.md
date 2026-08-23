@@ -56,7 +56,7 @@ cur.execute("CALL sp_name);")
 After that, call the `commit()` method to commit the transaction:
 
 ```python
-conn.commit();
+conn.commit()
 ```
 
 Finally, call the `close()` method of the `cursor` and `connection` objects to close the connection to the PostgreSQL database server.
@@ -125,7 +125,7 @@ from config import load_config
 
 
 def add_part(part_name, vendor_name):
-    """ Add a new part """
+    """Add a new part"""
     # read database configuration
     params = load_config()
 
@@ -134,7 +134,7 @@ def add_part(part_name, vendor_name):
         with psycopg2.connect(**params) as conn:
             with conn.cursor() as cur:
                 # call a stored procedure
-                cur.execute('CALL add_new_part(%s,%s)', (part_name, vendor_name))
+                cur.execute("CALL add_new_part(%s,%s)", (part_name, vendor_name))
 
             # commit the transaction
             conn.commit()
@@ -142,8 +142,8 @@ def add_part(part_name, vendor_name):
         print(error)
 
 
-if __name__ == '__main__':
-    add_part('OLED', 'LG')
+if __name__ == "__main__":
+    add_part("OLED", "LG")
 ```
 
 ### 3\) Execute the Python module

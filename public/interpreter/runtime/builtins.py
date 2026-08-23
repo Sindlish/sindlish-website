@@ -4,15 +4,17 @@ Built-in functions for the Sindlish language.
 Standalone functions available in the global scope: lambi, likh, majmuo.
 """
 
-from ..objects import SdNumber, SdNull, SdBool, SdDict, SdList, SdSet, SdString
-from ..errors import QisamJeGhalti, HalndeVaktGhalti
+from ..errors import HalndeVaktGhalti, QisamJeGhalti
+from ..objects import SdList, SdNull, SdNumber, SdSet, SdString
 
 
 def _register(registry_dict):
     """Decorator to auto-register functions into a dictionary."""
+
     def decorator(func):
         registry_dict[func.__name__] = func
         return func
+
     return decorator
 
 
@@ -36,9 +38,9 @@ class SimpleBuiltins:
         if len(args) != 1:
             raise HalndeVaktGhalti("lambi() khe sirf 1 argument khapay.")
         obj = args[0]
-        if hasattr(obj, 'elements'):
+        if hasattr(obj, "elements"):
             return SdNumber(len(obj.elements))
-        if hasattr(obj, 'value') and isinstance(obj.value, (str, dict)):
+        if hasattr(obj, "value") and isinstance(obj.value, (str, dict)):
             return SdNumber(len(obj.value))
         raise QisamJeGhalti(f"'{obj.type.name}' ji lambai nathi mapay saghjay.")
 
@@ -47,7 +49,7 @@ class SimpleBuiltins:
         """Print values to stdout."""
         print(*(str(arg) for arg in args))
         return SdNull()
-    
+
     @_register(functions)
     def puch(self, args):
         """Takes input from user."""
@@ -62,12 +64,15 @@ class SimpleBuiltins:
         elif len(args) == 2:
             start, end, step = int(args[0].value), int(args[1].value), 1
         elif len(args) == 3:
-            start, end, step = int(args[0].value), int(args[1].value), int(args[2].value)
+            start, end, step = (
+                int(args[0].value),
+                int(args[1].value),
+                int(args[2].value),
+            )
         else:
             raise HalndeVaktGhalti("range() khe 1, 2, ya 3 arguments khapan.")
-        
-        return SdList([SdNumber(i) for i in range(start, end, step)])
 
+        return SdList([SdNumber(i) for i in range(start, end, step)])
 
     def get_all(self):
         """Return all registered built-in functions."""
