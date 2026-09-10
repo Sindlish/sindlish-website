@@ -28,7 +28,7 @@ kaam is_prime(n) {
     agar n <= 1 { wapas koorh }
     
     # har loop for iteration
-    har i mein range(2, n) {
+    har i mein silsilo(2, n) {
         agar i * i > n { tor } # Exit early using 'tor'
         
         agar n % i == 0 {

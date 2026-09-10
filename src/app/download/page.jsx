@@ -55,11 +55,11 @@ const DownloadPage = () => (
               Download
             </span>
             <h1 className="mt-3 text-[52px] leading-tight font-bold tracking-tighter xl:text-4xl lg:text-[32px] sm:text-[28px]">
-              Get Sindlish <span className="text-gray-new-40">v0.1.0</span>
+              Get Sindlish <span className="text-gray-new-40">v0.1.1</span>
             </h1>
             <p className="mt-4 max-w-xl text-xl leading-snug tracking-extra-tight text-gray-new-60 lg:text-lg">
-              The first alpha release of the Sindlish interpreter. Download the binary for your
-              platform and start coding in your mother tongue.
+              The latest release of the Sindlish interpreter. Download the binary for your platform
+              and start coding in your mother tongue.
             </p>
           </m.div>
           {/* Alpha Notice */}
@@ -71,10 +71,10 @@ const DownloadPage = () => (
           >
             <div className="flex items-center gap-3">
               <div className="size-2 animate-pulse rounded-none bg-[#E02424]" />
-              <span className="font-bold text-[#E02424]">Alpha Release Notice</span>
+              <span className="font-bold text-[#E02424]">Release Notice</span>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-gray-new-60">
-              This is our first alpha release. <strong>Important:</strong> These binaries are
+              This is the current v0.1.1 release. <strong>Important:</strong> These binaries are
               currently unverified by platform vendors (Windows, Apple, etc.), so your system may
               flag them as risky. Rest assured,{' '}
               <strong>all Sindlish source code is completely open-source</strong> and available for
@@ -118,7 +118,7 @@ const DownloadPage = () => (
                   </ol>
                   <Button
                     className="mt-6 w-full justify-center"
-                    to={`https://github.com/AmanatAliPanhwer/Sindlish/releases/latest/download//${file}`}
+                    to={`https://github.com/Sindlish/Sindlish/releases/latest/download//${file}`}
                     target="_blank"
                     theme="white-filled"
                     size="new"
@@ -147,7 +147,7 @@ const DownloadPage = () => (
                 Documentation
               </Button>
               <Button
-                to="https://github.com/AmanatAliPanhwer/Sindlish/releases"
+                to="https://github.com/Sindlish/Sindlish/releases"
                 target="_blank"
                 theme="outlined"
                 size="xxs"

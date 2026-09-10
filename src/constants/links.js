@@ -15,7 +15,7 @@ export default {
   controlFlow: '/docs/language-reference/control-flow',
 
   // Socials
-  github: 'https://github.com/AmanatAliPanhwer/Sindlish',
+  github: 'https://github.com/Sindlish/Sindlish',
 
   // Downloads & External
   download: '/download',

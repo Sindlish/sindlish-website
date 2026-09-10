@@ -33,8 +33,8 @@
     "check:docs:neonctl": "vitest run scripts/docs-checks/neonctl/__tests__/neonctl-docs.test.js"
   },
   "dependencies": {
-    "@emotion/memoize": "0.7.4",
     "@codemirror/lang-sql": "^6.9.1",
+    "@emotion/memoize": "0.7.4",
     "@headlessui/react": "^2.2.9",
     "@headlessui/tailwindcss": "^0.2.2",
     "@hookform/resolvers": "^3.3.4",
@@ -82,7 +82,7 @@
     "lodash.isempty": "^4.4.0",
     "lodash.shuffle": "^4.2.0",
     "lottie-web": "^5.12.2",
-    "markdownlint-cli": "^0.48.0",
+    "markdownlint-cli": "^0.49.1",
     "mdast-util-gfm": "^3.1.0",
     "mdast-util-mdx": "^3.0.0",
     "mdast-util-to-markdown": "^2.1.2",
@@ -128,7 +128,7 @@
     "@shikijs/transformers": "^1.3.0",
     "@svgr/webpack": "^8.1.0",
     "@vitest/ui": "^4.0.2",
-    "cypress": "^13.8.0",
+    "cypress": "^16.0.0",
     "encoding": "^0.1.13",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^10.0.0",

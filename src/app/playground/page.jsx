@@ -1,10 +1,11 @@
 'use client';
-import { m, LazyMotion, domAnimation } from 'framer-motion';
-import { useState, useEffect, useMemo } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { githubDark } from '@uiw/codemirror-theme-github';
 import { autocompletion, completeFromList } from '@codemirror/autocomplete';
 import { StreamLanguage } from '@codemirror/language';
+import { githubDark } from '@uiw/codemirror-theme-github';
+import CodeMirror from '@uiw/react-codemirror';
+import { m, LazyMotion, domAnimation } from 'framer-motion';
+import { useState, useEffect, useMemo } from 'react';
+
 import Container from 'components/shared/container';
 import Layout from 'components/shared/layout';
 import { runSindlish, initSindlish } from 'lib/sindlish-interpreter';
@@ -19,7 +20,7 @@ adad version = 1
 # Multi-line string
 lafz intro = """Sindlish is a powerful language.
 It is designed for the Sindhi community.
-V0.1.0 Alpha is here!"""
+V0.1.1 is here!"""
 Salam(name)
 agar version == 1 {
   likh(intro)
@@ -101,26 +102,32 @@ const sindlishHighlight = StreamLanguage.define({
       return 'string';
     }
     if (stream.match(/^-?\d+(\.\d+)?/)) return 'number';
-    if (stream.match(/^\b(agar|yawari|warna|jistain|har|mein|tor|jari|kaam|wapas|pakko|adad|lafz|dahai|faislo|khali|fehrist|lughat|majmuo|sach|koorh|likh|puch|lambi|aen|ya|nah)\b/)) {
+    if (
+      stream.match(
+        /^\b(agar|yawari|warna|jistain|har|mein|tor|jari|kaam|wapas|pakko|adad|lafz|dahai|faislo|khali|fehrist|lughat|majmuo|sach|koorh|likh|puch|lambi|aen|ya|nah)\b/
+      )
+    ) {
       return 'keyword';
     }
     if (stream.match(/^[a-zA-Z_][a-zA-Z0-9_]*/)) return 'variableName';
     stream.next();
     return null;
-  }
+  },
 });
 const PlaygroundPage = () => {
   const [code, setCode] = useState('');
   const [result, setResult] = useState('');
-  const [status, setStatus] = useState('idle'); 
+  const [status, setStatus] = useState('idle');
   const [loadProgress, setLoadProgress] = useState('');
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const codeParam = params.get('code');
     setCode(codeParam ? decodeURIComponent(codeParam) : DEFAULT_CODE);
-    
+
     // Pre-initialize interpreter
-    initSindlish((p) => setLoadProgress(p)).then(() => setStatus('ready')).catch(() => setStatus('idle'));
+    initSindlish((p) => setLoadProgress(p))
+      .then(() => setStatus('ready'))
+      .catch(() => setStatus('idle'));
   }, []);
   const handleRun = async () => {
     setStatus('running');
@@ -136,20 +143,20 @@ const PlaygroundPage = () => {
       setLoadProgress('');
     }
   };
-  const extensions = useMemo(() => [
-    sindlishHighlight,
-    autocompletion({
-      override: [completeFromList(SINDLISH_KEYWORDS)]
-    })
-  ], []);
+  const extensions = useMemo(
+    () => [
+      sindlishHighlight,
+      autocompletion({
+        override: [completeFromList(SINDLISH_KEYWORDS)],
+      }),
+    ],
+    []
+  );
   return (
     <Layout isHeaderSticky isHeaderStickyOverlay theme="black">
       <LazyMotion features={domAnimation}>
-        <section className="safe-paddings relative bg-black-pure text-white min-h-screen">
-          <Container
-            className="relative z-10 pt-40 pb-16 xl:pt-32 lg:pt-28 md:pt-24"
-            size="1600"
-          >
+        <section className="relative min-h-screen bg-black-pure safe-paddings text-white">
+          <Container className="relative z-10 pt-40 pb-16 xl:pt-32 lg:pt-28 md:pt-24" size="1600">
             <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -157,16 +164,16 @@ const PlaygroundPage = () => {
             >
               <div className="flex items-end justify-between md:flex-col md:items-start md:gap-4">
                 <div>
-                  <span className="text-sm font-medium uppercase tracking-wider text-[#E02424]">
+                  <span className="text-sm font-medium tracking-wider text-[#E02424] uppercase">
                     Playground
                   </span>
-                  <h1 className="mt-3 text-[52px] font-bold leading-tight tracking-tighter xl:text-4xl lg:text-[32px] sm:text-[28px]">
+                  <h1 className="mt-3 text-[52px] leading-tight font-bold tracking-tighter xl:text-4xl lg:text-[32px] sm:text-[28px]">
                     Try Sindlish
                   </h1>
                 </div>
                 <button
                   id="run-button"
-                  className="flex items-center gap-2 rounded-none border border-gray-new-20 bg-[#E02424] px-6 py-3 text-sm font-bold uppercase tracking-widest text-white transition-all hover:bg-[#c01e1e] active:scale-95 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-none border border-gray-new-20 bg-[#E02424] px-6 py-3 text-sm font-bold tracking-widest text-white uppercase transition-all hover:bg-[#c01e1e] active:scale-95 disabled:opacity-50"
                   onClick={handleRun}
                   disabled={status === 'running' || status === 'loading'}
                 >
@@ -177,7 +184,18 @@ const PlaygroundPage = () => {
                     </>
                   ) : (
                     <>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        stroke="currentColor"
+                        strokeWidth="1"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
                       Run
                     </>
                   )}
@@ -191,7 +209,7 @@ const PlaygroundPage = () => {
                 animate={{ opacity: 1 }}
               >
                 <span className="size-2 animate-pulse rounded-none bg-[#E02424]" />
-                <span className="text-sm font-mono text-gray-new-50">{loadProgress}</span>
+                <span className="font-mono text-sm text-gray-new-50">{loadProgress}</span>
               </m.div>
             )}
             <m.div
@@ -209,11 +227,11 @@ const PlaygroundPage = () => {
                       <span className="size-3 rounded-none bg-[#984A45]/60" />
                       <span className="size-3 rounded-none bg-[#1B3A5C]/60" />
                     </div>
-                    <span className="text-xs font-mono uppercase tracking-widest text-gray-new-50">
+                    <span className="font-mono text-xs tracking-widest text-gray-new-50 uppercase">
                       playground.sd
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-new-40">
+                  <span className="text-[10px] font-bold tracking-widest text-gray-new-40 uppercase">
                     Editor
                   </span>
                 </div>
@@ -223,7 +241,7 @@ const PlaygroundPage = () => {
                     theme={githubDark}
                     extensions={extensions}
                     onChange={(val) => setCode(val)}
-                    className="h-full w-full outline-none [&>.cm-editor]:h-full [&>.cm-editor]:bg-transparent [&_.cm-scroller]:font-mono [&_.cm-scroller]:text-sm [&_.cm-gutters]:bg-transparent [&_.cm-gutters]:border-r [&_.cm-gutters]:border-gray-new-20 [&_.cm-gutters]:text-gray-new-30 [&_.cm-activeLine]:bg-[#E02424]/5"
+                    className="h-full w-full outline-none [&_.cm-activeLine]:bg-[#E02424]/5 [&_.cm-gutters]:border-r [&_.cm-gutters]:border-gray-new-20 [&_.cm-gutters]:bg-transparent [&_.cm-gutters]:text-gray-new-30 [&_.cm-scroller]:font-mono [&_.cm-scroller]:text-sm [&>.cm-editor]:h-full [&>.cm-editor]:bg-transparent"
                     basicSetup={{
                       lineNumbers: true,
                       highlightActiveLine: true,
@@ -233,26 +251,34 @@ const PlaygroundPage = () => {
                 </div>
               </div>
               {/* Output */}
-              <div className="flex flex-col rounded-none border border-l-0 border-gray-new-20 bg-[#060607] lg:min-h-[300px] lg:border-l lg:border-t-0">
+              <div className="flex flex-col rounded-none border border-l-0 border-gray-new-20 bg-[#060607] lg:min-h-[300px] lg:border-t-0 lg:border-l">
                 <div className="flex shrink-0 items-center justify-between border-b border-gray-new-20 px-5 py-3">
                   <div className="flex items-center gap-3">
-                    <div className={`size-2 rounded-none ${status === 'ready' ? 'bg-green-500' : 'bg-gray-new-30'} ${status === 'running' ? 'animate-pulse bg-[#E02424]' : ''}`} />
-                    <span className="text-xs font-mono uppercase tracking-widest text-gray-new-50">
+                    <div
+                      className={`size-2 rounded-none ${status === 'ready' ? 'bg-green-500' : 'bg-gray-new-30'} ${status === 'running' ? 'animate-pulse bg-[#E02424]' : ''}`}
+                    />
+                    <span className="font-mono text-xs tracking-widest text-gray-new-50 uppercase">
                       Output
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-new-40">
-                    {status === 'idle' ? 'Waiting' : status === 'loading' ? 'Loading' : status === 'running' ? 'Executing' : 'Console'}
+                  <span className="text-[10px] font-bold tracking-widest text-gray-new-40 uppercase">
+                    {status === 'idle'
+                      ? 'Waiting'
+                      : status === 'loading'
+                        ? 'Loading'
+                        : status === 'running'
+                          ? 'Executing'
+                          : 'Console'}
                   </span>
                 </div>
                 <div className="flex-1 overflow-auto p-6">
                   {result ? (
-                    <pre 
-                      className="font-mono text-sm leading-relaxed text-green-400 whitespace-pre-wrap"
+                    <pre
+                      className="text-green-400 font-mono text-sm leading-relaxed whitespace-pre-wrap"
                       dangerouslySetInnerHTML={{ __html: result }}
                     />
                   ) : (
-                    <p className="font-mono text-sm italic text-gray-new-30">
+                    <p className="font-mono text-sm text-gray-new-30 italic">
                       {status === 'idle'
                         ? 'Click Run to execute your code...'
                         : status === 'loading'
@@ -270,11 +296,12 @@ const PlaygroundPage = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#E02424]">
+              <span className="text-[10px] font-bold tracking-widest text-[#E02424] uppercase">
                 Language Info
               </span>
               <span className="text-sm text-gray-new-50">
-                Sindlish uses <code className="text-[#E02424]">#</code> for single-line comments and <code className="text-[#E02424]">/* */</code> for multi-line. Try it out!
+                Sindlish uses <code className="text-[#E02424]">#</code> for single-line comments and{' '}
+                <code className="text-[#E02424]">{'/* */'}</code> for multi-line. Try it out!
               </span>
             </m.div>
           </Container>
