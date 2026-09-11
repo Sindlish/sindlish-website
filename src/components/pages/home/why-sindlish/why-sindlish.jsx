@@ -11,6 +11,7 @@ import clockIcon from 'icons/home/features/clock.svg';
 import connectionsIcon from 'icons/home/features/connections.svg';
 import { runSindlish } from 'lib/sindlish-interpreter';
 import { cn } from 'utils/cn';
+import githubStars from 'utils/data/github-stars.generated.json';
 const Keyword = ({ children }) => <span className="font-bold text-[#E02424]">{children}</span>;
 const String = ({ children }) => <span className="text-[#FFED9C]">{children}</span>;
 const Punctuation = ({ children }) => <span className="text-white">{children}</span>;
@@ -183,7 +184,7 @@ const REASONS = [
           <div className="flex items-center gap-3">
             <GitHubIcon className="size-5 text-white" />
             <span className="text-sm font-bold text-white">
-              AmanatAliPanhwer / <span className="text-[#E02424]">Sindlish</span>
+              Sindlish / <span className="text-[#E02424]">Sindlish</span>
             </span>
           </div>
           <div className="border border-gray-new-20 px-2 py-0.5 text-[10px] font-bold tracking-tighter text-gray-new-50 uppercase">
@@ -205,7 +206,7 @@ const REASONS = [
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-white transition-colors group-hover:text-[#E02424]">
-                1
+                {githubStars.stargazers_count}
               </span>
               <span className="text-[10px] font-bold tracking-widest text-gray-new-50 uppercase">
                 Star
