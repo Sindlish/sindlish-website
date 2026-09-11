@@ -3,6 +3,7 @@ export default {
   docsHome: '/docs/introduction',
   creator: '/creator',
   playground: '/playground',
+  changelog: '/docs/changelog',
 
   // Docs - Sindlish Language
   standardLibrary: '/docs/reference/standard-library',

@@ -52,6 +52,10 @@ export default {
           text: 'Creator',
           to: LINKS.creator,
         },
+        {
+          text: 'Changelog',
+          to: LINKS.changelog,
+        },
       ],
     },
     {
