@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('next/server', () => ({
   NextResponse: {
@@ -10,20 +10,23 @@ vi.mock('next/server', () => ({
   },
 }));
 
-global.fetch = vi.fn(() => Promise.resolve({ ok: true }));
-
 let GET, POST;
 
 describe('/api/docs-feedback', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.spyOn(global, 'fetch');
     const mod = await import('./route.js');
     GET = mod.GET;
     POST = mod.POST;
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   const makeRequest = (body, headers = {}) =>
-    new Request('https://neon.com/api/docs-feedback', {
+    new Request('https://sindlish.org/api/docs-feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers },
       body: JSON.stringify(body),
@@ -44,7 +47,7 @@ describe('/api/docs-feedback', () => {
 
   describe('POST — validation', () => {
     it('returns 400 for invalid JSON', async () => {
-      const req = new Request('https://neon.com/api/docs-feedback', {
+      const req = new Request('https://sindlish.org/api/docs-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: 'not json',
@@ -68,17 +71,13 @@ describe('/api/docs-feedback', () => {
     });
 
     it('truncates feedback exceeding max length instead of rejecting', async () => {
-      await POST(makeRequest({ feedback: 'x'.repeat(5000) }));
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
-      expect(payload.data.feedback.length).toBe(3000);
+      const res = await POST(makeRequest({ feedback: 'x'.repeat(5000) }));
+      expect(res.status).toBe(204);
     });
 
     it('truncates path exceeding max length instead of rejecting', async () => {
-      await POST(makeRequest({ feedback: 'test', path: '/docs/' + 'x'.repeat(600) }));
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
-      expect(payload.data.path.length).toBe(500);
+      const res = await POST(makeRequest({ feedback: 'test', path: '/docs/' + 'x'.repeat(600) }));
+      expect(res.status).toBe(204);
     });
 
     it('ignores unknown fields without error', async () => {
@@ -98,71 +97,22 @@ describe('/api/docs-feedback', () => {
     it('returns 204 with path', async () => {
       const res = await POST(
         makeRequest({
-          feedback: 'Connection string is wrong',
-          path: '/docs/auth/overview',
+          feedback: 'The code example is outdated',
+          path: '/docs/basics/variables',
         })
       );
       expect(res.status).toBe(204);
     });
 
-    it('fires fetch to neonapi.io with correct payload shape', async () => {
+    it('does not fire any external fetch', async () => {
       await POST(
         makeRequest({
           feedback: 'test feedback',
-          path: '/docs/auth/overview',
+          path: '/docs/basics/variables',
         })
       );
 
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      const [url, opts] = global.fetch.mock.calls[0];
-      expect(url).toBe('https://neonapi.io/t.js');
-      expect(opts.method).toBe('POST');
-
-      const payload = JSON.parse(opts.body);
-      expect(payload.name).toBe('Agent Feedback Submitted');
-      expect(payload.data.feedback).toBe('test feedback');
-      expect(payload.data.path).toBe('/docs/auth/overview');
-      expect(payload.zarazData).toBeDefined();
-      expect(payload.system.device.ip).toBe('192.168.0.1');
-    });
-
-    it('strips unknown fields from data', async () => {
-      await POST(makeRequest({ feedback: 'test', malicious: 'injected', foo: 'bar' }));
-
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
-      expect(payload.data.malicious).toBeUndefined();
-      expect(payload.data.foo).toBeUndefined();
-      expect(payload.data.feedback).toBe('test');
-    });
-
-    it('skips fetch when dry_run is set', async () => {
-      const res = await POST(makeRequest({ feedback: 'test', dry_run: true }));
-      expect(res.status).toBe(204);
       expect(global.fetch).not.toHaveBeenCalled();
-    });
-
-    it('constructs page URL from path', async () => {
-      await POST(makeRequest({ feedback: 'test', path: '/docs/auth/overview' }));
-
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
-      expect(payload.zarazData.l).toBe('https://neon.com/docs/auth/overview');
-    });
-
-    it('falls back to Referer when path is omitted', async () => {
-      const headerMap = new Map([
-        ['content-type', 'application/json'],
-        ['referer', 'https://neon.com/docs/intro'],
-        ['cookie', ''],
-        ['user-agent', ''],
-      ]);
-      const req = {
-        json: () => Promise.resolve({ feedback: 'test' }),
-        headers: { get: (name) => headerMap.get(name.toLowerCase()) || '' },
-      };
-      await POST(req);
-
-      const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
-      expect(payload.zarazData.l).toBe('https://neon.com/docs/intro');
     });
   });
 });

@@ -1,18 +1,24 @@
 'use client';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
 import Image from 'next/image';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+
 import Container from 'components/shared/container';
+import GitHubIcon from 'icons/github.inline.svg';
 import boltIcon from 'icons/home/features/bolt-lightning.svg';
 import clockIcon from 'icons/home/features/clock.svg';
 import connectionsIcon from 'icons/home/features/connections.svg';
-import GitHubIcon from 'icons/github.inline.svg';
 import { runSindlish } from 'lib/sindlish-interpreter';
 import { cn } from 'utils/cn';
-const Keyword = ({ children }) => <span className="text-[#E02424] font-bold">{children}</span>;
+const Keyword = ({ children }) => <span className="font-bold text-[#E02424]">{children}</span>;
 const String = ({ children }) => <span className="text-[#FFED9C]">{children}</span>;
 const Punctuation = ({ children }) => <span className="text-white">{children}</span>;
 const Function = ({ children }) => <span className="text-[#F7B983]">{children}</span>;
+Keyword.propTypes = { children: PropTypes.node.isRequired };
+String.propTypes = { children: PropTypes.node.isRequired };
+Punctuation.propTypes = { children: PropTypes.node.isRequired };
+Function.propTypes = { children: PropTypes.node.isRequired };
 const ReasonContent = ({ code, children }) => {
   const [result, setResult] = useState(null);
   const [status, setStatus] = useState('idle');
@@ -31,17 +37,17 @@ const ReasonContent = ({ code, children }) => {
   };
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-none border border-gray-new-20 bg-[#0A0A0B] p-6 shadow-2xl relative group/card">
+      <div className="group/card relative rounded-none border border-gray-new-20 bg-[#0A0A0B] p-6 shadow-2xl">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex gap-2">
             <div className="size-3 rounded-none bg-[#E02424]/40" />
             <div className="size-3 rounded-none bg-[#984A45]/40" />
             <div className="size-3 rounded-none bg-[#1B3A5C]/40" />
           </div>
-          <button 
+          <button
             onClick={handleRun}
             disabled={status === 'running'}
-            className="text-[10px] font-bold uppercase tracking-widest text-gray-new-40 opacity-0 group-hover/card:opacity-100 transition-opacity hover:text-[#E02424] disabled:opacity-50"
+            className="text-[10px] font-bold tracking-widest text-gray-new-40 uppercase opacity-0 transition-opacity group-hover/card:opacity-100 hover:text-[#E02424] disabled:opacity-50"
           >
             {status === 'running' ? 'Running...' : 'Run →'}
           </button>
@@ -50,22 +56,29 @@ const ReasonContent = ({ code, children }) => {
           <code>{children}</code>
         </pre>
       </div>
-      
+
       <AnimatePresence>
         {result && (
-          <m.div 
+          <m.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="rounded-none border border-green-500/20 bg-green-500/5 p-4 mt-2">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-green-500">Output</span>
-                <button onClick={() => setResult(null)} className="text-[10px] text-gray-new-40 hover:text-white uppercase font-bold">Clear</button>
+            <div className="border-green-500/20 bg-green-500/5 mt-2 rounded-none border p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-green-500 text-[10px] font-bold tracking-widest uppercase">
+                  Output
+                </span>
+                <button
+                  onClick={() => setResult(null)}
+                  className="text-[10px] font-bold text-gray-new-40 uppercase hover:text-white"
+                >
+                  Clear
+                </button>
               </div>
-              <pre 
-                className="text-xs font-mono text-green-400 whitespace-pre-wrap"
+              <pre
+                className="text-green-400 font-mono text-xs whitespace-pre-wrap"
                 dangerouslySetInnerHTML={{ __html: result }}
               />
             </div>
@@ -75,6 +88,10 @@ const ReasonContent = ({ code, children }) => {
     </div>
   );
 };
+ReasonContent.propTypes = {
+  code: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
 const REASONS = [
   {
     title: 'Code in Sindhi',
@@ -83,13 +100,25 @@ const REASONS = [
       'Sindlish uses Roman Sindhi keywords like likh (print) and agar (if). Write your logic in the language you think in, removing the cognitive overhead of translating thought to code.',
     icon: connectionsIcon,
     content: (
-      <ReasonContent code={`kaam salam() {\n  likh("Bhale Kare Aya!")\n}\n\nagar (sach) {\n  salam()\n}`}>
-        <Keyword>kaam</Keyword> <Function>salam</Function><Punctuation>()</Punctuation> &#123;{'\n'}
-        {'  '}<Keyword>likh</Keyword><Punctuation>(</Punctuation><String>&quot;Bhale Kare Aya!&quot;</String><Punctuation>)</Punctuation>{'\n'}
+      <ReasonContent
+        code={`kaam salam() {\n  likh("Bhale Kare Aya!")\n}\n\nagar (sach) {\n  salam()\n}`}
+      >
+        <Keyword>kaam</Keyword> <Function>salam</Function>
+        <Punctuation>()</Punctuation> &#123;{'\n'}
+        {'  '}
+        <Keyword>likh</Keyword>
+        <Punctuation>(</Punctuation>
+        <String>&quot;Bhale Kare Aya!&quot;</String>
+        <Punctuation>)</Punctuation>
+        {'\n'}
         &#125;{'\n'}
         {'\n'}
-        <Keyword>agar</Keyword> <Punctuation>(</Punctuation>sach<Punctuation>)</Punctuation> &#123;{'\n'}
-        {'  '}<Function>salam</Function><Punctuation>()</Punctuation>{'\n'}
+        <Keyword>agar</Keyword> <Punctuation>(</Punctuation>sach<Punctuation>)</Punctuation> &#123;
+        {'\n'}
+        {'  '}
+        <Function>salam</Function>
+        <Punctuation>()</Punctuation>
+        {'\n'}
         &#125;
       </ReasonContent>
     ),
@@ -103,24 +132,40 @@ const REASONS = [
     content: (
       <div className="flex flex-col gap-4 rounded-none border border-gray-new-20 bg-[#0A0A0B] p-8 shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-new-20 pb-4">
-          <span className="text-xs font-semibold uppercase text-gray-new-50 tracking-widest">English</span>
-          <span className="text-xs font-semibold uppercase text-[#E02424] tracking-widest">Sindlish</span>
+          <span className="text-xs font-semibold tracking-widest text-gray-new-50 uppercase">
+            English
+          </span>
+          <span className="text-xs font-semibold tracking-widest text-[#E02424] uppercase">
+            Sindlish
+          </span>
         </div>
         <div className="space-y-4">
-          <div className="flex items-center justify-between group cursor-default">
-            <span className="text-sm text-gray-new-70 italic transition-colors group-hover:text-gray-new-90">print(&quot;Hi&quot;)</span>
-            <div className="h-px flex-1 mx-4 bg-gray-new-10" />
-            <span className="text-sm font-bold text-white group-hover:text-[#E02424] transition-colors">likh(&quot;Hi&quot;)</span>
+          <div className="group flex cursor-default items-center justify-between">
+            <span className="text-sm text-gray-new-70 italic transition-colors group-hover:text-gray-new-90">
+              print(&quot;Hi&quot;)
+            </span>
+            <div className="mx-4 h-px flex-1 bg-gray-new-10" />
+            <span className="text-sm font-bold text-white transition-colors group-hover:text-[#E02424]">
+              likh(&quot;Hi&quot;)
+            </span>
           </div>
-          <div className="flex items-center justify-between group cursor-default">
-            <span className="text-sm text-gray-new-70 italic transition-colors group-hover:text-gray-new-90">if (condition)</span>
-            <div className="h-px flex-1 mx-4 bg-gray-new-10" />
-            <span className="text-sm font-bold text-white group-hover:text-[#E02424] transition-colors">agar (faislo)</span>
+          <div className="group flex cursor-default items-center justify-between">
+            <span className="text-sm text-gray-new-70 italic transition-colors group-hover:text-gray-new-90">
+              if (condition)
+            </span>
+            <div className="mx-4 h-px flex-1 bg-gray-new-10" />
+            <span className="text-sm font-bold text-white transition-colors group-hover:text-[#E02424]">
+              agar (faislo)
+            </span>
           </div>
-          <div className="flex items-center justify-between group cursor-default">
-            <span className="text-sm text-gray-new-70 italic transition-colors group-hover:text-gray-new-90">return x</span>
-            <div className="h-px flex-1 mx-4 bg-gray-new-10" />
-            <span className="text-sm font-bold text-white group-hover:text-[#E02424] transition-colors">wapas x</span>
+          <div className="group flex cursor-default items-center justify-between">
+            <span className="text-sm text-gray-new-70 italic transition-colors group-hover:text-gray-new-90">
+              return x
+            </span>
+            <div className="mx-4 h-px flex-1 bg-gray-new-10" />
+            <span className="text-sm font-bold text-white transition-colors group-hover:text-[#E02424]">
+              wapas x
+            </span>
           </div>
         </div>
       </div>
@@ -133,56 +178,79 @@ const REASONS = [
       'Sindlish is fully open source. Built with a high-performance bytecode VM, a native object model, and seamless integration through a dedicated VS Code extension.',
     icon: boltIcon,
     content: (
-      <div className="rounded-none border border-gray-new-20 bg-[#0A0A0B] p-0 shadow-2xl overflow-hidden group">
-        <div className="p-6 border-b border-gray-new-20 bg-gray-new-10/10 flex items-center justify-between">
+      <div className="group overflow-hidden rounded-none border border-gray-new-20 bg-[#0A0A0B] p-0 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-gray-new-20 bg-gray-new-10/10 p-6">
           <div className="flex items-center gap-3">
             <GitHubIcon className="size-5 text-white" />
-            <span className="text-sm font-bold text-white">AmanatAliPanhwer / <span className="text-[#E02424]">Sindlish</span></span>
+            <span className="text-sm font-bold text-white">
+              AmanatAliPanhwer / <span className="text-[#E02424]">Sindlish</span>
+            </span>
           </div>
-          <div className="px-2 py-0.5 border border-gray-new-20 text-[10px] font-bold text-gray-new-50 uppercase tracking-tighter">Public</div>
+          <div className="border border-gray-new-20 px-2 py-0.5 text-[10px] font-bold tracking-tighter text-gray-new-50 uppercase">
+            Public
+          </div>
         </div>
-        <div className="p-6 space-y-6">
-          <p className="text-xs text-gray-new-50 leading-relaxed italic">
+        <div className="space-y-6 p-6">
+          <p className="text-xs leading-relaxed text-gray-new-50 italic">
             &quot;The first Roman Sindhi programming language. Empowering 30M+ speakers.&quot;
           </p>
           <div className="flex gap-6">
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-white group-hover:text-[#E02424] transition-colors">33</span>
-              <span className="text-[10px] text-gray-new-50 uppercase tracking-widest font-bold">Commits</span>
+              <span className="text-2xl font-bold text-white transition-colors group-hover:text-[#E02424]">
+                33
+              </span>
+              <span className="text-[10px] font-bold tracking-widest text-gray-new-50 uppercase">
+                Commits
+              </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-white group-hover:text-[#E02424] transition-colors">1</span>
-              <span className="text-[10px] text-gray-new-50 uppercase tracking-widest font-bold">Star</span>
+              <span className="text-2xl font-bold text-white transition-colors group-hover:text-[#E02424]">
+                1
+              </span>
+              <span className="text-[10px] font-bold tracking-widest text-gray-new-50 uppercase">
+                Star
+              </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-white group-hover:text-[#E02424] transition-colors">30+</span>
-              <span className="text-[10px] text-gray-new-50 uppercase tracking-widest font-bold">Files</span>
+              <span className="text-2xl font-bold text-white transition-colors group-hover:text-[#E02424]">
+                30+
+              </span>
+              <span className="text-[10px] font-bold tracking-widest text-gray-new-50 uppercase">
+                Files
+              </span>
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex justify-between text-[11px] font-bold tracking-tighter text-gray-new-60 uppercase">
               <span>Main Language</span>
               <span className="text-white">Python 98.5%</span>
             </div>
-            <div className="h-1.5 w-full bg-gray-new-10 rounded-none overflow-hidden flex">
+            <div className="flex h-1.5 w-full overflow-hidden rounded-none bg-gray-new-10">
               <div className="h-full bg-[#E02424]" style={{ width: '98.5%' }} />
               <div className="h-full bg-[#1B3A5C]" style={{ width: '1.5%' }} />
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {['interpreter', 'vscode-extension', 'bytecode-vm', 'sindhi-grammar'].map(tag => (
-              <span key={tag} className="px-2 py-1 bg-gray-new-10 border border-gray-new-20 text-[10px] text-gray-new-70 font-mono">
+            {['interpreter', 'vscode-extension', 'bytecode-vm', 'sindhi-grammar'].map((tag) => (
+              <span
+                key={tag}
+                className="border border-gray-new-20 bg-gray-new-10 px-2 py-1 font-mono text-[10px] text-gray-new-70"
+              >
                 {tag}
               </span>
             ))}
           </div>
-          <div className="pt-4 mt-2 border-t border-gray-new-10 flex items-center justify-between">
+          <div className="mt-2 flex items-center justify-between border-t border-gray-new-10 pt-4">
             <div className="flex items-center gap-2">
-              <div className="size-2 rounded-none bg-green-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-gray-new-40 uppercase tracking-widest">Active Development</span>
+              <div className="bg-green-500 size-2 animate-pulse rounded-none" />
+              <span className="text-[10px] font-bold tracking-widest text-gray-new-40 uppercase">
+                Active Development
+              </span>
             </div>
-            <span className="text-[11px] font-bold text-[#E02424] group-hover:underline cursor-pointer">View Repo →</span>
+            <span className="cursor-pointer text-[11px] font-bold text-[#E02424] group-hover:underline">
+              View Repo →
+            </span>
           </div>
         </div>
       </div>
@@ -191,22 +259,22 @@ const REASONS = [
 ];
 const WhySindlish = () => (
   <LazyMotion features={domAnimation}>
-    <m.section 
+    <m.section
       id="why-sindlish"
-      className="why-sindlish safe-paddings py-32 xl:py-24 lg:py-20 md:py-16 scroll-mt-20"
+      className="why-sindlish scroll-mt-20 py-32 safe-paddings xl:py-24 lg:py-20 md:py-16"
       initial={{ opacity: 0, y: 100 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-20%' }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
       <Container
-        className="relative grid grid-cols-[224px_1fr] items-center gap-x-32 xl:grid-cols-1 xl:gap-y-12 pt-[180px] pb-20"
+        className="relative grid grid-cols-[224px_1fr] items-center gap-x-32 pt-[180px] pb-20 xl:grid-cols-1 xl:gap-y-12"
         size="1600"
       >
         <div className="xl:hidden" /> {/* Spacer for TOC */}
         <div className="flex flex-col gap-y-24">
           <div className="text-left">
-            <span className="text-sm font-medium uppercase tracking-wider text-[#E02424]">
+            <span className="text-sm font-medium tracking-wider text-[#E02424] uppercase">
               Cho Sindlish?
             </span>
             <h2 className="mt-3 text-[52px] leading-tight font-bold tracking-tighter xl:text-4xl lg:text-[32px] sm:text-[28px]">
@@ -241,10 +309,10 @@ const WhySindlish = () => (
                       alt=""
                     />
                   </div>
-                  <h3 className="text-4xl font-bold leading-dense tracking-tighter text-white xl:text-3xl sm:text-2xl">
+                  <h3 className="text-4xl leading-dense font-bold tracking-tighter text-white xl:text-3xl sm:text-2xl">
                     {title}
                   </h3>
-                  <p className="mt-2 text-sm font-medium uppercase tracking-widest text-[#E02424]">
+                  <p className="mt-2 text-sm font-medium tracking-widest text-[#E02424] uppercase">
                     {subtitle}
                   </p>
                   <p className="mt-6 text-xl leading-snug tracking-extra-tight text-gray-new-60 lg:text-lg">
@@ -252,8 +320,8 @@ const WhySindlish = () => (
                   </p>
                 </div>
                 <div className="flex-1 xl:w-full">
-                  <div className="relative group">
-                    <div className="absolute -inset-4 rounded-none bg-[#E02424]/5 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="group relative">
+                    <div className="absolute -inset-4 rounded-none bg-[#E02424]/5 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
                     <div className="relative transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_50px_-12px_rgba(224,36,36,0.3)]">
                       {content}
                     </div>

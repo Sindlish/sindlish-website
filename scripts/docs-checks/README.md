@@ -1,22 +1,18 @@
 # docs-checks
 
-Validate `content/**/*.md` against authoritative sources (CLI schemas, type
-defs, OpenAPI specs, etc.). Each check is self-contained in its own subfolder.
+Validate `content/**/*.md` against authoritative sources. Each check is self-contained in its own subfolder.
 
 ## Run
 
 ```bash
 npm run check:docs              # all checks
-npm run check:docs:neonctl      # one check
 ```
 
 Exits non-zero on any validation error.
 
 ## Checks
 
-| Check                   | Validates                                    |
-| ----------------------- | -------------------------------------------- |
-| [`neonctl`](./neonctl/) | Every `neonctl`/`neon` CLI example is valid. |
+None currently. Previous Neon-specific checks (e.g. `neonctl`) were removed with the Neon content.
 
 ## Add a new check
 
@@ -38,10 +34,6 @@ Exits non-zero on any validation error.
    ```
 
    `check:docs` picks it up via glob.
-
-4. External inputs (cloned repos, API calls) run at **schema-generation time**
-   and emit a committed JSON file. Runtime needs only `node` + this repo. See
-   [`neonctl/generate-schema.js`](./neonctl/generate-schema.js).
 
 ## Shared helpers
 

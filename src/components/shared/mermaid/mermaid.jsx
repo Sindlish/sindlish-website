@@ -10,7 +10,7 @@ let mermaidAPI;
 const getNeonTheme = (isDark) => ({
   theme: 'base',
   themeVariables: {
-    primaryColor: '#00E599',
+    primaryColor: '#E02424',
     primaryBorderColor: '#00cc88',
     primaryTextColor: isDark ? '#ffffff' : '#0c0d0d',
     secondaryColor: isDark ? '#303236' : '#EFEFF0',
@@ -34,7 +34,7 @@ const getNeonTheme = (isDark) => ({
     fontFamily: 'var(--font-geist-mono), ui-monospace, monospace',
     fontSize: '14px',
     // Git graph
-    git0: '#00E599',
+    git0: '#E02424',
     git1: '#ff4c79',
     git2: '#f0f075',
     git3: '#ffa64c',

@@ -68,6 +68,7 @@ Sindlish provides several methods to manage your data pairs.
 | **`.nakal()`** | Returns a shallow copy of the dictionary. |
 
 ### Examples:
+
 ```sd
 scores = { "Ali": 90, "Sara": 95 }
 

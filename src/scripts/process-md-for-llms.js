@@ -1224,7 +1224,7 @@ const componentHandlers = {
     // Include link prop as "Read case study" link
     const link = getAttr(node, 'link');
     if (link) {
-      const url = link.startsWith('/') ? `https://neon.com${link}` : link;
+      const url = link.startsWith('/') ? `https://sindlish.org${link}` : link;
       children.push({
         type: 'paragraph',
         children: [{ type: 'link', url, children: [{ type: 'text', value: 'Read case study' }] }],
@@ -1477,7 +1477,7 @@ function remarkCleanCodeBlocks() {
 /**
  * Convert relative URLs to absolute URLs
  */
-const BASE_URL = 'https://neon.com';
+const BASE_URL = 'https://sindlish.org';
 
 function toAbsoluteUrl(url, pageUrl) {
   if (!url) return url;
@@ -1501,7 +1501,7 @@ function toAbsoluteUrl(url, pageUrl) {
   // Convert relative URLs (no leading /) - resolve relative to current page's parent directory
   if (pageUrl && !url.startsWith('.')) {
     // Get parent directory of current page
-    // e.g., https://neon.com/postgresql/postgresql-getting-started -> https://neon.com/postgresql/
+    // e.g., https://sindlish.org/postgresql/postgresql-getting-started -> https://sindlish.org/postgresql/
     const lastSlash = pageUrl.lastIndexOf('/');
     const pageDir = lastSlash > 0 ? pageUrl.slice(0, lastSlash + 1) : `${pageUrl}/`;
     return `${pageDir}${url}`;
@@ -1524,7 +1524,7 @@ function remarkAbsoluteUrls(pageUrl) {
 
 /**
  * Calculate page URL from file path
- * e.g., content/docs/guides/django.md -> https://neon.com/docs/guides/django
+ * e.g., content/docs/guides/django.md -> https://sindlish.org/docs/guides/django
  */
 function getPageUrl(inputPath, baseContentDir) {
   if (!baseContentDir) return null;
@@ -1801,8 +1801,7 @@ let navigationMap = null;
 /**
  * Build a navigation lookup map from navigation.yaml files.
  *
- * Parses both content/docs/navigation.yaml and content/postgresql/navigation.yaml
- * into a Map<slug, { sectionName, siblings, urlPrefix, breadcrumbs, pageTitle }>.
+ * Parses content/docs/navigation.yaml into a Map<slug, { sectionName, siblings, urlPrefix, breadcrumbs, pageTitle }>.
  *
  * - sectionName: the section/sub-group name containing this page
  * - siblings: other leaf pages at the same nesting level [{ title, slug }]
@@ -1946,7 +1945,7 @@ function buildPageHeader(slug, navMap, _relativePath) {
   }
 
   // Index line (always)
-  lines.push(`> Full Neon documentation index: ${BASE_URL}/docs/llms.txt`);
+  lines.push(`> Full Sindlish documentation index: ${BASE_URL}/docs/llms.txt`);
 
   return `${lines.join('\n')}\n\n`;
 }
@@ -2002,7 +2001,7 @@ function addNavigationContext(content, relativePath, navMap) {
  */
 function stripNavigationContext(content) {
   let stripped = content.replace(
-    /^(?:> This page location:[^\n]*\n)?> Full Neon documentation index:[^\n]*\n(?:> IMPORTANT: If this page[^\n]*\n)?\n/,
+    /^(?:> This page location:[^\n]*\n)?> Full Sindlish documentation index:[^\n]*\n(?:> IMPORTANT: If this page[^\n]*\n)?\n/,
     ''
   );
 

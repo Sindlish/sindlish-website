@@ -1,3 +1,4 @@
+/* eslint-disable import/namespace */
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -27,14 +28,14 @@ const sindlishGrammar = {
     { include: '#function-calls' },
     { include: '#operators' },
     { include: '#punctuation' },
-    { include: '#variables' }
+    { include: '#variables' },
   ],
   repository: {
     comments: {
       patterns: [
         { begin: '/\\*', end: '\\*/', name: 'comment.block.sindlish' },
-        { match: '#.*$', name: 'comment.line.number-sign.sindlish' }
-      ]
+        { match: '#.*$', name: 'comment.line.number-sign.sindlish' },
+      ],
     },
     strings: {
       patterns: [
@@ -43,72 +44,81 @@ const sindlishGrammar = {
           begin: '"',
           end: '"',
           name: 'string.quoted.double.sindlish',
-          patterns: [{ match: '\\\\.', name: 'constant.character.escape.sindlish' }]
+          patterns: [{ match: '\\\\.', name: 'constant.character.escape.sindlish' }],
         },
         {
           begin: "'",
           end: "'",
           name: 'string.quoted.single.sindlish',
-          patterns: [{ match: '\\\\.', name: 'constant.character.escape.sindlish' }]
-        }
-      ]
+          patterns: [{ match: '\\\\.', name: 'constant.character.escape.sindlish' }],
+        },
+      ],
     },
     numbers: {
       match: '\\b[0-9]+(?:\\.[0-9]+)?\\b|\\B\\.[0-9]+\\b',
-      name: 'constant.numeric.sindlish'
+      name: 'constant.numeric.sindlish',
     },
     types: {
       match: '\\b(?:adad|lafz|dahai|faislo|khali|fehrist|lughat|majmuo)\\b',
-      name: 'support.type.sindlish'
+      name: 'support.type.sindlish',
     },
     keywords: {
       patterns: [
-        { match: '\\b(?:agar|yawari|warna|jistain|har|mein|tor|jari|kaam|wapas|pakko|bahari|aalmi|match)\\b', name: 'keyword.control.sindlish' },
+        {
+          match:
+            '\\b(?:agar|yawari|warna|jistain|har|mein|tor|jari|kaam|wapas|pakko|bahari|aalmi|match)\\b',
+          name: 'keyword.control.sindlish',
+        },
         { match: '\\b(?:sach|koorh|khali|ok)\\b', name: 'constant.language.sindlish' },
         { match: '\\b(?:ghalti|kharabi)\\b', name: 'keyword.other.sindlish' },
-        { match: '\\b(?:aen|ya|nah)\\b', name: 'keyword.operator.logical.sindlish' }
-      ]
+        { match: '\\b(?:aen|ya|nah)\\b', name: 'keyword.operator.logical.sindlish' },
+      ],
     },
     operators: {
       match: '(\\+|\\-|\\*|\\/|%|==|!=|<=|>=|<|>|=)',
-      name: 'keyword.operator.sindlish'
+      name: 'keyword.operator.sindlish',
     },
     punctuation: {
       match: '(\\(|\\)|\\{|\\}|\\[|\\]|,|:|\\.)',
-      name: 'punctuation.separator.sindlish'
+      name: 'punctuation.separator.sindlish',
     },
     builtins: {
       patterns: [
         { match: '\\b(?:majmuo|lambi|likh|puch|range)\\b', name: 'support.function.sindlish' },
         {
-          match: '\\.\\s*(?:addkar|alaghahe|bade|cabeyon|chad|defaultrakh|farq|garn|hasil|hata|index|kadh|milap|nakal|nandohisoahe|raqamon|saf|symmetric_farq|syon|syonkadh|tarteeb|ulto|update|wadha|wadhayo|wadohisoahe|wajh|bachao|lazmi)\\b',
-          name: 'entity.name.function.sindlish'
-        }
-      ]
+          match:
+            '\\.\\s*(?:addkar|alaghahe|bade|cabeyon|chad|defaultrakh|farq|garn|hasil|hata|index|kadh|milap|nakal|nandohisoahe|raqamon|saf|symmetric_farq|syon|syonkadh|tarteeb|ulto|update|wadha|wadhayo|wadohisoahe|wajh|bachao|lazmi)\\b',
+          name: 'entity.name.function.sindlish',
+        },
+      ],
     },
     'function-defs': {
       match: '\\b(kaam)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b',
       captures: {
-        '1': { name: 'keyword.control.sindlish' },
-        '2': { name: 'entity.name.function.sindlish' }
-      }
+        1: { name: 'keyword.control.sindlish' },
+        2: { name: 'entity.name.function.sindlish' },
+      },
     },
     'function-calls': {
       match: '\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()',
-      name: 'entity.name.function.sindlish'
+      name: 'entity.name.function.sindlish',
     },
     variables: {
       patterns: [
-        { match: '\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?==)', name: 'variable.other.sindlish' }
-      ]
-    }
-  }
+        { match: '\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?==)', name: 'variable.other.sindlish' },
+      ],
+    },
+  },
 };
 export default async function highlight(code, lang = 'bash', meta = '', theme = customTheme) {
   let language = lang.toLocaleLowerCase();
   if (language === 'sd' || language === 'sindlish') language = 'sindlish';
   // check if language is supported
-  if (!Object.keys(bundledLanguages).includes(language) && language !== 'text' && language !== 'sindlish') {
+  if (
+    !Object.keys(bundledLanguages).includes(language) &&
+    language !== 'text' &&
+    language !== 'sindlish'
+  ) {
     language = 'bash';
   }
   if (!highlighter) {
@@ -140,7 +150,9 @@ export default async function highlight(code, lang = 'bash', meta = '', theme = 
             const parseHighlightLines = (meta) => {
               const metaArray = meta.split(' ').filter(Boolean);
               let highlightLines = [];
-              const highlightToken = metaArray.find((token) => token.includes('{') && token.includes('}'));
+              const highlightToken = metaArray.find(
+                (token) => token.includes('{') && token.includes('}')
+              );
               if (highlightToken) {
                 const highlightStringArray = highlightToken.split('{')[1].split('}')[0].split(',');
                 highlightLines = highlightStringArray.reduce((result, item) => {

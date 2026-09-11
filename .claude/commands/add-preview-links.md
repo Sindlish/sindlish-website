@@ -9,7 +9,7 @@ Add a Vercel preview link section to a PR description for every changed document
 ## Usage
 
 ```
-/add-preview-links https://github.com/neondatabase/website/pull/1234
+/add-preview-links https://github.com/sindlish-website/pull/1234
 ```
 
 If no PR URL is provided, ask for it.
@@ -24,7 +24,7 @@ Extract the PR number from the URL (e.g. `1234`).
 
 Call `mcp__github__github_read_api_call` with endpoint `pull_requests.get`:
 
-- org: `neondatabase`
+- org: `sindlish`
 - repo: `website`
 
 Extract: current PR body, head branch name, list of changed files.
@@ -38,7 +38,7 @@ Slugify the branch name:
 - Collapse consecutive hyphens into one
 - Trim leading and trailing hyphens
 
-Base URL: `https://neon-next-git-{slugified-branch}-neondatabase.vercel.app`
+Base URL: `https://sindlish-next-git-{slugified-branch}.vercel.app`
 
 ### 4. Filter to content files
 
@@ -58,15 +58,15 @@ Example: `content/docs/guides/index.md` → `docs/guides`
 ### 6. Build the preview section
 
 ```
-## NEON PREVIEW
+## SINDLISH PREVIEW
 
-- https://neon-next-git-{slugified-branch}-neondatabase.vercel.app/{path1}
-- https://neon-next-git-{slugified-branch}-neondatabase.vercel.app/{path2}
+- https://sindlish-next-git-{slugified-branch}.vercel.app/{path1}
+- https://sindlish-next-git-{slugified-branch}.vercel.app/{path2}
 ```
 
 ### 7. Update the PR description
 
-- If `## NEON PREVIEW` already exists in the body, replace that section
+- If `## SINDLISH PREVIEW` already exists in the body, replace that section
 - Otherwise, append the section to the end of the existing body
 
 Call `mcp__github__github_write_api_call` with endpoint `pull_requests.update`.

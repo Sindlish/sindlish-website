@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
 
-const NEONAPI_TRACK_URL = 'https://neonapi.io/t.js';
-const SITE_URL = 'https://neon.com';
-
 // Fields are truncated (not rejected) to avoid losing useful feedback over length limits.
 // Will revisit policy after observing real usage patterns.
 const MAX_LENGTHS = {
@@ -53,35 +50,6 @@ export async function POST(request) {
     const path = typeof body.path === 'string' ? body.path.trim() : '';
     if (path) {
       data.path = path.slice(0, MAX_LENGTHS.path);
-    }
-
-    const referrer = request.headers.get('referer') || '';
-    const cookies = request.headers.get('cookie') || '';
-    const userAgent = request.headers.get('user-agent') || '';
-
-    const pageUrl = data.path ? `${SITE_URL}${data.path}` : referrer;
-
-    const payload = {
-      name: 'Agent Feedback Submitted',
-      data,
-      zarazData: {
-        c: cookies,
-        l: pageUrl,
-        r: referrer,
-      },
-      system: {
-        device: {
-          ip: '192.168.0.1',
-        },
-      },
-    };
-
-    if (!body.dry_run) {
-      fetch(NEONAPI_TRACK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'User-Agent': `LLMAGENT: ${userAgent}` },
-        body: JSON.stringify(payload),
-      }).catch(() => {});
     }
 
     return new Response(null, { status: 204 });

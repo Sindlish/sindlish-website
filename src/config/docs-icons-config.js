@@ -301,11 +301,6 @@ const ICONS_CONFIG = {
     lightIconPath: '/images/technology-logos/neo-tax.svg',
     darkIconPath: '/images/technology-logos/neo-tax-dark.svg',
   },
-  neon: {
-    name: 'neon',
-    lightIconPath: '/images/technology-logos/neon.svg',
-    darkIconPath: '/images/technology-logos/neon-dark.svg',
-  },
   'nest-js': {
     name: 'nest-js',
     lightIconPath: '/images/technology-logos/nest-js.svg',
@@ -360,11 +355,6 @@ const ICONS_CONFIG = {
     name: 'polyscale',
     lightIconPath: '/images/technology-logos/polyscale.svg',
     darkIconPath: '/images/technology-logos/polyscale-dark.svg',
-  },
-  postgresql: {
-    name: 'postgresql',
-    lightIconPath: '/images/technology-logos/postgresql.svg',
-    darkIconPath: '/images/technology-logos/postgresql-dark.svg',
   },
   prisma: {
     name: 'prisma',

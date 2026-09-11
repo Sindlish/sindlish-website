@@ -27,7 +27,7 @@ const { CONTENT_ROUTES } = require('../constants/content');
 const config = require('./llms-index-config');
 const { stripNavigationContext } = require('./process-md-for-llms');
 
-const BASE_URL = 'https://neon.com';
+const BASE_URL = 'https://sindlish.org';
 const OUTPUT_PATH = 'public/docs/llms-full.txt';
 
 const EXCLUDED_DIRS = ['shared-content', 'unused'];
@@ -98,10 +98,10 @@ async function scanDirectory(dirPath, relativeTo = '') {
  */
 function buildHeader() {
   const lines = [
-    '# Neon Postgres Documentation',
+    '# Sindlish Language Documentation',
     '',
     `> ${config.tagline}`,
-    `> This file contains the full Neon documentation. For a table of contents, see ${BASE_URL}/docs/llms.txt`,
+    `> This file contains the full Sindlish documentation. For a table of contents, see ${BASE_URL}/docs/llms.txt`,
     '',
   ];
   return lines.join('\n');
@@ -139,7 +139,7 @@ async function main() {
       const contentRelative = path.relative(contentPath, file.contentPath);
       const mdPath = path.join(mdOutputDir, contentRelative);
 
-      // URL: content/docs/guides/prisma.md -> https://neon.com/docs/guides/prisma.md
+      // URL: content/docs/basics/variables.md -> https://sindlish.org/basics/variables.md
       const url = `${BASE_URL}/${contentRelative}`;
 
       allFiles.push({
@@ -191,10 +191,6 @@ async function main() {
     const stripped = stripNavigationContext(content);
     parts.push(`--- [Document source](${file.url}) ---\n\n${stripped.trim()}\n`);
   }
-
-  parts.push(
-    `---\n\nFor all past changelog entries, see [changelog](https://neon.com/docs/changelog.md)\n`
-  );
 
   if (readErrors > 0) {
     console.warn(`\nWarning: ${readErrors} file(s) missing from public/md/`);

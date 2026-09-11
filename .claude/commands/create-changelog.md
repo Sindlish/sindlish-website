@@ -1,10 +1,10 @@
 ---
-description: 'Create a new Neon weekly changelog file for the next Friday (or a specific date). Produces a draft with placeholder content and titled dropdown sections.'
+description: 'Create a new weekly changelog file for the next Friday (or a specific date). Produces a draft with placeholder content and titled dropdown sections.'
 ---
 
 # Create Changelog
 
-Generate a new Neon weekly changelog file. By default, targets the next upcoming Friday in the America/New_York timezone.
+Generate a new weekly changelog file. By default, targets the next upcoming Friday in the America/New_York timezone.
 
 **Output path:** `content/changelog/YYYY-MM-DD.md`
 
@@ -43,16 +43,16 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 
 <details>
-<summary>**Neon API**</summary>
+<summary>**API**</summary>
 
 - [Short bullet describing an API change or improvement.]
 
 </details>
 
 <details>
-<summary>**Console**</summary>
+<summary>**UI**</summary>
 
-- [Short bullet describing a console or UI change.]
+- [Short bullet describing a UI change.]
 
 </details>
 ```
@@ -63,7 +63,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 - Sentence-style capitalization for headings.
 - Feature headings communicate user value, not internal names.
 - Each feature description: 1-3 sentences.
-- **Dropdown sections:** After the main `##` feature sections, include one or more `<details>` blocks with **descriptive titles** that group fixes or improvements by product area (e.g. **Neon API**, **Console**, **Tables page**). Use multiple titled dropdowns, not a single "Fixes & improvements" section.
+- **Dropdown sections:** After the main `##` feature sections, include one or more `<details>` blocks with **descriptive titles** that group fixes or improvements by area (e.g. **API**, **UI**, **CLI**). Use multiple titled dropdowns, not a single "Fixes & improvements" section.
 - Leave all feature content as Lorem ipsum placeholders. The author fills in real content after the file is created.
 
 ## After creating

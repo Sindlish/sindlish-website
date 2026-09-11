@@ -11,6 +11,7 @@ Loops are used to repeat a block of code multiple times. Sindlish provides two m
 The `har` loop is used to iterate over a collection (like a list, dictionary, or set) or a range of numbers. The **`mein`** keyword is mandatory between the iterator variable and the collection.
 
 ### Numeric Range
+
 The `range()` function generates a sequence of numbers. It can be used in three ways:
 1. `range(end)`: 0 to end (exclusive).
 2. `range(start, end)`: start to end (exclusive).
@@ -29,6 +30,7 @@ har i mein range(10, 0, -2) {
 ```
 
 ### Iterating over Collections
+
 You can use `har` to process items in any collection.
 
 ```sd
@@ -59,6 +61,7 @@ jistain count <= 3 {
 ## 3. Loop Control: `tor` & `jari`
 
 ### `tor` (Break)
+
 The `tor` keyword exits the loop immediately.
 
 ```sd
@@ -71,6 +74,7 @@ har i mein range(100) {
 ```
 
 ### `jari` (Continue)
+
 The `jari` keyword skips the current iteration and jumps to the next one.
 
 ```sd

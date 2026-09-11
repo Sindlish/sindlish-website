@@ -25,6 +25,7 @@ Sindlish provides five core primitive data types. Whenever you declare a variabl
 Sindlish features a **Hybrid Typing System**. This means you get the best of both worlds: you can write extremely fast, dynamic code when prototyping, or you can write strict, rigidly-typed code when building large, reliable systems.
 
 ### 1. Dynamic Typing (The Quick Way)
+
 You do not have to tell Sindlish what type of data you are storing. It will infer the type automatically based on the value you provide. Furthermore, because it is dynamic, you can change the type of the variable later in your code!
 
 ```sd
@@ -39,6 +40,7 @@ umar = "pacheeh"   # Now it's a string! No errors thrown.
 ```
 
 ### 2. Typed Declarations (The Safe Way)
+
 If you are building a critical system, you might want to guarantee that a variable *only* ever holds numbers. If you explicitly declare the type before the variable name, Sindlish will enforce that type.
 
 ```sd
@@ -60,6 +62,7 @@ adad count     # Sindlish assigns 0 to count
 ```
 
 ### 3. Postfix Type Annotations
+
 For developers coming from modern languages like TypeScript, Rust, or Python, you can use the colon `:` syntax to declare types. It behaves exactly the same as the method above.
 
 ```sd
@@ -68,6 +71,7 @@ is_active: faislo = sach
 ```
 
 ### 4. Constants (`pakko`)
+
 Sometimes you have a value that should **never** change throughout the entire lifespan of your program (for example, the value of Pi, or a server configuration URL). You can lock the variable permanently using the `pakko` keyword. 
 
 ```sd
@@ -87,6 +91,7 @@ In real-world programming, you will constantly receive data in one format and ne
 You need to convert the data. This process is called **Typecasting** (or Qisam Badli in Sindlish). In Sindlish, you typecast by simply using the type keyword as if it were a function.
 
 ### Converting to Integers (`adad`)
+
 You can convert strings and floats into whole numbers using `adad()`. When converting a float to an integer, it truncates (chops off) the decimal part; it does not round up.
 
 ```sd
@@ -106,6 +111,7 @@ likh(adad(koorh))  # Prints: 0
 ```
 
 ### Converting to Floats (`dahai`)
+
 You can convert integers and strings into decimal numbers.
 
 ```sd
@@ -121,6 +127,7 @@ likh(price_float * 2)  # Prints: 199.98
 ```
 
 ### Converting to Strings (`lafz`)
+
 Almost anything in Sindlish can be converted into a string using `lafz()`. This is incredibly useful when you want to concatenate (join) numbers with text.
 
 ```sd
@@ -134,6 +141,7 @@ likh(lafz(sach))  # Prints the text "sach"
 ```
 
 ### Converting to Booleans (`faislo`)
+
 When converting a boolean, Sindlish follows the concept of "Truthiness". 
 - `0`, `0.0`, `""` (empty string), and `khali` will convert to `koorh` (False).
 - Any non-zero number and any non-empty string will convert to `sach` (True).
@@ -149,6 +157,7 @@ likh(faislo(khali))   # Prints: koorh
 ```
 
 ### Converting Collections
+
 You can even use typecasting to convert strings into Lists (`fehrist`)! Every character in the string becomes an item in the list.
 
 ```sd

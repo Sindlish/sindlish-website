@@ -145,48 +145,55 @@ describe('getMarkdownPath', () => {
       expect(result).toBe('/md/docs/introduction.md');
     });
 
-    it('should convert /postgresql/tutorial to markdown path', () => {
-      const result = getMarkdownPath('/postgresql/tutorial');
-      expect(result).toBe('/md/postgresql/tutorial.md');
+    it('should convert /docs/get-started/installation to markdown path', () => {
+      const result = getMarkdownPath('/docs/get-started/installation');
+      expect(result).toBe('/md/docs/get-started/installation.md');
     });
 
-    it('should convert /guides/neon-sst to markdown path', () => {
-      const result = getMarkdownPath('/guides/neon-sst');
-      expect(result).toBe('/md/guides/neon-sst.md');
-    });
-
-    it('should convert /branching/introduction to markdown path', () => {
-      const result = getMarkdownPath('/branching/introduction');
-      expect(result).toBe('/md/branching/introduction.md');
-    });
-
-    it('should convert /programs/agents to markdown path', () => {
-      const result = getMarkdownPath('/programs/agents');
-      expect(result).toBe('/md/pages/programs/agents.md');
-    });
-
-    it('should convert /use-cases/ai-agents to markdown path', () => {
-      const result = getMarkdownPath('/use-cases/ai-agents');
-      expect(result).toBe('/md/pages/use-cases/ai-agents.md');
+    it('should convert /docs/basics/variables to markdown path', () => {
+      const result = getMarkdownPath('/docs/basics/variables');
+      expect(result).toBe('/md/docs/basics/variables.md');
     });
 
     it('should handle nested docs paths', () => {
-      const result = getMarkdownPath('/docs/guides/logical-replication');
-      expect(result).toBe('/md/docs/guides/logical-replication.md');
+      const result = getMarkdownPath('/docs/reference/keywords');
+      expect(result).toBe('/md/docs/reference/keywords.md');
     });
   });
 
-  describe('Excluded routes (should return null)', () => {
-    it('should exclude index page /guides', () => {
-      const result = getMarkdownPath('/guides');
+  describe('Non-docs routes (should return null)', () => {
+    it('should return null for /postgresql/tutorial', () => {
+      const result = getMarkdownPath('/postgresql/tutorial');
       expect(result).toBeNull();
     });
 
-    it('should exclude index page /branching', () => {
-      const result = getMarkdownPath('/branching');
+    it('should return null for /guides/neon-sst', () => {
+      const result = getMarkdownPath('/guides/neon-sst');
       expect(result).toBeNull();
     });
 
+    it('should return null for /branching/introduction', () => {
+      const result = getMarkdownPath('/branching/introduction');
+      expect(result).toBeNull();
+    });
+
+    it('should return null for /programs/agents', () => {
+      const result = getMarkdownPath('/programs/agents');
+      expect(result).toBeNull();
+    });
+
+    it('should return null for /use-cases/ai-agents', () => {
+      const result = getMarkdownPath('/use-cases/ai-agents');
+      expect(result).toBeNull();
+    });
+
+    it('should return null for index pages /guides and /branching', () => {
+      expect(getMarkdownPath('/guides')).toBeNull();
+      expect(getMarkdownPath('/branching')).toBeNull();
+    });
+  });
+
+  describe('Custom markdown paths', () => {
     it('should resolve /docs/changelog to custom markdown path', () => {
       const result = getMarkdownPath('/docs/changelog');
       expect(result).toBe('/md/docs/changelog.md');
@@ -195,21 +202,6 @@ describe('getMarkdownPath', () => {
     it('should resolve /docs/changelog.md to custom markdown path', () => {
       const result = getMarkdownPath('/docs/changelog.md');
       expect(result).toBe('/md/docs/changelog.md');
-    });
-
-    it('should resolve individual changelog entries to changelog content path', () => {
-      const result = getMarkdownPath('/docs/changelog/2026-03-13');
-      expect(result).toBe('/md/changelog/2026-03-13.md');
-    });
-
-    it('should exclude /use-cases/multi-tb', () => {
-      const result = getMarkdownPath('/use-cases/multi-tb');
-      expect(result).toBeNull();
-    });
-
-    it('should exclude /use-cases/serverless-apps', () => {
-      const result = getMarkdownPath('/use-cases/serverless-apps');
-      expect(result).toBeNull();
     });
   });
 
@@ -236,9 +228,19 @@ describe('getMarkdownPath', () => {
       expect(result).toBeNull();
     });
 
-    it('should resolve /pricing to custom markdown path', () => {
+    it('should return null for /pricing', () => {
       const result = getMarkdownPath('/pricing');
-      expect(result).toBe('/pricing.md');
+      expect(result).toBeNull();
+    });
+
+    it('should return null for /use-cases/multi-tb', () => {
+      const result = getMarkdownPath('/use-cases/multi-tb');
+      expect(result).toBeNull();
+    });
+
+    it('should return null for /use-cases/serverless-apps', () => {
+      const result = getMarkdownPath('/use-cases/serverless-apps');
+      expect(result).toBeNull();
     });
   });
 
@@ -249,8 +251,8 @@ describe('getMarkdownPath', () => {
     });
 
     it('should handle paths with special characters', () => {
-      const result = getMarkdownPath('/docs/api-reference');
-      expect(result).toBe('/md/docs/api-reference.md');
+      const result = getMarkdownPath('/docs/reference/api-reference');
+      expect(result).toBe('/md/docs/reference/api-reference.md');
     });
 
     it('should not double .md when path already ends with .md', () => {
@@ -259,28 +261,28 @@ describe('getMarkdownPath', () => {
     });
 
     it('should not double .md for nested paths ending with .md', () => {
-      const result = getMarkdownPath('/docs/guides/logical-replication.md');
-      expect(result).toBe('/md/docs/guides/logical-replication.md');
+      const result = getMarkdownPath('/docs/reference/keywords.md');
+      expect(result).toBe('/md/docs/reference/keywords.md');
     });
 
-    it('should map /branching.md to /md/branching.md (file may not exist)', () => {
+    it('should return null for /branching.md (no matching route)', () => {
       const result = getMarkdownPath('/branching.md');
-      expect(result).toBe('/md/branching.md');
+      expect(result).toBeNull();
     });
 
-    it('should map /guides.md to /md/guides.md (file may not exist)', () => {
+    it('should return null for /guides.md (no matching route)', () => {
       const result = getMarkdownPath('/guides.md');
-      expect(result).toBe('/md/guides.md');
+      expect(result).toBeNull();
     });
 
-    it('should map /postgresql.md to /md/postgresql.md (file may not exist)', () => {
+    it('should return null for /postgresql.md (no matching route)', () => {
       const result = getMarkdownPath('/postgresql.md');
-      expect(result).toBe('/md/postgresql.md');
+      expect(result).toBeNull();
     });
 
-    it('should map /programs.md to /md/pages/programs.md (file may not exist)', () => {
+    it('should return null for /programs.md (no matching route)', () => {
       const result = getMarkdownPath('/programs.md');
-      expect(result).toBe('/md/pages/programs.md');
+      expect(result).toBeNull();
     });
   });
 });
@@ -297,14 +299,14 @@ describe('buildAgent404Response', () => {
     expect(result).toContain('/docs/llms-full.txt');
   });
 
-  it('should include a link to the API reference', () => {
+  it('should mention Sindlish documentation', () => {
     const result = buildAgent404Response('/docs/some-page');
-    expect(result).toContain('/docs/reference/api-reference.md');
+    expect(result).toContain('Sindlish');
   });
 
   it('should work with deeply nested paths', () => {
-    const result = buildAgent404Response('/docs/guides/deeply/nested/path');
-    expect(result).toContain('`/docs/guides/deeply/nested/path`');
+    const result = buildAgent404Response('/docs/concepts/deeply/nested/path');
+    expect(result).toContain('`/docs/concepts/deeply/nested/path`');
     expect(result).toContain('/docs/llms.txt');
   });
 });

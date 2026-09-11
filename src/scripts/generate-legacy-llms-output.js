@@ -24,10 +24,10 @@ const {
  * Exclusion rules matching Python's config.py
  * Python only processes content/docs/, not other content routes
  */
-const LLMS_EXCLUDED_DIRS = ['shared-content', 'postgresql', 'unused', 'community', 'sdk'];
+const LLMS_EXCLUDED_DIRS = ['shared-content', 'unused', 'community', 'sdk'];
 const LLMS_EXCLUDED_FILES = ['README.md', 'index.md', '_index.md', 'GUIDE_TEMPLATE.md'];
-const LLMS_EXCLUDED_PATTERNS = ['guides/neon-rls*'];
-const LLMS_INCLUDED_FILES = ['guides/neon-rls-drizzle.md']; // Override pattern exclusion
+const LLMS_EXCLUDED_PATTERNS = [];
+const LLMS_INCLUDED_FILES = [];
 
 /**
  * Check if a file should be excluded based on Python's rules
@@ -110,7 +110,7 @@ async function processToLlmsDir(rootDir) {
         const outputPath = path.join(outputDir, flatName);
 
         // Build page URL for this file
-        const pageUrl = `https://neon.com/docs/${relativePath.replace(/\.md$/, '')}`;
+        const pageUrl = `https://sindlish.org/docs/${relativePath.replace(/\.md$/, '')}`;
 
         try {
           const result = await processFile(fullPath, pageUrl, rootDir);

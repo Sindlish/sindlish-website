@@ -1,22 +1,21 @@
-# Neon Website Repository Context
+# Sindlish Documentation Repository Context
 
 ## Project Overview
 
-This is the Neon database company's marketing website and documentation hub. It's built with Next.js and serves multiple purposes:
+This is the Sindlish programming language's marketing website and documentation hub. It's built with Next.js and serves multiple purposes:
 
-- Marketing pages for Neon's serverless Postgres platform
+- Marketing pages for the Sindlish programming language
 - Comprehensive technical documentation
-- PostgreSQL tutorials and learning resources
+- Tutorials and learning resources
 - Blog and changelog
 
-**Live site:** <https://neon.tech> (also neon.com)
+**Live site:** <https://sindlish.org>
 
 ## Tech Stack
 
 - **Framework:** Next.js 14 (React 18, App Router)
 - **Styling:** Tailwind CSS with custom components
 - **Content:** MDX for documentation (in `content/` directory)
-- **Database:** Prisma (for some features)
 - **Search:** Algolia for documentation search
 - **Animations:** GSAP, Framer Motion, Rive
 - **Code Highlighting:** Shiki
@@ -29,9 +28,7 @@ website/
 ├── content/              # All markdown content
 │   ├── docs/            # Technical documentation
 │   ├── changelog/       # Product updates
-│   ├── guides/          # How-to guides
-│   ├── postgresql/      # PostgreSQL tutorials
-│   └── branching/       # Branching feature docs
+│   └── guides/          # How-to guides
 ├── src/
 │   ├── app/             # Next.js app router pages
 │   ├── components/      # React components
@@ -41,9 +38,7 @@ website/
 │   ├── utils/           # Helper functions
 │   └── styles/          # Global CSS
 ├── public/              # Static assets
-│   ├── docs/            # Documentation images
-│   └── llms/            # LLM-specific content files
-└── prisma/              # Database schema
+│   └── docs/            # Documentation images
 ```
 
 Multiple team members clone this repo to different local paths. Never hardcode a local path in documentation or scripts.
@@ -70,7 +65,7 @@ npm run format           # Run Prettier only (subset of fix)
 
 ```bash
 npm run test             # Open Cypress
-npm run check:broken-links -- https://neon.com  # Check for broken links
+npm run check:broken-links -- https://sindlish.org  # Check for broken links
 ```
 
 ## Git Workflow
@@ -87,7 +82,7 @@ Then commit and open a PR targeting `main`. No special push commands needed (`gi
 
 ## Environment Setup
 
-Copy `.env.example` to `.env` and configure. See internal Notion page for values.
+Copy `.env.example` to `.env` and configure.
 
 ## Content Guidelines
 
@@ -95,9 +90,9 @@ Copy `.env.example` to `.env` and configure. See internal Notion page for values
 
 `content/docs/README.md` is the canonical reference for all MDX components, code block syntax, and navigation structure. Check it first when in doubt.
 
-### content/docs/ — Neon technical documentation
+### content/docs/ — Technical documentation
 
-Official Neon documentation written and maintained by the Neon docs team. All pages go through a full review process. New pages require an entry in `content/docs/navigation.yaml`.
+All pages go through a review process. New pages require an entry in `content/docs/navigation.yaml`.
 
 1. Create `.md` file in the appropriate `content/docs/` subdirectory
 2. Add an entry to `content/docs/navigation.yaml`
@@ -106,7 +101,7 @@ Official Neon documentation written and maintained by the Neon docs team. All pa
 
 ### content/guides/ — Third-party integration guides
 
-Community and third-party contributed guides showing how to use Neon with other technologies, frameworks, and services. These go through a lighter review process than core docs. Guides do **not** require a `navigation.yaml` entry — they are surfaced through their own index. Follow the same frontmatter and style conventions as `content/docs/` unless a guide contributor has a specific format.
+Community and third-party contributed guides. These go through a lighter review process than core docs. Guides do **not** require a `navigation.yaml` entry -- they are surfaced through their own index. Follow the same frontmatter and style conventions as `content/docs/` unless a guide contributor has a specific format.
 
 ### Updating components
 
@@ -138,36 +133,13 @@ The build will fail if any `.md` file in `content/docs/` is missing `title`.
 
 Files live in `content/changelog/` with the filename `YYYY-MM-DD.md`.
 
-**Frontmatter:** Only `title` — a short plain-text summary of the main items in the entry.
+**Frontmatter:** Only `title` -- a short plain-text summary of the main items in the entry.
 
 **Structure:**
 
 - Major features and changes: `##` (h2) heading, full prose description
 - Sub-topics within a major item: `###` (h3) heading
-- Minor items (bug fixes, small updates): wrap in `<details>` with a `<summary>` — no h2 heading
-
-**Example structure:**
-
-```md
----
-title: Feature X, improvement Y, and more
----
-
-## Feature X
-
-Description of the major feature...
-
-## Improvement Y
-
-Description of the improvement...
-
-<details>
-<summary>**Bug fixes**</summary>
-
-Fixed an issue where...
-
-</details>
-```
+- Minor items (bug fixes, small updates): wrap in `<details>` with a `<summary>` -- no h2 heading
 
 ## Navigation (content/docs/navigation.yaml)
 
@@ -190,13 +162,13 @@ The navigation file drives both the header nav and the left sidebar. Top-level i
       slug: guides/page-one
 ```
 
-`title` in `navigation.yaml` may differ from `title` in the page frontmatter — the nav title can be shorter. `slug` must always match the file path relative to `content/docs/`, without the `.md` extension.
+`title` in `navigation.yaml` may differ from `title` in the page frontmatter -- the nav title can be shorter. `slug` must always match the file path relative to `content/docs/`, without the `.md` extension.
 
 Tags (`new`, `beta`, etc.) set in frontmatter must also be added to the corresponding nav entry for the badge to appear.
 
 ## Writing Style
 
-The voice should sound like one human being explaining something to another — approachable and professional, not stiff or overly formal.
+The voice should sound like one human being explaining something to another -- approachable and professional, not stiff or overly formal.
 
 ### Voice and language
 
@@ -205,16 +177,16 @@ The voice should sound like one human being explaining something to another — 
 - **Simple language:** Choose simpler words. "Use the tool" not "Utilize the instrument."
 - **Concise sentences:** Keep them short. Don't pad.
 - **Address the reader:** Use "you" but don't start every sentence with it.
-- **Consistent terminology:** Pick one term per concept and stick to it. Don't mix "dashboard" and "control panel."
+- **Consistent terminology:** Pick one term per concept and stick to it.
 - **US English:** Use US spelling and grammar throughout.
 - **No emojis or exclamation marks** in documentation.
-- **No em dashes (—):** Restructure the sentence instead.
+- **No em dashes:** Restructure the sentence instead.
 
 ### Capitalization
 
 - Use lowercase wherever possible.
 - Page titles: sentence case ("Create your first project", not "Create Your First Project").
-- Product names: follow official capitalization (PostgreSQL, GitHub, npm, Vercel).
+- Product names: follow official capitalization (GitHub, npm, Vercel).
 - UI text: match the interface exactly.
 - Feature names: lowercase by default.
 - Methods/methodologies: capitalize (Continuous Integration, Continuous Deployment).
@@ -230,25 +202,10 @@ Never use real user data in examples.
 - Emails: use `@example.com` or `@domain.com`
 - Usernames: `example_username`, Zhang Kai, Alex Lopez, or Dana Smith
 - Passwords: `AbC123dEf`
-- Database names: `dbname`
-
-### Connection strings
-
-Standard format:
-
-```text
-postgresql://[user]:[password]@[neon_hostname]/[dbname]
-```
-
-Example with realistic values:
-
-```text
-postgresql://alex:AbC123dEf@ep-cool-darkness-123456.us-east-2.aws.neon.tech/dbname?sslmode=require&channel_binding=require
-```
 
 ### Commands, parameters, filenames
 
-Enclose in backticks: `neon projects list`, `git clone`, `postgresql://...`
+Enclose in backticks: `git clone`, `sindlish build`
 
 ## Code Blocks
 
@@ -257,7 +214,7 @@ See `content/docs/README.md` for full syntax. Key features:
 ### Line highlighting
 
 ````text
-```sql {1,3-5}
+```sindlish {1,3-5}
 ````
 
 ### Filename label
@@ -268,8 +225,8 @@ See `content/docs/README.md` for full syntax. Key features:
 
 ### Flags
 
-- `showLineNumbers` — shows line numbers
-- `shouldWrap` — enables line wrapping (use for long commands)
+- `showLineNumbers` -- shows line numbers
+- `shouldWrap` -- enables line wrapping (use for long commands)
 
 ### Diff notation
 
@@ -291,7 +248,7 @@ See `content/docs/README.md` for full syntax and `content/docs/community/compone
 
 ### Essential components
 
-**Admonition** — Callouts for notes, warnings, and tips.
+**Admonition** -- Callouts for notes, warnings, and tips.
 
 Types: `note` (default), `important`, `tip`, `info`, `warning`, `comingSoon`
 
@@ -301,7 +258,7 @@ Optional information to help a user be more successful.
 </Admonition>
 ```
 
-**Callout** — Supplementary context or best practices. Less urgent than Admonition. Default label is "Good to know".
+**Callout** -- Supplementary context or best practices. Less urgent than Admonition. Default label is "Good to know".
 
 ```mdx
 <Callout title="Before you start">
@@ -311,7 +268,7 @@ Make sure you have Node.js 18+ installed.
 
 Use Callout for neutral "good to know" info. Use Admonition when missing the information could cause user error.
 
-**Steps** — Numbered sequential steps, split by `##` headings.
+**Steps** -- Numbered sequential steps, split by `##` headings.
 
 ```mdx
 <Steps>
@@ -329,7 +286,7 @@ Then do this.
 
 ### Tabbed content
 
-**CodeTabs** — Multi-language code examples with tabs.
+**CodeTabs** -- Multi-language code examples with tabs.
 
 ````mdx
 <CodeTabs labels={["JavaScript", "Python"]}>
@@ -345,53 +302,15 @@ conn = psycopg2.connect(os.environ["DATABASE_URL"])
 </CodeTabs>
 ```
 
-**Tabs + TabItem** — General tabbed content (non-code). For code tabs, use CodeTabs instead.
-
-```mdx
-<Tabs labels={["Console", "CLI", "API"]}>
-<TabItem>
-Console instructions here.
-</TabItem>
-<TabItem>
-CLI instructions here.
-</TabItem>
-</Tabs>
-```
+**Tabs + TabItem** -- General tabbed content (non-code). For code tabs, use CodeTabs instead.
 
 ### Navigation and hub pages
 
-**DetailIconCards** — Card grid for feature or service showcases. Uses monochrome icons. Best for hub/overview pages.
+**DetailIconCards** -- Card grid for feature or service showcases. Uses monochrome icons. Best for hub/overview pages.
 
-```mdx
-<DetailIconCards>
-<a href="/docs/ai/langchain" description="Create AI workflows with LangChain" icon="langchain">LangChain</a>
-</DetailIconCards>
-```
+**TechCards** -- Card grid for technology/framework showcases. Uses colorful technology logos.
 
-**TechCards** — Card grid for technology/framework showcases. Uses colorful technology logos. Different icon system from DetailIconCards.
-
-```mdx
-<TechCards>
-<a href="/docs/guides/node" title="Node.js" description="Connect Node.js apps to Neon" icon="node-js">Node.js</a>
-</TechCards>
-```
-
-See `content/docs/community/component-icon-guide.md` for available icons for both components.
-
-**InfoBlock + DocsList** — Multi-column layout for page introductions. Combine learning objectives with related links.
-
-```mdx
-<InfoBlock>
-<DocsList title="What you will learn:">
-<p>How to create a project</p>
-<p>How to connect</p>
-</DocsList>
-
-<DocsList title="Related topics" theme="docs">
-<a href="/docs/introduction/branching">About branching</a>
-</DocsList>
-</InfoBlock>
-```
+**InfoBlock + DocsList** -- Multi-column layout for page introductions. Combine learning objectives with related links.
 
 DocsList `theme` values: default (checkbox icon), `docs` (document icon), `repo` (repository icon).
 
@@ -399,91 +318,37 @@ Use InfoBlock on tutorials and guides. Use DetailIconCards on hub/overview pages
 
 ### Structured layouts
 
-**TwoColumnLayout** — Two-column layout for tutorials and reference docs. Add `layout: wide` to frontmatter to hide the right sidebar.
+**TwoColumnLayout** -- Two-column layout for tutorials and reference docs. Add `layout: wide` to frontmatter to hide the right sidebar.
 
-Subcomponents:
+**FeatureList** -- Visual feature list, split by `##` and `###` headings. Supports an `icons` prop.
 
-- `TwoColumnLayout.Step` — Numbered step with `title` prop (for tutorials)
-- `TwoColumnLayout.Item` — Default item with `title`, `method`, and `id` props
-- `TwoColumnLayout.Block` — Content block with optional `label` prop
-- `TwoColumnLayout.Footer` — Full-width content at the bottom of a step
-
-**FeatureList** — Visual feature list, split by `##` and `###` headings. Supports an `icons` prop.
-
-```mdx
-<FeatureList>
-
-### Instant provisioning
-
-Create databases in seconds.
-
-### Autoscaling
-
-Scale compute up and down automatically.
-
-</FeatureList>
-```
-
-**DefinitionList** — Accessible term/definition lists for technical terms.
-
-```mdx
-<DefinitionList>
-
-Connection pool
-: A cache of database connections
-: Improves performance by reusing connections
-
-</DefinitionList>
-```
+**DefinitionList** -- Accessible term/definition lists for technical terms.
 
 ### Interactive elements
 
-**CheckList + CheckItem** — Interactive checklist saved in browser local storage. Best used alongside Steps.
+**CheckList + CheckItem** -- Interactive checklist saved in browser local storage. Best used alongside Steps.
 
-```mdx
-<CheckList title="Setup checklist">
-<CheckItem title="Install dependencies" href="#install">Install Node.js and npm.</CheckItem>
-<CheckItem title="Configure env" href="#env">Set DATABASE_URL.</CheckItem>
-</CheckList>
-```
+**CTA** -- Call-to-action block with title, description, and button.
 
-**CTA** — Call-to-action block with title, description, and button.
-
-```mdx
-<CTA title="Try it on Neon" description="Sign up for a free account." buttonText="Sign Up" buttonUrl="https://console.neon.tech/signup" />
-```
-
-**CopyPrompt** — Displays a copyable LLM prompt from a file. Prompt files go in `public/prompts/`.
-
-```mdx
-<CopyPrompt src="/prompts/my-prompt.md" displayText="Use this prompt to get started." buttonText="Copy prompt" />
-```
+**CopyPrompt** -- Displays a copyable LLM prompt from a file. Prompt files go in `public/prompts/`.
 
 ### External content
 
-**ExternalCode** — Embeds code from an external URL with syntax highlighting. Always use raw GitHub URLs.
+**ExternalCode** -- Embeds code from an external URL with syntax highlighting. Always use raw GitHub URLs.
 
-```mdx
-<ExternalCode url="https://raw.githubusercontent.com/neondatabase/neon/main/README.md" />
-```
-
-**YoutubeIframe** — Embeds a YouTube video.
-
-```mdx
-<YoutubeIframe embedId="IcoOpnAcO1Y" />
-```
+**YoutubeIframe** -- Embeds a YouTube video.
 
 ### Shared components
 
-**NeedHelp** — Standard "need help?" footer block. Insert as `<NeedHelp/>`.
+**NeedHelp** -- Standard "need help?" footer block. Insert as `<NeedHelp/>`.
 
 ## Images
 
 Images for docs pages go in `public/docs/`, mirroring the content path.
 
 ```text
-public/docs/guides/my-feature.png   ← image
-content/docs/guides/my-feature.md  ← doc
+public/docs/guides/my-feature.png   <- image
+content/docs/guides/my-feature.md  <- doc
 ```
 
 Reference in markdown:
@@ -522,12 +387,12 @@ Use `/simple-content` for edits to existing pages, shorter additions, or when yo
 
 | Command           | When to use                                                                            |
 | ----------------- | -------------------------------------------------------------------------------------- |
-| `/write-content`  | New pages or substantial rewrites — full IA → draft → review → validate pipeline       |
+| `/write-content`  | New pages or substantial rewrites -- full IA -> draft -> review -> validate pipeline    |
 | `/simple-content` | Edits to existing pages, smaller additions, or when you want step-by-step confirmation |
 | `/review-content` | Review an existing page for style, standards, and accuracy without rewriting it        |
-| `/improve-intro`  | Rewrite just the first paragraph of a page to match Neon style                         |
-| `/humanize`       | Remove AI writing patterns and apply Neon voice: contractions, active voice, "you"     |
-| `/golden-corpus`  | Load exemplary doc files by type for style and structure reference before writing      |
+| `/improve-intro`  | Rewrite just the first paragraph of a page to match writing style                      |
+| `/humanize`       | Remove AI writing patterns and apply voice: contractions, active voice, "you"           |
+| `/golden-corpus`  | Load exemplary doc files by type for style and structure reference before writing       |
 
 ### Maintaining docs quality
 
@@ -550,16 +415,9 @@ Use `/simple-content` for edits to existing pages, shorter additions, or when yo
 
 | Command             | When to use                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------- |
-| `/create-pr-report` | Weekly report of merged PRs across monitored repos; supports PR deep dives and follow-on workflows |
-| `/create-changelog` | Generate next Friday's changelog draft (or a specific date) with placeholder content               |
-| `/post-changelog`   | Post the changelog preview to Lakebase Slack channels for review. Databricks employees only.       |
+| `/create-pr-report` | Report of merged PRs across monitored repos; supports PR deep dives and follow-on workflows        |
+| `/create-changelog` | Generate a changelog draft (or a specific date) with placeholder content                           |
 | `/update-roadmap`   | Sync the introduction roadmap with recent changelog entries                                        |
-
-### Issue tracking
-
-| Command              | When to use                                                                                                                                                                                                     |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/create-doc-ticket` | Create a JIRA task in the Databricks LKB project, assigned to yourself. Databricks employees only — requires the JIRA MCP. Non-employees should open a GitHub issue at github.com/neondatabase/website instead. |
 
 ### Reference and navigation
 
@@ -577,11 +435,11 @@ Use `/simple-content` for edits to existing pages, shorter additions, or when yo
 
 ## Notes for AI Assistants
 
-- Documentation-heavy site with 1000+ markdown files — search before creating
+- Documentation-heavy site -- search before creating
 - Do not modify `src/` components, CSS, or site structure without explicit instruction; a web team actively maintains the frontend
 - Do not modify `node_modules/` or generated files
 - Run `npm run fix` before every commit
 - The codebase uses both `pages/` and `app/` directory (migration in progress)
 - Images are optimized via Next.js Image component
-- Accessibility matters — follow WCAG guidelines
+- Accessibility matters -- follow WCAG guidelines
 - For writing style and component details, `content/docs/README.md` and `content/docs/community/` are the authoritative sources

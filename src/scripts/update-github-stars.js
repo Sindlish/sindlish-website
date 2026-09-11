@@ -5,18 +5,18 @@ require('dotenv').config({ path: '.env' });
 const fs = require('fs/promises');
 const path = require('path');
 
-const API_URL = 'https://api.github.com/repos/neondatabase/neon';
+const API_URL = 'https://api.github.com/repos/Sindlish/Sindlish';
 const SNAPSHOT_PATH = path.join(process.cwd(), 'src/utils/data/github-stars.generated.json');
 const SNAPSHOT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 const FAILED_FETCH_RETRY_DELAY_MS = 60 * 60 * 1000;
-const DEFAULT_STARS_COUNT = 21500;
+const DEFAULT_STARS_COUNT = 2;
 const FETCH_TIMEOUT_MS = 10000;
 
 function getHeaders() {
   const token = process.env.GITHUB_TOKEN;
   const headers = {
     Accept: 'application/vnd.github+json',
-    'User-Agent': 'neon-next-github-stars-updater',
+    'User-Agent': 'sindlish-next-github-stars-updater',
   };
 
   if (token) {

@@ -20,6 +20,7 @@ Arithmetic operators are used to perform common mathematical operations.
 | **`^`** | Exponent | `2 ^ 3` | `8` |
 
 ### Floating Point Division
+
 In Sindlish, division (`/`) always returns a decimal number (**`dahai`**), even if both numbers are integers. This prevents precision loss.
 
 ```sd

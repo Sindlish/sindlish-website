@@ -1,10 +1,10 @@
 ---
-description: 'Sync the Neon introduction roadmap with the changelog. Moves shipped items from "What we are working on now" and adds missing changelog features to "What we have shipped recently."'
+description: 'Sync the introduction roadmap with the changelog. Moves shipped items from "What we are working on now" and adds missing changelog features to "What we have shipped recently."'
 ---
 
 # Update Roadmap
 
-Keep the Neon introduction roadmap aligned with the changelog. Review changelog entries for a recent time window (default: past 1 month), then:
+Keep the introduction roadmap aligned with the changelog. Review changelog entries for a recent time window (default: past 1 month), then:
 
 1. Move items from "What we're working on now" to "What we've shipped recently" when the changelog shows they shipped.
 2. Add major changelog features missing from "What we've shipped recently."

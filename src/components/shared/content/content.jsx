@@ -13,7 +13,6 @@ import DefinitionList from 'components/pages/doc/definition-list';
 import DetailIconCards from 'components/pages/doc/detail-icon-cards';
 import DocsLink from 'components/pages/doc/docs-link';
 import DocsList from 'components/pages/doc/docs-list';
-import IncludeBlock from 'components/pages/doc/include-block';
 import InfoBlock from 'components/pages/doc/info-block';
 import LinkPreview from 'components/pages/doc/link-preview';
 import PromptCards from 'components/pages/doc/prompt-cards';
@@ -37,11 +36,9 @@ import ImageZoom from 'components/shared/image-zoom';
 import MegaLink from 'components/shared/mega-link';
 import Mermaid from 'components/shared/mermaid';
 import RequestForm from 'components/shared/request-form';
-import SqlToRestConverter from 'components/shared/sql-to-rest-converter';
 import getCodeProps from 'lib/rehype-code-props';
 import { cn } from 'utils/cn';
 
-import sharedMdxComponents from '../../../../content/docs/shared-content';
 import FeatureList from '../feature-list';
 import QuickLinks from '../quick-links';
 import QuoteBlock from '../quote-block';
@@ -173,14 +170,6 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
   MegaLink,
   CopyPrompt,
   RequestForm,
-  SqlToRestConverter,
-  ...Object.keys(sharedMdxComponents).reduce(
-    (acc, key) => ({
-      ...acc,
-      [key]: (props) => <IncludeBlock url={sharedMdxComponents[key]} {...props} />,
-    }),
-    {}
-  ),
 });
 
 const Content = ({

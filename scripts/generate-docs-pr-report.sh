@@ -270,8 +270,8 @@ get_doc_indicator() {
         return
     fi
 
-    # NEON LOCAL VS CODE EXTENSION - High likelihood unless clearly internal
-    if [[ "$repo" == "neon_local_vs_code_extension" ]]; then
+    # LOCAL VS CODE EXTENSION - High likelihood unless clearly internal
+    if [[ "$repo" == "sindlish_vscode_extension" ]]; then
         # Internal updates unlikely to need docs
         if [[ "$title_no_cat" =~ (refactor|internal|test|ci|build|deps) ]]; then
             echo "❌"
@@ -292,17 +292,6 @@ get_doc_indicator() {
     if [[ "$title_no_cat" =~ (tool|Tool) ]]; then
         if [[ "$title_no_cat" =~ (add|new|feat|feature|fix|modify|update|change|make|Add|New|Feat|Feature|Fix|Modify|Update|Change|Make) ]]; then
             echo "✅"
-            return
-        fi
-    fi
-
-    # mcp-server-neon repo: most changes affect user-facing MCP tools
-    if [[ "$repo" == "mcp-server-neon" ]]; then
-        if [[ "$title_no_cat" =~ ^(feat|feature|add|new|implement|Feat|Add|New) ]]; then
-            echo "✅"
-            return
-        elif [[ "$title_no_cat" =~ ^(fix|Fix) ]] && [[ ! "$title_no_cat" =~ (link|typo|formatting) ]]; then
-            echo "✅"  # Fixes likely change tool behavior
             return
         fi
     fi
@@ -462,7 +451,7 @@ for i in $(seq 0 $((REPO_COUNT - 1))); do
             rm -f "$TEMP_BY_COMPONENT"
 
         else
-            # Standard tag-based releases (neonctl, neon-js, neon-api-python, serverless, etc.)
+            # Standard tag-based releases (CLI, SDKs, serverless, etc.)
             # No release PRs: only show merged PRs in the time window. Use tag creatordate (when the
             # release was cut) and only the single most recent tag in the window so we don't aggregate
             # multiple releases.

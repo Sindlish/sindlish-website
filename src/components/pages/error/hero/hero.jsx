@@ -7,12 +7,11 @@ import { useEffect, useState } from 'react';
 
 import Button from 'components/shared/button';
 import Container from 'components/shared/container';
-import InkeepTrigger from 'components/shared/inkeep-trigger';
 import Link from 'components/shared/link';
 
 import illustration from './images/illustration.png';
 
-const CTA = ({ isDocsPage = false, reset }) => (
+const CTA = ({ isDocsPage: _isDocsPage = false, reset }) => (
   <>
     <div className="flex items-center gap-6 lg:gap-4">
       <Button size="xs" theme="primary" onClick={reset}>

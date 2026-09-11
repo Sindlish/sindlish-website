@@ -1,5 +1,5 @@
 module.exports = {
-  siteUrl: process.env.NEXT_PUBLIC_DEFAULT_SITE_URL || 'https://neon.com',
+  siteUrl: process.env.NEXT_PUBLIC_DEFAULT_SITE_URL || 'https://sindlish.org',
   exclude: [
     // API routes
     '/api/*',
@@ -9,12 +9,6 @@ module.exports = {
 
     // Blog pages (handled by blog-sitemap.xml)
     '/blog/*',
-
-    // PostgreSQL Tutorial (handled by sitemap-postgres.xml)
-    '/postgresql/*',
-
-    // Home page for logged-in users
-    '/home',
 
     // Legacy docs
     '/docs/auth/legacy/*',
@@ -26,17 +20,11 @@ module.exports = {
       {
         userAgent: '*',
         disallow: [
-          // Home page for logged-in users
-          '/home$',
-
           // Legacy docs
           '/docs/auth/legacy/',
         ],
       },
     ],
-    additionalSitemaps: [
-      `${process.env.NEXT_PUBLIC_DEFAULT_SITE_URL}/blog-sitemap.xml`,
-      `${process.env.NEXT_PUBLIC_DEFAULT_SITE_URL}/sitemap-postgres.xml`,
-    ],
+    additionalSitemaps: [`${process.env.NEXT_PUBLIC_DEFAULT_SITE_URL}/blog-sitemap.xml`],
   },
 };

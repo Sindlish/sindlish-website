@@ -3,8 +3,6 @@ import { cache } from 'react';
 
 import { BLOG_POSTS_PER_PAGE, BLOG_POSTS_FOR_PREVIEW, EXTRA_CATEGORIES } from 'constants/blog';
 import { gql, graphQLClientAdmin, fetchGraphQL, graphQLClient } from 'lib/graphQLClient';
-import { getAllChangelogs } from 'utils/api-docs';
-import { getAllGuides } from 'utils/api-guides';
 
 import getAuthToken from './api-auth';
 
@@ -150,14 +148,6 @@ const getWpPostsByCategorySlug = cache(async (slug) => {
 });
 
 const getPostsByCategorySlug = async (slug) => {
-  if (slug === 'guides') {
-    return getAllGuides();
-  }
-
-  if (slug === 'changelog') {
-    return getAllChangelogs();
-  }
-
   const wpPosts = await getWpPostsByCategorySlug(slug);
   return wpPosts;
 };
@@ -241,11 +231,7 @@ const getAllWpPosts = cache(async () => {
 });
 
 const getAllPosts = async () => {
-  const [wpPosts, guides, changelogs] = await Promise.all([
-    getAllWpPosts(),
-    getAllGuides(),
-    getAllChangelogs(),
-  ]);
+  const wpPosts = await getAllWpPosts();
 
   // Separate first two featured posts
   const [featuredWpPosts, restWpPosts] = wpPosts.reduce(
@@ -261,7 +247,7 @@ const getAllPosts = async () => {
   );
 
   // Sort the rest posts by date, newest first
-  const restPosts = [...restWpPosts, ...guides, ...changelogs];
+  const restPosts = [...restWpPosts];
   restPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   // Combine the results

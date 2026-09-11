@@ -1,10 +1,10 @@
 ---
-description: 'Make a documentation page sound like a human explaining something to another human. Removes AI writing patterns and applies Neon voice: contractions, active voice, direct address, concise sentences.'
+description: 'Make a documentation page sound like a human explaining something to another human. Removes AI writing patterns and applies voice: contractions, active voice, direct address, concise sentences.'
 ---
 
 # Humanize
 
-Transform a documentation page to sound like one human explaining something to another — the Neon voice. This command does two things: removes AI writing patterns, and applies Neon style conventions where they're missing.
+Transform a documentation page to sound like one human explaining something to another. This command does two things: removes AI writing patterns, and applies style conventions where they're missing.
 
 ## Usage
 
@@ -60,7 +60,7 @@ Transform a documentation page to sound like one human explaining something to a
 
 ---
 
-## Part 2: Apply Neon voice
+## Part 2: Apply project voice
 
 These are positive additions, not just removals. Apply where the text is technically correct but sounds impersonal or stiff.
 

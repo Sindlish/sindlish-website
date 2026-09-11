@@ -1,10 +1,10 @@
 ---
-description: 'Generate a weekly documentation PR report from monitored Neon repositories. Default time range: since last Friday 00:00 UTC. Also supports PR deep dives and follow-on documentation or changelog workflows.'
+description: 'Generate a documentation PR report from monitored repositories. Default time range: since last Friday 00:00 UTC. Also supports PR deep dives and follow-on documentation or changelog workflows.'
 ---
 
 # Create PR Report
 
-Generate a report of merged PRs across monitored Neon repositories to identify what needs documentation updates. Default time range: since last Friday 00:00 UTC.
+Generate a report of merged PRs across monitored repositories to identify what needs documentation updates. Default time range: since last Friday 00:00 UTC.
 
 Run all commands from the **repository root** (website repo).
 
@@ -57,7 +57,7 @@ When the user wants to investigate a specific PR: "review PR #[number]", "deep d
 
 ### 1. Identify the repository
 
-Check the most recent report in `~/docs-reviews/` (the latest `docs-pr-report-*.md`). Search for the PR number to find which repo section it appears in. Use that repo. If not found, or if the user specifies a repo, use that. Common repos: `neon-cloud` (databricks-eng), `hadron` (databricks-eng), `neondatabase/website`. If still unclear, ask.
+Check the most recent report in `~/docs-reviews/` (the latest `docs-pr-report-*.md`). Search for the PR number to find which repo section it appears in. Use that repo. If not found, or if the user specifies a repo, use that. If still unclear, ask.
 
 ### 2. Check GitHub CLI
 
@@ -98,7 +98,7 @@ Wait for the user's response before proceeding.
 2. Present a Documentation Update Plan (files to modify or create, navigation updates). Wait for approval.
 3. Create branch `docs/pr-{PR_NUMBER}-{short-slug}`.
 4. Make changes, run `npm run lint:md`.
-5. Create PR: `gh pr create --repo neondatabase/website` with title and body linking to the original PR.
+5. Create PR: `gh pr create` with title and body linking to the original PR.
 
 ---
 

@@ -1,7 +1,7 @@
 import LINKS from 'constants/links';
 import closeIcon from 'icons/close.svg';
 
-const BASE_URL = 'https://neon.com';
+const BASE_URL = 'https://sindlish.org';
 
 const inkeepTheme = {
   styles: [
@@ -40,24 +40,24 @@ const baseSettings = {
   apiKey: process.env.INKEEP_INTEGRATION_API_KEY,
   integrationId: process.env.INKEEP_INTEGRATION_ID,
   organizationId: process.env.INKEEP_ORGANIZATION_ID,
-  primaryBrandColor: '#00E599',
-  organizationDisplayName: 'Neon',
+  primaryBrandColor: '#E02424',
+  organizationDisplayName: 'Sindlish',
   customIcons: {
     close: { custom: closeIcon.src },
   },
 };
 
 const aiChatSettings = {
-  aiAssistantName: 'Neon AI',
-  chatSubjectName: 'Neon',
+  aiAssistantName: 'Sindlish AI',
+  chatSubjectName: 'Sindlish',
   placeholder: 'How do I get started?',
   introMessage:
-    "Hi!\nI'm an AI assistant trained on documentation, help articles, and other content.\n\nAsk me anything about Neon.",
+    "Hi!\nI'm an AI assistant trained on documentation, help articles, and other content.\n\nAsk me anything about Sindlish.",
   exampleQuestions: [
-    'What’s Neon?',
-    'How do I sign up for Neon?',
-    'How to create a project?',
-    'How to get started with the Neon API?',
+    'What is Sindlish?',
+    'How do I install Sindlish?',
+    'How do I write my first program?',
+    'How do I get started with the Sindlish docs?',
   ],
   aiAssistantAvatar: {
     light: '/inkeep/images/bot.svg',
@@ -68,19 +68,11 @@ const aiChatSettings = {
   shareChatUrlBasePath: `${BASE_URL}${LINKS.docsHome}`,
   getHelpOptions: [
     {
-      icon: { builtIn: 'FaDiscord' },
-      name: 'Discord',
-      action: {
-        type: 'open_link',
-        url: LINKS.discord,
-      },
-    },
-    {
       icon: { builtIn: 'IoChatbubblesOutline' },
-      name: 'Neon Support',
+      name: 'Sindlish Support',
       action: {
         type: 'open_link',
-        url: LINKS.consoleSupport,
+        url: LINKS.github,
       },
     },
   ],

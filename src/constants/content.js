@@ -1,10 +1,8 @@
 const CONTENT_DIR_PATH = 'content';
 const DOCS_DIR_PATH = `${CONTENT_DIR_PATH}/docs`;
-const GUIDES_DIR_PATH = `${CONTENT_DIR_PATH}/guides`;
 
 const CONTENT_ROUTES = {
   docs: DOCS_DIR_PATH,
-  guides: GUIDES_DIR_PATH,
 };
 
 const EXCLUDED_ROUTES = [];
@@ -16,5 +14,4 @@ module.exports = {
   EXCLUDED_ROUTES,
   EXCLUDED_FILES,
   DOCS_DIR_PATH,
-  GUIDES_DIR_PATH,
 };

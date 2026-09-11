@@ -1,6 +1,9 @@
 const fs = require('fs');
+
 const jsYaml = require('js-yaml');
+
 const { DOCS_DIR_PATH } = require('../constants/content');
+
 const { getPostSlugs, getPostBySlug } = require('./api-content');
 
 const getAllPosts = async () => {
@@ -24,9 +27,6 @@ const getAllPosts = async () => {
 const getNavigation = () =>
   jsYaml.load(fs.readFileSync(`${process.cwd()}/${DOCS_DIR_PATH}/navigation.yaml`, 'utf8'));
 
-const getSDKNavigation = () =>
-  jsYaml.load(fs.readFileSync(`${process.cwd()}/${DOCS_DIR_PATH}/sdk-navigation.yaml`, 'utf8'));
-
 const getNavigationLinks = (slug, flatSidebar) => {
   const posts = [
     ...new Map(flatSidebar.filter((item) => item.slug).map((item) => [item.slug, item])).values(),
@@ -42,10 +42,8 @@ const getNavigationLinks = (slug, flatSidebar) => {
   };
 };
 
-
 module.exports = {
   getNavigation,
-  getSDKNavigation,
   getNavigationLinks,
   getAllPosts,
 };

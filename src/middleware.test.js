@@ -18,18 +18,13 @@ vi.mock('next/server', () => ({
   },
 }));
 
-vi.mock('app/actions', () => ({
-  checkCookie: vi.fn(() => Promise.resolve(false)),
-  getReferer: vi.fn(() => Promise.resolve('')),
-}));
-
-// Mock fetch globally — default returns a safe no-op response so
-// trackLLMPageview's fire-and-forget fetch never throws or consumes
-// the targeted mockResolvedValueOnce set up by individual tests.
+// Mock fetch globally — default returns a safe no-op response so the
+// markdown fetch never throws or consumes the targeted mockResolvedValueOnce
+// set up by individual tests.
 global.fetch = vi.fn(() => Promise.resolve({ ok: true }));
 
 // Ensure SITE_URL is defined so the error-fallback redirect doesn't throw
-process.env.NEXT_PUBLIC_DEFAULT_SITE_URL = 'https://neon.com';
+process.env.NEXT_PUBLIC_DEFAULT_SITE_URL = 'https://sindlish.org';
 
 // Now import middleware after all mocks are set up
 let middleware;
@@ -46,10 +41,10 @@ describe('Middleware - AI Agent Integration Tests', () => {
   const createMockRequest = (pathname, userAgent = '', accept = '') => ({
     nextUrl: {
       pathname,
-      origin: 'https://neon.com',
-      href: `https://neon.com${pathname}`,
+      origin: 'https://sindlish.org',
+      href: `https://sindlish.org${pathname}`,
     },
-    url: `https://neon.com${pathname}`,
+    url: `https://sindlish.org${pathname}`,
     headers: new Map([
       ['user-agent', userAgent],
       ['accept', accept],
@@ -57,25 +52,17 @@ describe('Middleware - AI Agent Integration Tests', () => {
   });
 
   // Helper to mock a successful markdown fetch.
-  // The markdown fetch fires first, then trackLLMPageview fires after
-  // (on the success early-return path), so mocks must be in that order.
   const mockMarkdownFetch = (content = '# Test Markdown') => {
-    global.fetch
-      .mockResolvedValueOnce({
-        ok: true,
-        text: () => Promise.resolve(content),
-      }) // markdown fetch (first call)
-      .mockResolvedValueOnce({ ok: true }); // analytics (trackLLMPageview, second call)
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      text: () => Promise.resolve(content),
+    });
   };
 
   describe('Content routes - AI Agents should get markdown', () => {
     const testCases = [
       { name: 'Docs', path: '/docs/introduction' },
-      { name: 'PostgreSQL', path: '/postgresql/tutorial' },
-      { name: 'Guides', path: '/guides/neon-sst' },
-      { name: 'Branching', path: '/branching/introduction' },
-      { name: 'Programs', path: '/programs/agents' },
-      { name: 'Use Cases', path: '/use-cases/ai-agents' },
+      { name: 'Nested Docs', path: '/docs/get-started/installation' },
     ];
 
     testCases.forEach(({ name, path }) => {
@@ -120,58 +107,11 @@ describe('Middleware - AI Agent Integration Tests', () => {
     });
   });
 
-  describe('Excluded routes - no index markdown available, return HTML', () => {
-    const excludedCases = [
-      { name: 'Index /guides', path: '/guides', reason: 'index page without markdown' },
-      { name: 'Index /branching', path: '/branching', reason: 'index page without markdown' },
-      {
-        name: 'Use case multi-tb',
-        path: '/use-cases/multi-tb',
-        reason: 'no markdown available',
-      },
-      {
-        name: 'Use case serverless-apps',
-        path: '/use-cases/serverless-apps',
-        reason: 'no markdown available',
-      },
-      { name: 'RSS file', path: '/guides/rss.xml', reason: 'RSS file' },
-    ];
-
-    excludedCases.forEach(({ name, path, reason }) => {
-      it(`should return HTML for ${name} (${path}) even with AI User-Agent - ${reason}`, async () => {
-        const req = createMockRequest(path, 'Claude/1.0', 'text/html');
-
-        const response = await middleware(req);
-
-        // Analytics fetch fires (trackLLMPageview), but no markdown fetch
-        const markdownFetchCalls = global.fetch.mock.calls.filter(
-          ([url]) => url !== 'https://neonapi.io/t.js'
-        );
-        expect(markdownFetchCalls).toHaveLength(0);
-        expect(response.type).toBe('next');
-      });
-
-      it(`should return HTML for ${name} (${path}) with Accept: text/plain - ${reason}`, async () => {
-        const req = createMockRequest(path, 'Mozilla/5.0', 'text/plain');
-
-        const response = await middleware(req);
-
-        const markdownFetchCalls = global.fetch.mock.calls.filter(
-          ([url]) => url !== 'https://neonapi.io/t.js'
-        );
-        expect(markdownFetchCalls).toHaveLength(0);
-        expect(response.type).toBe('next');
-      });
-    });
-  });
-
   describe('Error handling', () => {
     it('should return agent-friendly 404 markdown when markdown fetch returns 404', async () => {
       const req = createMockRequest('/docs/non-existent', 'Claude/1.0', 'text/html');
 
-      global.fetch
-        .mockResolvedValueOnce({ ok: false, status: 404 }) // markdown 404
-        .mockResolvedValueOnce({ ok: true }); // analytics
+      global.fetch.mockResolvedValueOnce({ ok: false, status: 404 });
 
       const response = await middleware(req);
 
@@ -188,9 +128,7 @@ describe('Middleware - AI Agent Integration Tests', () => {
     it('should use shorter cache TTL for agent 404 responses', async () => {
       const req = createMockRequest('/docs/non-existent', 'Claude/1.0', 'text/html');
 
-      global.fetch
-        .mockResolvedValueOnce({ ok: false, status: 404 })
-        .mockResolvedValueOnce({ ok: true });
+      global.fetch.mockResolvedValueOnce({ ok: false, status: 404 });
 
       const response = await middleware(req);
 
@@ -201,13 +139,10 @@ describe('Middleware - AI Agent Integration Tests', () => {
     it('should fallback to next() when markdown fetch throws error', async () => {
       const req = createMockRequest('/docs/introduction', 'Claude/1.0', 'text/html');
 
-      global.fetch
-        .mockRejectedValueOnce(new Error('Network error')) // markdown fetch throws
-        .mockResolvedValueOnce({ ok: true }); // analytics (still fires after catch)
+      global.fetch.mockRejectedValueOnce(new Error('Network error'));
 
       const response = await middleware(req);
 
-      expect(global.fetch).toHaveBeenCalled();
       expect(response.type).toBe('next');
     });
   });
@@ -256,33 +191,27 @@ describe('Middleware - AI Agent Integration Tests', () => {
 
     it('should pass through static .md files under docs/ai/ without rewriting', async () => {
       const req = createMockRequest(
-        '/docs/ai/skills/neon-postgres/references/neon-serverless.md',
+        '/docs/ai/skills/example/reference.md',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'text/html'
       );
 
       const response = await middleware(req);
 
-      const markdownFetchCalls = global.fetch.mock.calls.filter(
-        ([url]) => url !== 'https://neonapi.io/t.js'
-      );
-      expect(markdownFetchCalls).toHaveLength(0);
+      expect(global.fetch).not.toHaveBeenCalled();
       expect(response.type).toBe('next');
     });
 
     it('should pass through static .md files under docs/ai/ for AI agents too', async () => {
       const req = createMockRequest(
-        '/docs/ai/skills/neon-postgres/references/neon-serverless.md',
+        '/docs/ai/skills/example/reference.md',
         'Claude/1.0',
         'text/html'
       );
 
       const response = await middleware(req);
 
-      const markdownFetchCalls = global.fetch.mock.calls.filter(
-        ([url]) => url !== 'https://neonapi.io/t.js'
-      );
-      expect(markdownFetchCalls).toHaveLength(0);
+      expect(global.fetch).not.toHaveBeenCalled();
       expect(response.type).toBe('next');
     });
   });
@@ -296,6 +225,7 @@ describe('Middleware - AI Agent Integration Tests', () => {
 
       expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600, s-maxage=86400');
       expect(response.headers.get('X-Robots-Tag')).toBe('noindex');
+      expect(response.headers.get('X-LLMs-Txt')).toBe('/docs/llms.txt');
     });
 
     it('should set correct content type for markdown', async () => {

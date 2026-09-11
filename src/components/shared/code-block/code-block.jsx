@@ -19,9 +19,9 @@ const getFileNameFromMeta = (meta) => {
 const getTrackingLabelFromMeta = (meta) => {
   if (!meta) return null;
 
-  // Support: trackingLabel="Copy neonctl init - docs intro"
+  // Support: trackingLabel="Copy command - docs intro"
   // Examples:
-  // ```bash trackingLabel="Copy neonctl init - docs intro"
+  // ```bash trackingLabel="Copy command - docs intro"
   const match = meta.match(/\btrackingLabel=(?:"([^"]+)"|'([^']+)'|(\S+))/i);
   return match ? match[1] || match[2] || match[3] : null;
 };

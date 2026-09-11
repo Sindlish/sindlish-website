@@ -15,7 +15,7 @@ permissions:
 jobs:
   install:
     runs-on:
-      group: neondatabase-protected-runner-group
+      group: sindlish-protected-runner-group
       labels: linux-ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
