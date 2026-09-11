@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import PropTypes from 'prop-types';
 import { useEffect, useRef } from 'react';
 
-import SDKTableOfContents from 'components/shared/sdk-table-of-contents';
 import { cn } from 'utils/cn';
 
 import Menu from '../menu';
@@ -38,14 +37,11 @@ const getActiveMenu = (navigation, slug) => {
   return flatMenus?.find((item) => containsActiveSlug(item, slug));
 };
 
-const Sidebar = ({ className = null, navigation, basePath, customType, sdkNavigation }) => {
+const Sidebar = ({ className = null, navigation, basePath, customType }) => {
   const pathname = usePathname();
   const currentSlug = pathname.replace(basePath, '');
   const menu = getActiveMenu(navigation, currentSlug);
   const navRef = useRef(null);
-
-  // Get SDK TOC for current page from pre-loaded data
-  const sdkTOC = sdkNavigation?.[currentSlug] || null;
 
   useEffect(() => {
     if (navRef.current) {
@@ -62,13 +58,7 @@ const Sidebar = ({ className = null, navigation, basePath, customType, sdkNaviga
     return null;
   }
 
-  const renderContent = sdkTOC ? (
-    <SDKTableOfContents
-      title={sdkTOC.title}
-      url={`${basePath}${currentSlug}`}
-      sections={sdkTOC.sections}
-    />
-  ) : menu ? (
+  const renderContent = menu ? (
     <Menu basePath={basePath} {...menu} customType={customType} />
   ) : null;
 
@@ -105,12 +95,6 @@ Sidebar.propTypes = {
     title: PropTypes.string,
     link: PropTypes.string,
   }),
-  sdkNavigation: PropTypes.objectOf(
-    PropTypes.shape({
-      title: PropTypes.string,
-      sections: PropTypes.array,
-    })
-  ),
 };
 
 export default Sidebar;

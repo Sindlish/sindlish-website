@@ -3,9 +3,8 @@
  * Dev tool: Compare MDX conversion output
  *
  * Usage:
- *   node compare-md-conversion.js content/docs/guides/prisma.md
- *   node compare-md-conversion.js content/postgresql/postgresql-getting-started.md
- *   node compare-md-conversion.js prisma                    # shorthand for docs/guides/
+ *   node compare-md-conversion.js content/docs/basics/variables.md
+ *   node compare-md-conversion.js variables                    # shorthand for docs/basics/
  */
 
 const { execSync } = require('child_process');
@@ -20,9 +19,8 @@ async function main() {
 Usage: node compare-md-conversion.js <file-path> [options]
 
 Examples:
-  node compare-md-conversion.js content/docs/guides/prisma.md
-  node compare-md-conversion.js content/postgresql/postgresql-getting-started.md
-  node compare-md-conversion.js prisma                    # shorthand for docs/guides/prisma.md
+  node compare-md-conversion.js content/docs/basics/variables.md
+  node compare-md-conversion.js variables                    # shorthand for docs/basics/variables.md
 
 Options:
   --python  Compare with Python output (public/llms/) instead of original
@@ -45,13 +43,13 @@ Options:
     inputPath = inputArg.startsWith('/') ? inputArg : path.join(projectRoot, inputArg);
   } else {
     // Shorthand: just the guide name (e.g., "prisma")
-    inputPath = path.join(projectRoot, `content/docs/guides/${inputArg}.md`);
+    inputPath = path.join(projectRoot, `content/docs/basics/${inputArg}.md`);
   }
 
   // Calculate page URL from path
   const relativePath = path.relative(path.join(projectRoot, 'content'), inputPath);
   const urlPath = relativePath.replace(/\.md$/, '');
-  const pageUrl = `https://neon.com/${urlPath}`;
+  const pageUrl = `https://sindlish.org/${urlPath}`;
 
   // Calculate Python output path (flat filename)
   const pythonFileName = relativePath.replace(/\.md$/, '.txt').replace(/\//g, '-');

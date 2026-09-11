@@ -43,7 +43,7 @@ buildNavigationMap(rootDir)       <-- parses navigation.yaml files once
     |-- unified + remark-parse + remark-gfm + remark-mdx (parse to AST)
     |-- remarkTransformMdxComponents (transform MDX nodes)
     |-- remarkCleanCodeBlocks (remove shouldWrap, Shiki annotations)
-    |-- remarkAbsoluteUrls (convert /docs/... to https://neon.com/docs/...)
+    |-- remarkAbsoluteUrls (convert /docs/... to https://sindlish.org/docs/...)
     |-- toMarkdown (serialize back to markdown)
     |-- addNavigationContext() (breadcrumb header + sibling footer)
     |-- Write to public/md/{route}/{slug}.md
@@ -55,17 +55,17 @@ postbuild: generate-llms-index.js
 Write public/docs/llms.txt
 ```
 
-`CONTENT_ROUTES` from `src/constants/content.js` (docs, docs/changelog, postgresql, use-cases, guides, branching, programs) drives the processor, rewrites, middleware, and index generator.
+`CONTENT_ROUTES` from `src/constants/content.js` (currently `docs`) drives the processor, rewrites, middleware, and index generator.
 
 ### Runtime: How Agents Access Content
 
 All paths serve from the same source: `public/md/`.
 
-- **Explicit `.md` URL**: `GET /docs/guides/prisma.md` -> `next.config.js` rewrite (`afterFiles`) -> `public/md/docs/guides/prisma.md`
-- **User-Agent detection**: `GET /docs/guides/prisma` with AI User-Agent -> `middleware.js` -> `isAIAgentRequest()` -> fetch from `/md/docs/guides/prisma.md`
-- **Legacy redirect**: `GET /llms/guides-prisma.txt` -> middleware -> `llms-redirect-map.json` lookup -> 301 to `/docs/guides/prisma.md`
+- **Explicit `.md` URL**: `GET /docs/introduction.md` -> `next.config.js` rewrite (`afterFiles`) -> `public/md/docs/introduction.md`
+- **User-Agent detection**: `GET /docs/introduction` with AI User-Agent -> `middleware.js` -> `isAIAgentRequest()` -> fetch from `/md/docs/introduction.md`
+- **Legacy redirect**: `GET /llms/some-old-file.txt` -> middleware -> `llms-redirect-map.json` lookup -> 301 to the canonical `.md` URL
 - **Discoverability**: HTML pages include `<link rel="alternate" type="text/markdown" href="...">` via `markdownPath` in `getMetadata()` (`src/utils/get-metadata.js`)
-- **llms.txt**: The docs index is generated at build time and written to `public/docs/llms.txt`. We serve it at both `https://neon.com/docs/llms.txt` (canonical) and `https://neon.com/llms.txt` for backwards compatibility; they may diverge in the future, and we may add other indexes (e.g. `llms-full.txt`) later.
+- **llms.txt**: The docs index is generated at build time and written to `public/docs/llms.txt`. We serve it at both `https://sindlish.org/docs/llms.txt` (canonical) and `https://sindlish.org/llms.txt` for backwards compatibility; they may diverge in the future, and we may add other indexes (e.g. `llms-full.txt`) later.
 
 ## Page Structure
 
@@ -73,7 +73,7 @@ Each processed markdown file has this structure:
 
 ```markdown
 > This page location: Section > Subsection > Page Title
-> Full Neon documentation index: https://neon.com/docs/llms.txt
+> Full Sindlish documentation index: https://sindlish.org/docs/llms.txt
 
 # Title (from frontmatter)
 
@@ -85,13 +85,13 @@ Subtitle (from frontmatter, if present)
 
 ## Related docs (Section Name)
 
-- [Sibling Page](https://neon.com/docs/path/to/sibling)
-- [Another Sibling](https://neon.com/docs/path/to/other)
+- [Sibling Page](https://sindlish.org/docs/path/to/sibling)
+- [Another Sibling](https://sindlish.org/docs/path/to/other)
 ```
 
-Navigation context is added by `addNavigationContext()`, which calls `buildPageHeader()` and `buildNavigationFooter()`. The **page header** always includes the documentation index URL. For pages in the navigation map, it also includes the page location (breadcrumb trail). The location includes section nodes (non-linkable groupings) that the HTML site's breadcrumbs skip, giving LLMs richer hierarchical context. Consecutive duplicate ancestors are deduplicated, and the trailing page title is omitted when it matches the last breadcrumb (e.g. "Connect to Neon" instead of "Connect to Neon > Connect to Neon"). The **footer** lists sibling pages (current page omitted), with standard URLs (no `.md`). Pages not in `navigation.yaml` get only the index line (no location, no footer).
+Navigation context is added by `addNavigationContext()`, which calls `buildPageHeader()` and `buildNavigationFooter()`. The **page header** always includes the documentation index URL. For pages in the navigation map, it also includes the page location (breadcrumb trail). The location includes section nodes (non-linkable groupings) that the HTML site's breadcrumbs skip, giving LLMs richer hierarchical context. Consecutive duplicate ancestors are deduplicated, and the trailing page title is omitted when it matches the last breadcrumb. The **footer** lists sibling pages (current page omitted), with standard URLs (no `.md`). Pages not in `navigation.yaml` get only the index line (no location, no footer).
 
-**Cross-references:** Some pages appear in multiple `navigation.yaml` locations (e.g. `extensions/pgvector` is listed under both AI and Extensions). To pick the canonical location, `processNavItems` scores each occurrence by how many siblings share the same slug prefix. For pgvector, the Extensions section siblings all share `extensions/` while the AI section siblings have `ai/`, so Extensions wins. Ties keep the first occurrence.
+**Cross-references:** Some pages appear in multiple `navigation.yaml` locations. To pick the canonical location, `processNavItems` scores each occurrence by how many siblings share the same slug prefix. Ties keep the first occurrence.
 
 ## Component Handlers
 
@@ -153,13 +153,13 @@ Configured in `getMarkdownOptions()`: GFM table serialization via `gfmToMarkdown
 
 ## llms.txt Index
 
-`generate-llms-index.js` scans `CONTENT_ROUTES`, extracts title/subtitle from frontmatter, and generates a Table of Contents with canonical `.md` URLs. Large sections are collapsed via `COLLAPSED_ROUTES` to keep the index concise (~500 entries instead of ~1300): `docs/changelog`, `postgresql`, and `guides` each become a single entry under "Additional Resources".
+`generate-llms-index.js` scans `CONTENT_ROUTES`, extracts title/subtitle from frontmatter, and generates a Table of Contents with canonical `.md` URLs.
 
 ## Middleware & Agent Detection
 
 `src/utils/ai-agent-detection.js` detects AI agents by Accept header (`text/markdown`) and User-Agent patterns (`chatgpt`, `openai`, `claude`, `anthropic`, `cursor`, `windsurf`, `perplexity`, `copilot`, `axios`, `got`). The middleware has layered error handling (outer try-catch, inner try-catch for fetch, 404 fallback to HTML).
 
-Some routes serve HTML even to agents (`EXCLUDED_ROUTES` in `src/constants/content.js`): `guides` (index only), `branching` (index only), and specific use-cases. These are **exact matches** -- `/guides` is excluded but `/guides/metabase-neon` is not. `docs/changelog` is handled via `CUSTOM_MARKDOWN_PATHS` and serves the full generated changelog markdown.
+`EXCLUDED_ROUTES` in `src/constants/content.js` is currently empty, so all content routes serve markdown to agents. `docs/changelog` is handled via `CUSTOM_MARKDOWN_PATHS` and serves the full generated changelog markdown.
 
 ## Legacy /llms/\*.txt Redirects
 
@@ -201,20 +201,20 @@ npm run test:unit
 npm run test:unit -- src/scripts/process-md-for-llms.test.js
 
 # Process single file to stdout
-node src/scripts/process-md-for-llms.js --file content/docs/guides/prisma.md
+node src/scripts/process-md-for-llms.js --file content/docs/introduction.md
 
 # Process all (production build)
 node src/scripts/process-md-for-llms.js --all
 
 # Compare single file conversion
-node src/scripts/compare-md-conversion.js prisma
+node src/scripts/compare-md-conversion.js introduction
 
 # Generate legacy format for bulk diff
 node src/scripts/generate-legacy-llms-output.js && git diff public/llms/
 
 # Verify after build (dev server on port 3001)
-curl -I -s http://localhost:3001/docs/get-started/connect-neon.md | grep "200 OK"
-curl -H "User-Agent: Cursor" -s http://localhost:3001/docs/get-started/connect-neon | head -5
+curl -I -s http://localhost:3001/docs/introduction.md | grep "200 OK"
+curl -H "User-Agent: Cursor" -s http://localhost:3001/docs/introduction | head -5
 curl -s http://localhost:3001/llms.txt | head -5
 ```
 

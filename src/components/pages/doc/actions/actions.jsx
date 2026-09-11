@@ -1,16 +1,12 @@
 'use client';
 
 import PropTypes from 'prop-types';
-import { useState } from 'react';
 
 import Link from 'components/shared/link';
 import ArrowBackToTopIcon from 'icons/arrow-back-to-top.inline.svg';
-import StarIcon from 'icons/docs/star.inline.svg';
 import GitHubIcon from 'icons/github.inline.svg';
 import { cn } from 'utils/cn';
 import sendGtagEvent from 'utils/send-gtag-event';
-
-import NeonInitModal from '../neon-init-modal';
 
 export const ActionItem = ({
   icon: Icon,
@@ -75,65 +71,12 @@ ActionItem.propTypes = {
   className: PropTypes.string,
 };
 
-const SetUpNeonButton = ({ onClick, tooltip }) => (
-  <ActionItem icon={StarIcon} text="Set up Neon with AI" tooltip={tooltip} onClick={onClick} />
-);
-
-SetUpNeonButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  tooltip: PropTypes.string,
-};
-
-/* Disabled for now - kept for possible future use
-const CopyMCPServerButton = () => {
-  const [status, setStatus] = useState('default'); // 'default' | 'copied' | 'failed'
-  const mcpServerUrl = 'https://mcp.neon.tech/mcp';
-
-  const getButtonText = () => {
-    if (status === 'failed') return 'Failed to copy';
-    if (status === 'copied') return 'Copied!';
-    return 'Copy MCP Server';
-  };
-
-  const copyServerUrl = () => {
-    try {
-      copyToClipboard(mcpServerUrl);
-      setStatus('copied');
-      setTimeout(() => {
-        setStatus('default');
-      }, 2000);
-    } catch (error) {
-      setStatus('failed');
-      setTimeout(() => {
-        setStatus('default');
-      }, 2000);
-    }
-  };
-
-  return (
-    <ActionItem
-      icon={MarkdownIcon}
-      text={getButtonText()}
-      onClick={status === 'copied' ? undefined : copyServerUrl}
-      tooltip="Copy the Neon MCP server URL"
-    />
-  );
-};
-*/
-
-const Actions = ({ gitHubPath, withBorder = false, isTemplate = false }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const Actions = ({ gitHubPath, withBorder = false, isTemplate: _isTemplate = false }) => {
   const githubBase = process.env.NEXT_PUBLIC_GITHUB_PATH;
 
   const gitHubLink = `${githubBase}${gitHubPath}`;
   const backToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-    sendGtagEvent('Action Clicked', { text: 'Set up Neon with your AI', tag_name: 'DocsSidebar' });
-  };
-
-  
   const templateActions = (
     <>
       <ActionItem

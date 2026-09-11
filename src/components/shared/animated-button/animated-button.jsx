@@ -33,7 +33,7 @@ const AnimatedButton = ({
   className: additionalClassName = null,
   to = null,
   isAnimated = false,
-  animationColor = '#00E599',
+  animationColor = '#E02424',
   size = null,
   tagName = null,
   theme,

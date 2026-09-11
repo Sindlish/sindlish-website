@@ -4,7 +4,7 @@ summary: How to install Sindlish on your machine.
 enableTableOfContents: true
 ---
 
-# Installation Guide
+## Installation Guide
 
 You can run Sindlish directly from your terminal! Follow the instructions for your operating system below.
 

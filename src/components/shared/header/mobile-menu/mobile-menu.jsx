@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { useContext, useState } from 'react';
 
 import Button from 'components/shared/button';
-import InkeepTrigger from 'components/shared/inkeep-trigger';
 import Link from 'components/shared/link';
 import LINKS from 'constants/links';
 import MENUS from 'constants/menus';
@@ -125,7 +124,7 @@ const mobileMenuItems = [
   },
 ];
 
-const MobileMenu = ({ isDocPage = false, docPageType = null }) => {
+const MobileMenu = ({ isDocPage = false, docPageType: _docPageType = null }) => {
   const { isMobileMenuOpen, toggleMobileMenu } = useMobileMenu();
   const { hasTopbar } = useContext(TopbarContext);
 

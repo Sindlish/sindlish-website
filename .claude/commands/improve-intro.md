@@ -2,7 +2,7 @@
 description: 'Edit and improve the intro paragraph of a documentation page'
 ---
 
-Load content style guidelines from Neon documentation standards (reference `/golden-corpus` for examples).
+Load content style guidelines from documentation standards (reference `/golden-corpus` for examples).
 
 **Your task:** Improve the introductory section (first paragraph under H1) of the provided documentation page.
 
@@ -27,7 +27,7 @@ The improved intro should:
 1. **Lead with purpose** - Start with what this page helps users accomplish or what feature it documents
 2. **Be concise** - 2-4 sentences maximum unless ToC/outline is needed
 3. **Set expectations** - Briefly mention what content is covered
-4. **Use active voice** - Follow Neon style conventions (developer-friendly, clear, concise)
+4. **Use active voice** - Follow style conventions (developer-friendly, clear, concise)
 5. **State prerequisites** - If there are prereqs required, state them first
 
 ## Content-Specific Adaptations
@@ -115,4 +115,4 @@ See [What is Unity Catalog?](../unity-catalog/index.md) for more information abo
 - **Match the page's depth** - Don't oversimplify complex topics or overcomplicate simple ones
 - **Follow frontmatter conventions** - Intro should align with the page's subtitle/description metadata
 - **Consider context** - If this is part of a larger workflow, mention where it fits
-- **Follow Neon style** - Developer-friendly, practical, clear, and concise (reference `/golden-corpus` for examples)
+- **Follow voice guidelines** - Developer-friendly, practical, clear, and concise (reference `/golden-corpus` for examples)

@@ -4,7 +4,7 @@ updatedOn: '2026-03-23T12:18:17.899Z'
 
 # Docs
 
-Welcome to Neon docs! This folder contains the source code of the [Neon docs](/docs/).
+Welcome to Sindlish docs! This folder contains the source code of the [Sindlish docs](/docs/).
 
 ## Basic information
 
@@ -48,10 +48,10 @@ Each top-level navigation item has the following structure:
 ```yaml
 - nav: Get started # Navigation label (displayed in header)
   slug: introduction # URL slug for the section
-  title: Neon Docs # Page title
+  title: Sindlish Docs # Page title
   icon: home # Icon identifier
   subnav: # Sub-navigation items for header dropdowns
-    - title: Neon platform
+    - title: Sindlish platform
       slug: manage/platform
       icon: settings
       items: # Sidebar navigation items
@@ -72,7 +72,7 @@ The sidebar navigation supports multiple levels:
   items: # Sidebar navigation items
     - section: Features # Section header
       icon: features
-      slug: guides/neon-features
+      slug: guides/sindlish-features
       items: # Section items
         - title: Serverless
           slug: introduction/serverless
@@ -325,7 +325,7 @@ The `ExternalCode` component allows embedding code content from external sources
 
 ```markdown
 <ExternalCode
-  url="https://raw.githubusercontent.com/neondatabase/neon/main/README.md"
+  url="https://raw.githubusercontent.com/example-org/example-repo/main/README.md"
 />
 ```
 
@@ -384,20 +384,16 @@ To access the Hasura Console via the URL the HASURA_GRAPHQL_ENABLE_CONSOLE envir
 </TabItem>
 
 <TabItem>
-Alternatively, you can create read replicas using the Neon API or Neon CLI.
+Alternatively, you can create the resource programmatically with an HTTP client.
 
 ```bash
 curl --request POST \
-     --url https://console.neon.tech/api/v2/projects/late-bar-27572981/endpoints \
+     --url https://api.example.com/v1/resources \
      --header 'Accept: application/json' \
-     --header "Authorization: Bearer $NEON_API_KEY" \
      --header 'Content-Type: application/json' \
      --data '
 {
-  "endpoint": {
-    "type": "read_only",
-    "branch_id": "br-young-fire-15282225"
-  }
+  "type": "read_only"
 }
 ' | jq
 ```
@@ -502,7 +498,7 @@ Check the example for default data of CTA block
 To change text in CTA block, you can pass to the component props `title`, `description`, `buttonText`, `buttonUrl`:
 
 ```md
-<CTA title="Try it on Neon!" description="Neon is Serverless Postgres built for the cloud. Explore Postgres features and functions in our user-friendly SQL Editor. Sign up for a free account to get started." buttonText="Sign Up" buttonUrl="https://console.neon.tech/signup" />
+<CTA title="Try Sindlish!" description="Sindlish lets you write code in your mother tongue. Sign up for a free account to get started." buttonText="Sign Up" buttonUrl="https://example.com/signup" />
 ```
 
 ## Steps
@@ -559,7 +555,7 @@ The `TwoColumnLayout` component creates a two-column layout for tutorial pages a
 
 > **Note:** Pages using `TwoColumnLayout` should include `layout: wide` prop to hide the right sidebar (Table of Contents) and provide more space for the two-column layout.
 
-Check [Neon Auth with Next.js](https://neon.com/docs/auth/quick-start/nextjs-api-only) and [Neon TypeScript SDK](https://neon.com/docs/reference/javascript-sdk) for usage examples.
+Check [TwoColumnLayout examples](https://example.com/docs/components/two-column-layout) for usage examples.
 
 ````md
 <TwoColumnLayout>
@@ -573,7 +569,7 @@ Install the required packages for your project.
 <TwoColumnLayout.Block label="Terminal">
 
 ```bash
-npm install @neondatabase/neon-js
+npm install sindlish-sdk
 ```
 
 </TwoColumnLayout.Block>
@@ -636,9 +632,9 @@ Features will be splitted by `h2` and `h3` headings.
 
 A vibe coder imagines an app. Your agent builds it, full-stack.
 
-### Gets a working database instantly, with no friction
+### Gets a working runtime instantly, with no friction
 
-Neon provisions the database behind the scenes via API.
+The platform provisions the runtime behind the scenes.
 
 </FeatureList>
 ```
@@ -700,7 +696,7 @@ Example file structure:
 ├── public
 │ ├── docs
 │ │ ├── conceptual-guides
-│ │ ├── neon_architecture_2.png // put images in a directory with the same name as the .md file
+│ │ ├── sindlish_architecture_2.png // put images in a directory with the same name as the .md file
 ├── content
 │ ├── docs
 │ │ ├── conceptual-guides
@@ -710,13 +706,13 @@ Example file structure:
 To display images using Markdown syntax, use the following syntax: `![alt text](image url)`. Example content in `architecture-overview.md`:
 
 ```md
-![Neon architecture diagram](/docs/conceptual-guides/neon_architecture_2.png)
+![Sindlish architecture diagram](/docs/conceptual-guides/sindlish_architecture_2.png)
 ```
 
 If you need an image without border to show an annotated piece of UI, use the `"no-border"` attribute as in the example below:
 
 ```md
-![Neon architecture diagram](/docs/conceptual-guides/neon_architecture_2.png 'no-border')
+![Sindlish architecture diagram](/docs/conceptual-guides/sindlish_architecture_2.png 'no-border')
 ```
 
 With this approach, all images on your doc pages will be displayed both on the production and GitHub preview.
@@ -725,7 +721,7 @@ With this approach, all images on your doc pages will be displayed both on the p
 
 Custom `mdx` component that makes possible using [extended markdown syntax for descriptions lists](https://www.markdownguide.org/extended-syntax/#definition-lists). Fully [WCAG-compliant](https://www.w3.org/TR/WCAG20-TECHS/H40.html). It provides an accessible way to make term lists, and it's a generally good way to add structure to a text when a writer needs more than bullets and less than headings.
 
-The usage is pretty [straightforward](https://github.com/neondatabase/website/pull/231/commits/8f795eaf700c31794a2267fc5978c22bfc649a0c):
+The usage is pretty [straightforward](https://www.markdownguide.org/extended-syntax/#definition-lists):
 
 ```md
 [comment]: <> (other content here)
@@ -788,9 +784,9 @@ Another term for smoke test
 ```md
 <DetailIconCards>
 
-<a href="https://api-docs.neon.tech/reference/getting-started-with-neon-api" description="Collaborate on open-source projects" icon="github">Headless vector search</a>
+<a href="https://example.com/docs/concepts/getting-started" description="Collaborate on open-source projects" icon="github">Headless vector search</a>
 
-<a href="https://api-docs.neon.tech/reference/getting-started-with-neon-api" description="Collaborate on open-source projects" icon="github">Open AI completions</a>
+<a href="https://example.com/docs/concepts/getting-started" description="Collaborate on open-source projects" icon="github">Open AI completions</a>
 
 </DetailIconCards>
 ```
@@ -799,7 +795,7 @@ List of available icons in folder: /website/src/components/pages/doc/detail-icon
 
 ## Shared MDX components
 
-Create a [markdown file](https://github.com/neondatabase/website/blob/main/content/docs/shared-content/need-help.md) in folder `content/docs/shared-content/`, add to `sharedMdxComponents` the name of component and the path to component.
+Create a markdown file in folder `content/docs/shared-content/`, add to `sharedMdxComponents` the name of component and the path to component.
 
 ```js
 const sharedMdxComponents = {

@@ -1,44 +1,34 @@
 # Documentation Sitemap Guide
 
-This guide is a reference for where information should be placed in the documentation.
-Top-level items are categories that enable users to access the information they need at a glance. For example, if users need information about connecting, they can select the **Connect** category. Sidebar items should be sentence-cased. Only capitalize first words. When choosing page names, the title should start with a verb for procedure or task-based content; for example: `Connect with psql`. If the page describes a concept, use a noun or noun-based phrase. For example: `Compute lifecycle`.
+This guide is a reference for where information should be placed in the Sindlish documentation.
+Sidebar items should be sentence-cased. Only capitalize first words. When choosing page names, the title should start with a verb for procedure or task-based content; for example: `Set up an editor`. If the page describes a concept, use a noun or noun-based phrase. For example: `Variables`.
 
 To aid navigation, enable the TOC in pages to make it easy for readers to see what a page contains.
 
-The following information provide guidance for each item in the Neon documentation sidebar.
+The following information provides guidance for each item in the Sindlish documentation sidebar, driven by `content/docs/navigation.yaml`.
 
 ## Introduction
 
-This section provides introductory, high-level content that introduces users to Neon's key benefits, architecture, roadmap, tier scheme, region support, and so on.
+This section provides introductory, high-level content that introduces users to the Sindlish language, its goals, and how it fits into their workflow.
 
 ## Get started
 
-This section provides information that helps users to start using Neon. Lean towards brief pages in this category, as longer pages can make onboarding more challenging.
+This section provides information that helps users start using Sindlish. Lean towards brief pages in this category, as longer pages can make onboarding more challenging.
 
-## Connect
+## Basics
 
-This section provides information about connecting to Neon from various clients and applications.
+This section covers the core language concepts, such as variables, math, loops, and conditions. Structure pages to cover a broad topic, with subheadings that organize the content in a consistent and predictable way.
 
-## Manage
+## Data structures
 
-This section describes objects in the Neon hierarchy, such as API keys, projects, branches, endpoints, users, and databases. It explains how objects are related and how to create and manage them. Structure pages in this section to cover a broad topic, with subheadings that organize the content in a consistent and predictable way. For example, include "Create", "Update", and "Delete" topics in each page.
+This section describes the built-in data structures available in the language and how to work with them.
 
-## Guides
+## Intermediate
 
-This section is for various languages, frameworks, and integrations that Neon supports. The length of these pages determines the number of steps needed, so it is okay that some pages are longer than others, as one setup or integration may be more complex than another. This section may also include guides that are not language or framework-specific. For example, it could contain guides pertaining to particular Neon features. Such content will be considered on a case-by-case basis.
-
-## Migrate to Neon
-
-This section provides instructions for how to import data into Neon. Currently, it includes instructions for migrating from Postgres and other vendors. It can be expanded to include other data import methods and migrations.
+This section covers more advanced topics, such as functions and error handling.
 
 ## Reference
 
-This section contains reference information such as the glossary, API reference, CLI reference, supported Postgres extensions, and Postgres compatibility information.
+This section contains reference information such as the standard library, keywords, and code examples.
 
-## Security
-
-This section describes how Neon handles security.
-
-## Changelog
-
-This section describes the latest features and fixes from Neon. Changelog is categorized as either "Console" or "Storage". Within each category, changelog is organized under "What's new" and "Bug fixes" subcategories. Subcategories are further classified with tags. For example, each Console release note is tagged as "API", "Control Plane", "Integrations", or "UI". Storage changelog is tagged as "Compute", "Pageserver", "Proxy", or "Safekeeper". Write changelog from the user's perspective. Give context. Describe why each feature was introduced and the issue that a bug fix resolves. Provide links to the documentation or website for more details where applicable. Changelog should tell the story of Neon's development journey.
+For instructions on writing docs, see `content/docs/README.md`, the canonical reference for all MDX components, code block syntax, and navigation structure.

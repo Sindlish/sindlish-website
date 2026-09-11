@@ -10,7 +10,7 @@ Draft a clear PR title and description based on what changed in the PR. Works on
 
 ```
 /update-pr                                              # uses current branch
-/update-pr https://github.com/neondatabase/website/pull/1234
+/update-pr https://github.com/sindlish-website/pull/1234
 ```
 
 ## Steps
@@ -28,7 +28,7 @@ If no PR exists yet, tell the user to open one first (`gh pr create` or via GitH
 ### 2. Get changed files and commits
 
 ```bash
-gh pr view <number> --repo neondatabase/website --json files,commits,title,body,headRefName
+gh pr view <number> --repo sindlish/website --json files,commits,title,body,headRefName
 ```
 
 Filter changed files to content only (`content/**/*.md`). Also read recent commit messages for context.
@@ -40,8 +40,8 @@ Filter changed files to content only (`content/**/*.md`). Also read recent commi
 - Be specific: name the feature or page area, not just "docs update"
 
 Examples:
-- "Add guide for connecting Neon with Prisma Accelerate"
-- "Update autoscaling documentation for new CU limits"
+- "Add guide for connecting with project X"
+- "Update autoscaling documentation for new limits"
 - "Fix broken links in the branching overview"
 
 If a title already exists and is good, keep it. Suggest a replacement only if it's vague.

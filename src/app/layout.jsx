@@ -1,9 +1,7 @@
 import 'styles/globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { GeistMono } from 'geist/font/mono';
-import Script from 'next/script';
 
-import LINKS from 'constants/links';
 import { CodeTabsProvider } from 'contexts/code-tabs-context';
 import { TabsProvider } from 'contexts/tabs-context';
 import { TopbarProvider } from 'contexts/topbar-context';
@@ -30,16 +28,19 @@ const RootLayout = ({ children }) => (
     <head>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&display=swap"
+        rel="stylesheet"
+      />
       <link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
     </head>
     <body>
       <ThemeProvider>
-          <TopbarProvider>
-            <TabsProvider>
-              <CodeTabsProvider>{children}</CodeTabsProvider>
-            </TabsProvider>
-          </TopbarProvider>
+        <TopbarProvider>
+          <TabsProvider>
+            <CodeTabsProvider>{children}</CodeTabsProvider>
+          </TabsProvider>
+        </TopbarProvider>
       </ThemeProvider>
       <Analytics />
     </body>

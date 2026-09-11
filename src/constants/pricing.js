@@ -67,7 +67,7 @@ export const items = [
     textColor: 'text-green-45',
     activeColor: 'border-green-45 hover:border-green-45',
     defaultColor: 'border-gray-new-15 hover:border-green-45/30',
-    hexColor: '#00E599',
+    hexColor: '#E02424',
   },
   {
     label: 'Performance',

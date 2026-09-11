@@ -1,16 +1,16 @@
 ---
-description: 'Golden corpus of exemplary Neon documentation for style, tone, and writing convention reference'
+description: 'Golden corpus of exemplary documentation for style, tone, and writing convention reference'
 ---
 
-# Golden Corpus: Neon Documentation Examples
+# Golden Corpus: Documentation Examples
 
-This curated list contains exemplary documentation files that demonstrate Neon's preferred style, tone, and writing conventions. Use these as reference examples for few-shot prompting when generating content of similar types.
+This curated list contains exemplary documentation files that demonstrate the project's preferred style, tone, and writing conventions. Use these as reference examples for few-shot prompting when generating content of similar types.
 
 ## Purpose
 
 Agents should identify the content type of their task and reference the corresponding golden corpus examples to:
 
-- Match Neon's writing style and tone (clear, concise, developer-friendly)
+- Match the project's writing style and tone (clear, concise, developer-friendly)
 - Follow established structural patterns
 - Use consistent terminology and voice
 - Apply appropriate formatting and MDX components
@@ -19,81 +19,59 @@ Agents should identify the content type of their task and reference the correspo
 
 ## Content Type Examples
 
-**Note**: All file paths below are relative to `/Users/barry.grenon/website/`. For example, to read the Data API demo, use: `Read("content/docs/data-api/demo.md")`
+**Note**: All file paths below are relative to the project root. For example, to read a demo, use: `Read("content/docs/basics/variables.md")`
 
 ### Tutorial Content
 
 **Use these for**: Hands-on learning, progressive tutorials, step-by-step guides with exercises
 
-- `content/docs/data-api/demo.md` - Progressive hands-on tutorial with real working app, screenshots, and user exercises
-  - **Exemplary features**: Schema explanation, CRUD walkthrough, hands-on "Build Delete Functionality" exercise, code highlighting with markers, live demo, security-first approach
-- `content/docs/guides/rls-tutorial.md` - Security tutorial through experimentation and demonstration
-  - **Exemplary features**: Learning through breaking things, visual proof of data leaks, before/after security narratives, hands-on code modifications
+- `content/docs/get-started/installation.md` - Progressive setup walkthrough with real examples
+  - **Exemplary features**: Clear prerequisites, step-by-step instructions, code highlighting with markers, verification steps
+- `content/docs/data-structures/lists.md` - Data structure tutorial through experimentation
+  - **Exemplary features**: Learning through examples, visual explanations, before/after code comparisons, hands-on exercises
 
 ### Getting Started Guides
 
-**Use these for**: Onboarding, framework-specific setup, initial configuration
+**Use these for**: Onboarding, toolchain setup, initial configuration
 
-- `content/docs/guides/nextjs.md` - Comprehensive framework integration guide
-  - **Exemplary features**: Multiple framework patterns (App Router, Pages Router, Edge), CodeTabs for driver options, clear prerequisites, progressive steps, 6+ example repositories
-- `content/docs/data-api/get-started.md` - Security fundamentals and initial setup
-  - **Exemplary features**: Clear separation of Database Permissions vs RLS, multiple code options (SQL, Drizzle), step-by-step UI instructions with screenshots, complete working example, three-language client examples
+- `content/docs/vscode-extension.md` - Editor tooling setup guide
+  - **Exemplary features**: Installation walkthrough, feature overview, concrete configuration examples, troubleshooting
+- `content/docs/basics/math.md` - Core language feature introduction
+  - **Exemplary features**: Clear operator tables, code examples for each operation, progressive examples, common pitfalls
 
 ### Concept and Overview Pages
 
-**Use these for**: Feature explanations, conceptual understanding, architectural overviews
+**Use these for**: Feature explanations, conceptual understanding, language overviews
 
-- `content/docs/introduction/branching.md` - Core feature explanation with visuals
-  - **Exemplary features**: Clear definition, visual diagrams, embedded video, multiple use case workflows, restore window trade-offs, plan tier comparison
-- `content/docs/guides/neon-rls.md` - Technical security concept with architecture
-  - **Exemplary features**: Architecture diagram showing JWT flow, before/after code comparison, concrete use cases, comprehensive provider table (15+ auth providers), limitations transparency, 8+ sample applications
+- `content/docs/introduction.md` - Language overview with structure
+  - **Exemplary features**: Clear definition, visual diagrams where helpful, multiple use case workflows, plan/feature comparison
+- `content/docs/intermediate/functions.md` - Core language concept with practical examples
+  - **Exemplary features**: Syntax definition, before/after code comparison, concrete use cases, limitations transparency
 
 ### How-To Guides
 
 **Use these for**: Task-oriented instructions, specific operations, configuration steps
 
-- `content/docs/guides/branching-test-queries.md` - Simple, focused step-by-step guide
-  - **Exemplary features**: Clear problem statement, example dataset, screenshot-guided UI steps, CLI and API alternatives (curl examples), concrete test scenario, results verification
-- `content/docs/guides/autoscaling-guide.md` - Configuration guide with practical tips
-  - **Exemplary features**: Multiple configuration levels, default values table, monitoring section, practical decision guidance ("Start with a good minimum"), tip admonition boxes
+- `content/docs/data-structures/sets.md` - Simple, focused reference guide
+  - **Exemplary features**: Clear problem statement, example dataset, code examples, concrete use cases, results verification
+- `content/docs/basics/comments.md` - Configuration guide with practical tips
+  - **Exemplary features**: Multiple usage patterns, default values table, practical guidance, tip admonition boxes
 
 ### Reference Documentation
 
-**Use these for**: Technical specifications, API reference, comprehensive configuration details
+**Use these for**: Technical specifications, language reference, comprehensive syntax details
 
-- `content/docs/connect/connection-pooling.md` - Technical reference with comprehensive tables
-  - **Exemplary features**: Problem-solution structure, comprehensive max_connections table (56 rows), PgBouncer configuration transparency, limitations section, prepared statements examples (SQL + protocol-level), troubleshooting guidance
-- `content/docs/guides/prisma.md` - ORM reference with troubleshooting
-  - **Exemplary features**: Comprehensive troubleshooting section, exact error messages users encounter, connection pool formula explanations, configuration examples showing both good and bad patterns, cross-references to external docs
-
-### Integration Guides
-
-**Use these for**: Third-party integrations, platform connections, end-to-end workflows
-
-- `content/docs/guides/vercel-overview.md` - Integration decision framework
-  - **Exemplary features**: Decision tree structure, comparison table for 3 integration options, quick decision guide, color-coded DetailIconCards, checklist for getting started
-- `content/docs/guides/vercel-managed-integration.md` - Complete integration workflow
-  - **Exemplary features**: Steps component for 7 numbered steps, preview branching webhook diagram, environment variables table, FAQ-style operations, limitation transparency, schema migration integration
-- `content/docs/guides/logical-replication-guide.md` - Hub-and-spoke integration index
-  - **Exemplary features**: Serves as index to 20+ specialized guides, publisher-subscriber explanation, categorized destination/source links, tech cards layout for scanning
-- `content/docs/guides/neon-github-integration.md` - CI/CD integration with workflow examples
-  - **Exemplary features**: "How it works" section before setup, installation walkthrough, complete GitHub Actions YAML workflow, commented options users can enable, security warnings
-
-### Framework and ORM Guides
-
-**Use these for**: Language/framework-specific integrations, driver usage, ORM setup
-
-- `content/docs/guides/drizzle.md` - Type-safe ORM integration
-  - **Exemplary features**: Related resources InfoBlock upfront, two connection approaches (basic + Neon serverless adapter), copy-paste ready code, prerequisite clarity, AI rules link
-- `content/docs/guides/aws-lambda.md` - Serverless platform integration
-  - **Exemplary features**: Prerequisites upfront, CLI interaction transcript, table creation in SQL Editor, connection persistence pattern (client initialization outside handler), error handling, environment variable setup
+- `content/docs/reference/standard-library.md` - Technical reference with comprehensive tables
+  - **Exemplary features**: Problem-solution structure, comprehensive function tables, syntax rules, limitations section, troubleshooting guidance
+- `content/docs/reference/keywords.md` - Language keywords reference
+  - **Exemplary features**: Comprehensive keyword table, exact syntax rules, configuration examples showing both good and bad patterns
 
 ### Index and Hub Pages
 
 **Use these for**: Topic organization, navigation pages, content collections
 
-- `content/docs/guides/branching-intro.md` - Topic hub with organized navigation
-  - **Exemplary features**: Hub-and-spoke layout to branching docs, 6 sections with DetailIconCards, organized progression from concepts → automation → examples, links to 3 working demo repositories
+- `content/docs/README.md` - Topic hub with organized navigation
+  - **Exemplary features**: Hub-and-spoke layout to docs, organized progression from concepts to reference, links to all doc categories
 
 ## Usage Guidelines
 
@@ -101,10 +79,10 @@ Agents should identify the content type of their task and reference the correspo
 2. **Select corresponding examples** from the appropriate category above
 3. **Load and analyze** the example content for style patterns using the Read tool
 4. **Apply similar structure** and tone to your generated content
-5. **Maintain consistency** with Neon terminology and voice
+5. **Maintain consistency** with project terminology and voice
 6. **Use MDX components** appropriately (CodeTabs, Steps, Admonition, DetailIconCards, InfoBlock)
 
-## Neon Documentation Best Practices
+## Documentation Best Practices
 
 When referencing these examples, pay attention to:
 
@@ -162,4 +140,4 @@ When referencing these examples, pay attention to:
 
 ---
 
-**Note**: Always load the actual content of relevant examples before generating new content to ensure accurate style matching and consistency with current Neon documentation standards. The examples above represent the highest-quality documentation in the Neon library and should serve as templates for creating new pages.
+**Note**: Always load the actual content of relevant examples before generating new content to ensure accurate style matching and consistency with current documentation standards. The examples above represent the highest-quality documentation and should serve as templates for creating new pages.

@@ -4,27 +4,26 @@
 //
 // Usage: node scripts/test-markdown-urls.js <base-url> [options]
 // Options: --verbose, --json, --filter <pattern>, --generate
-// Example: node scripts/test-markdown-urls.js https://neon.com
+// Example: node scripts/test-markdown-urls.js https://sindlish.org
 //          node scripts/test-markdown-urls.js http://localhost:3000 --verbose
 //          node scripts/test-markdown-urls.js http://localhost:3000 --generate
 //          node scripts/test-markdown-urls.js http://localhost:3000 --filter "changelog"
 //
 // Generating public/md/ locally (so localhost matches production for /md/... fetches)
 // ---------------------------------------------------------------------------
-// Middleware serves markdown by fetching URLs like /md/changelog/2026-04-03.md, which
+// Middleware serves markdown by fetching URLs like /md/docs/introduction.md, which
 // map to files under public/md/. Those files are produced from content/ by the LLM
 // markdown pipeline — they are not all committed, and `npm run dev` does not regenerate
-// them automatically (only prebuild icons + pricing run before dev).
+// them automatically (only prebuild icons + content-data checks run before dev).
 //
-// If tests such as "Changelog entry /docs/changelog/YYYY-MM-DD" fail on localhost with
+// If tests such as "Docs page /docs/introduction" fail on localhost with
 // agent-404 or 404 for the .md URL, regenerate public/md/ first — or pass --generate
 // to this script so it runs the postbuild markdown chain before the HTTP checks:
 //
 //   node src/scripts/copy-md-content.js
 //
 // That is the same step as in npm's postbuild (after `next build`). copy-md-content.js
-// alone is enough to populate public/md/docs/, public/md/changelog/, etc. for this QA
-// script's /md/... checks.
+// alone is enough to populate public/md/docs/, etc. for this QA script's /md/... checks.
 //
 // Generating docs/llms.txt (and llms-full.txt)
 // ---------------------------------------------------------------------------
@@ -37,8 +36,6 @@
 //
 //   node src/scripts/generate-llms-full.js
 //
-// This QA script only sanity-checks that llms.txt is non-empty and mentions Neon; it does
-// not require you to run these unless you care about those files matching latest content.
 //
 // Full production-like asset generation: npm run build  (postbuild runs copy-md-content,
 // generate-llms-index, generate-llms-full, then sitemaps)
@@ -51,12 +48,10 @@
 // - Matches isAIAgentRequest() in src/utils/ai-agent-detection.js: we test text/markdown,
 //   text/plain, application/json (no text/html in Accept), axios UA, and Claude UA — not
 //   every UA pattern (got, perplexity, etc.) or application/xml Accept alone.
-// - Root / and /home: only spot-check that markdown is not served for negotiated requests;
+// - Root /: only spot-check that markdown is not served for negotiated requests;
 //   login redirects are not exercised.
-// - Legacy /llms/*.txt: one known redirect only; unmapped paths fall through to 404 (not tested).
-// - Changelog entry date is pinned; update if that file is removed from content/changelog/.
-// - Top-level hub .md URLs (/guides.md, /branching.md): dot-md tests require markdown 404
-//   (md-404). Fails on hosts without middleware + rewrite fixes for those paths.
+// - Top-level hub .md URLs: dot-md tests require markdown 404 (md-404). Fails on hosts
+//   without middleware + rewrite fixes for those paths.
 
 const { spawnSync } = require('child_process');
 const path = require('path');
@@ -104,7 +99,7 @@ if (!cli.baseUrl) {
   console.error('  --filter <pattern>     Run only matching tests');
   console.error('  --generate             Run copy-md + llms index + llms-full, then test');
   console.error('Examples:');
-  console.error('  node scripts/test-markdown-urls.js https://neon.com');
+  console.error('  node scripts/test-markdown-urls.js https://sindlish.org');
   console.error('  node scripts/test-markdown-urls.js http://localhost:3000 --generate');
   console.error('  node scripts/test-markdown-urls.js http://localhost:3000 --generate --verbose');
   process.exit(1);
@@ -224,15 +219,13 @@ function buildTests() {
     tests.push({ category, path, mode, assertions, spotCheck, note });
   };
 
-  // ── 1. Content routes with markdown (happy path) ──────────────────────
+  // ── 1. Docs content routes with markdown (happy path) ─────────────────
 
   const contentRoutes = [
-    { path: '/docs/introduction', spotWord: 'Neon' },
-    { path: '/postgresql/tutorial', spotWord: null },
-    { path: '/guides/neon-sst', spotWord: null },
-    { path: '/branching/introduction', spotWord: null },
-    { path: '/programs/agents', spotWord: null },
-    { path: '/use-cases/ai-agents', spotWord: null },
+    { path: '/docs/introduction', spotWord: 'Sindlish' },
+    { path: '/docs/get-started/installation', spotWord: null },
+    { path: '/docs/basics/variables', spotWord: null },
+    { path: '/docs/reference/keywords', spotWord: null },
   ];
 
   for (const { path, spotWord } of contentRoutes) {
@@ -332,197 +325,26 @@ function buildTests() {
       (r) => expectMarkdownBody(r.body),
       (r) => expectHeader(r.headers, 'x-content-source', 'markdown'),
     ],
-    { spotCheck: (r) => expectBodyContains(r.body, 'Neon', true), note: 'negotiated .md URL' }
+    { spotCheck: (r) => expectBodyContains(r.body, 'Sindlish', true), note: 'negotiated .md URL' }
   );
 
-  // ── 2. Excluded index routes ──────────────────────────────────────────
-
-  const excludedRoutes = [
-    { path: '/guides', hasDotMd: true },
-    { path: '/branching', hasDotMd: true },
-    { path: '/use-cases/multi-tb', hasDotMd: false },
-    { path: '/use-cases/serverless-apps', hasDotMd: false },
-  ];
-
-  for (const { path, hasDotMd } of excludedRoutes) {
-    add('Excluded route', path, 'browser', [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/html'),
-      (r) => expectHtmlBody(r.body),
-    ]);
-
-    add(
-      'Excluded route',
-      path,
-      'accept-md',
-      [
-        (r) => expectStatus(r.status, 200),
-        (r) => expectContentType(r.contentType, 'text/html'),
-        (r) => expectHtmlBody(r.body),
-      ],
-      { note: 'should return HTML even for markdown Accept' }
-    );
-
-    add(
-      'Excluded route',
-      path,
-      'agent-ua',
-      [
-        (r) => expectStatus(r.status, 200),
-        (r) => expectContentType(r.contentType, 'text/html'),
-        (r) => expectHtmlBody(r.body),
-      ],
-      { note: 'should return HTML even for AI agent' }
-    );
-
-    if (hasDotMd) {
-      // No index file at public/md/guides.md etc.; expect same contract as other .md 404s
-      // (requires top-level .md routing — see PR #4735).
-      add(
-        'Excluded route',
-        path,
-        'dot-md',
-        [
-          (r) => expectStatus(r.status, 404),
-          (r) => expectContentType(r.contentType, 'text/markdown'),
-          (r) => expectBodyContains(r.body, 'Page Not Found'),
-          (r) => expectBodyContains(r.body, '/docs/llms.txt'),
-          (r) => expectHeader(r.headers, 'x-content-source', 'md-404'),
-        ],
-        { note: 'hub index .md → markdown 404 (not Vercel HTML 404)' }
-      );
-    }
-  }
-
-  // ── 3. Custom markdown paths ──────────────────────────────────────────
-
-  // /pricing — spot-check uses "Scale" (plan name on real page); "pricing" can appear on 404s via URL/title
-  add('Custom path', '/pricing', 'browser', [
-    (r) => expectStatus(r.status, 200),
-    (r) => expectContentType(r.contentType, 'text/html'),
-    (r) => expectHtmlBody(r.body),
-  ]);
+  // ── 2. Excluded files (RSS etc.) ──────────────────────────────────────
 
   add(
-    'Custom path',
-    '/pricing',
-    'accept-md',
-    [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/markdown'),
-      (r) => expectMarkdownBody(r.body),
-      (r) => expectHeader(r.headers, 'x-content-source', 'markdown'),
-    ],
-    { spotCheck: (r) => expectBodyContains(r.body, 'Scale', true) }
-  );
-
-  add(
-    'Custom path',
-    '/pricing',
+    'RSS exclusion',
+    '/docs/rss.xml',
     'agent-ua',
     [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/markdown'),
-      (r) => expectMarkdownBody(r.body),
+      (r) => {
+        if (r.contentType && r.contentType.includes('text/markdown'))
+          return 'served markdown for RSS feed';
+        return null;
+      },
     ],
-    { spotCheck: (r) => expectBodyContains(r.body, 'Scale', true) }
+    { note: 'should NOT serve markdown' }
   );
 
-  // /pricing.md is a static file in public/ (served as text/markdown; not middleware-negotiated)
-  add(
-    'Custom path',
-    '/pricing.md',
-    'browser',
-    [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/markdown'),
-      (r) => expectMarkdownBody(r.body),
-    ],
-    { spotCheck: (r) => expectBodyContains(r.body, 'Scale', true), note: 'static file in public/' }
-  );
-
-  // /docs/changelog
-  add('Custom path', '/docs/changelog', 'browser', [
-    (r) => expectStatus(r.status, 200),
-    (r) => expectContentType(r.contentType, 'text/html'),
-    (r) => expectHtmlBody(r.body),
-  ]);
-
-  add(
-    'Custom path',
-    '/docs/changelog',
-    'accept-md',
-    [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/markdown'),
-      (r) => expectMarkdownBody(r.body),
-      (r) => expectHeader(r.headers, 'x-content-source', 'markdown'),
-    ],
-    { spotCheck: (r) => expectBodyContains(r.body, 'changelog', true) }
-  );
-
-  add(
-    'Custom path',
-    '/docs/changelog',
-    'agent-ua',
-    [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/markdown'),
-      (r) => expectMarkdownBody(r.body),
-    ],
-    { spotCheck: (r) => expectBodyContains(r.body, 'changelog', true) }
-  );
-
-  add(
-    'Custom path',
-    '/docs/changelog',
-    'dot-md',
-    [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/markdown'),
-      (r) => expectMarkdownBody(r.body),
-    ],
-    { spotCheck: (r) => expectBodyContains(r.body, 'changelog', true) }
-  );
-
-  // ── 4. Static doc prefixes (pass-through) ─────────────────────────────
-
-  const staticMdPath = '/docs/ai/skills/neon-postgres/references/neon-serverless.md';
-
-  add(
-    'Static .md',
-    staticMdPath,
-    'browser',
-    [(r) => expectStatus(r.status, 200), (r) => expectBodyNotEmpty(r.body)],
-    {
-      spotCheck: (r) => expectBodyContains(r.body, 'neon', true),
-      note: 'static file, not rewritten',
-    }
-  );
-
-  add(
-    'Static .md',
-    staticMdPath,
-    'accept-md',
-    [(r) => expectStatus(r.status, 200), (r) => expectBodyNotEmpty(r.body)],
-    {
-      spotCheck: (r) => expectBodyContains(r.body, 'neon', true),
-      note: 'should pass through unchanged',
-    }
-  );
-
-  add(
-    'Static .md',
-    staticMdPath,
-    'agent-ua',
-    [(r) => expectStatus(r.status, 200), (r) => expectBodyNotEmpty(r.body)],
-    {
-      spotCheck: (r) => expectBodyContains(r.body, 'neon', true),
-      note: 'should pass through unchanged',
-    }
-  );
-
-  // ── 5. 404 behavior ───────────────────────────────────────────────────
+  // ── 3. 404 behavior ───────────────────────────────────────────────────
 
   const fake404Path = '/docs/non-existent-page-xyz-qa-test';
 
@@ -558,27 +380,14 @@ function buildTests() {
     (r) => expectHeader(r.headers, 'x-content-source', 'md-404'),
   ]);
 
-  // ── 6. Legacy /llms/ redirects ────────────────────────────────────────
-
-  add(
-    'Legacy redirect',
-    '/llms/introduction.txt',
-    'browser',
-    [
-      (r) => expectStatus(r.status, 301),
-      (r) => expectHeader(r.headers, 'location', '/docs/introduction.md'),
-    ],
-    { note: 'redirect to .md URL' }
-  );
-
-  // ── 7. llms.txt files ─────────────────────────────────────────────────
+  // ── 4. llms.txt files ─────────────────────────────────────────────────
 
   add(
     'LLMs txt',
     '/docs/llms.txt',
     'browser',
     [(r) => expectStatus(r.status, 200), (r) => expectBodyNotEmpty(r.body)],
-    { spotCheck: (r) => expectBodyContains(r.body, 'neon', true) }
+    { spotCheck: (r) => expectBodyContains(r.body, 'sindlish', true) }
   );
 
   add(
@@ -586,26 +395,10 @@ function buildTests() {
     '/docs/llms-full.txt',
     'browser',
     [(r) => expectStatus(r.status, 200), (r) => expectBodyNotEmpty(r.body)],
-    { spotCheck: (r) => expectBodyContains(r.body, 'neon', true) }
+    { spotCheck: (r) => expectBodyContains(r.body, 'sindlish', true) }
   );
 
-  // ── 8. RSS exclusion ──────────────────────────────────────────────────
-
-  add(
-    'RSS exclusion',
-    '/guides/rss.xml',
-    'agent-ua',
-    [
-      (r) => {
-        if (r.contentType && r.contentType.includes('text/markdown'))
-          return 'served markdown for RSS feed';
-        return null;
-      },
-    ],
-    { note: 'should NOT serve markdown' }
-  );
-
-  // ── 9. Non-content routes ─────────────────────────────────────────────
+  // ── 5. Non-content routes ─────────────────────────────────────────────
 
   add(
     'Non-docs route',
@@ -621,7 +414,7 @@ function buildTests() {
     { note: 'homepage is not a CONTENT_ROUTE' }
   );
 
-  const nonContentRoutes = ['/about', '/blog'];
+  const nonContentRoutes = ['/download', '/playground', '/creator'];
 
   for (const path of nonContentRoutes) {
     add(
@@ -653,83 +446,7 @@ function buildTests() {
     );
   }
 
-  // ── 9b. Blog post (not a docs content route; stays HTML for agents / Accept: markdown)
-  // Example: https://neon.com/blog/prewarming
-
-  const blogPostPath = '/blog/prewarming';
-
-  add(
-    'Blog post',
-    blogPostPath,
-    'browser',
-    [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/html'),
-      (r) => expectHtmlBody(r.body),
-    ],
-    {
-      spotCheck: (r) => expectBodyContains(r.body, 'Prewarming', true),
-      note: 'engineering blog article',
-    }
-  );
-
-  add(
-    'Blog post',
-    blogPostPath,
-    'accept-md',
-    [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/html'),
-      (r) => expectHtmlBody(r.body),
-      (r) => {
-        const src = r.headers.get('x-content-source');
-        if (src === 'markdown') return 'blog post returned x-content-source: markdown';
-        return null;
-      },
-    ],
-    {
-      spotCheck: (r) => expectBodyContains(r.body, 'Prewarming', true),
-      note: 'Accept: markdown must not serve docs markdown',
-    }
-  );
-
-  add(
-    'Blog post',
-    blogPostPath,
-    'agent-ua',
-    [
-      (r) => expectStatus(r.status, 200),
-      (r) => expectContentType(r.contentType, 'text/html'),
-      (r) => expectHtmlBody(r.body),
-      (r) => {
-        const src = r.headers.get('x-content-source');
-        if (src === 'markdown') return 'blog post returned x-content-source: markdown';
-        return null;
-      },
-    ],
-    {
-      spotCheck: (r) => expectBodyContains(r.body, 'Prewarming', true),
-      note: 'AI UA must not get docs markdown',
-    }
-  );
-
-  // ── 10. Individual changelog entry (file must exist under public/md/changelog/ — run --generate)
-  // ---------------------------------------------------------------------------
-
-  add('Changelog entry', '/docs/changelog/2026-04-03', 'accept-md', [
-    (r) => expectStatus(r.status, 200),
-    (r) => expectContentType(r.contentType, 'text/markdown'),
-    (r) => expectMarkdownBody(r.body),
-    (r) => expectHeader(r.headers, 'x-content-source', 'markdown'),
-  ]);
-
-  add('Changelog entry', '/docs/changelog/2026-04-03', 'dot-md', [
-    (r) => expectStatus(r.status, 200),
-    (r) => expectContentType(r.contentType, 'text/markdown'),
-    (r) => expectMarkdownBody(r.body),
-  ]);
-
-  // ── 11. Content route doc headers on HTML responses ───────────────────
+  // ── 6. Content route doc headers on HTML responses ────────────────────
 
   add(
     'Doc headers on HTML',

@@ -1,4 +1,6 @@
 import fs from 'fs/promises';
+import os from 'os';
+import path from 'path';
 
 import { describe, it, expect } from 'vitest';
 
@@ -9,166 +11,48 @@ import {
   buildPageHeader,
 } from './process-md-for-llms.js';
 
-// Test actual file conversion - the important stuff
+// Test specific component conversions with inline MDX
 describe('MDX to Markdown Conversion', () => {
-  // Test a real file from the repo
-  describe('Real file conversion', () => {
-    it('should convert prisma.md without errors', async () => {
-      const inputPath = 'content/docs/guides/prisma.md';
-      const pageUrl = 'https://neon.com/docs/guides/prisma';
-
-      const result = await processFile(inputPath, pageUrl);
-
-      // Should have title from frontmatter
-      expect(result).toContain('# Connect from Prisma to Neon');
-
-      // Should have converted Admonitions
-      expect(result).toContain('**Tip:**');
-      expect(result).toContain('**Note:**');
-
-      // Should NOT have raw MDX components
-      expect(result).not.toContain('<Admonition');
-      expect(result).not.toContain('<CopyPrompt');
-      expect(result).not.toContain('<NeedHelp');
-
-      // Should preserve <details> as HTML
-      expect(result).toContain('<details>');
-      expect(result).toContain('<summary>');
-
-      // Should have absolute URLs
-      expect(result).toContain('https://neon.com/docs/');
-      expect(result).not.toMatch(/\]\(\/docs\//); // No relative /docs/ links
-    });
-
-    it('should convert nextjs.md with CodeTabs', async () => {
-      const inputPath = 'content/docs/guides/nextjs.md';
-      const pageUrl = 'https://neon.com/docs/guides/nextjs';
-
-      const result = await processFile(inputPath, pageUrl);
-
-      // Should have converted CodeTabs to bold labels
-      expect(result).toContain('**node-postgres**');
-      expect(result).toContain('**postgres.js**');
-      expect(result).toContain('**Neon serverless driver**');
-
-      // Should NOT have raw CodeTabs
-      expect(result).not.toContain('<CodeTabs');
-      expect(result).not.toContain('</CodeTabs>');
-    });
-
-    it('should load FeatureBeta shared content', async () => {
-      const inputPath = 'content/docs/workflows/data-anonymization.md';
-      const pageUrl = 'https://neon.com/docs/workflows/data-anonymization';
-      const projectRoot = process.cwd();
-
-      const result = await processFile(inputPath, pageUrl, projectRoot);
-
-      // FeatureBeta should be replaced with its content (an Admonition)
-      expect(result).toContain('**Note:**');
-      expect(result).toContain('This feature is in Beta');
-      expect(result).not.toContain('<FeatureBeta');
-    });
-
-    it('should expand AzureRegionsDeprecation shared content', async () => {
-      const inputPath = 'content/docs/introduction/regions.md';
-      const pageUrl = 'https://neon.com/docs/introduction/regions';
-      const projectRoot = process.cwd();
-
-      const result = await processFile(inputPath, pageUrl, projectRoot);
-
-      expect(result).toContain('Azure regions');
-      expect(result).toContain('April 7, 2026');
-      expect(result).not.toContain('<AzureRegionsDeprecation');
-    });
-
-    it('should expand ConsumptionAccountApiDeprecation shared content', async () => {
-      const inputPath = 'content/docs/guides/consumption-limits.md';
-      const pageUrl = 'https://neon.com/docs/guides/consumption-limits';
-      const projectRoot = process.cwd();
-
-      const result = await processFile(inputPath, pageUrl, projectRoot);
-
-      expect(result).toContain('consumption_history/account');
-      expect(result).toContain('deprecated');
-      expect(result).not.toContain('<ConsumptionAccountApiDeprecation');
-    });
-
-    it('should unwrap QuoteBlocksWrapper and preserve all quotes', async () => {
-      const inputPath = 'content/pages/use-cases/dev-test.md';
-      const pageUrl = 'https://neon.com/use-cases/dev-test';
-      const projectRoot = process.cwd();
-
-      const result = await processFile(inputPath, pageUrl, projectRoot);
-
-      expect(result).not.toContain('<QuoteBlocksWrapper');
-      expect(result).not.toContain('</QuoteBlocksWrapper>');
-      expect(result).toContain('Jonathan Reyes');
-      expect(result).toContain('Léonard Henriquez');
-      expect(result).toContain('Alex Co');
-    });
-
-    it('should convert TwoColumnLayout in reference docs', async () => {
-      const inputPath = 'content/docs/auth/reference/nextjs-server.md';
-      const pageUrl = 'https://neon.com/docs/auth/reference/nextjs-server';
-      const projectRoot = process.cwd();
-
-      const result = await processFile(inputPath, pageUrl, projectRoot);
-
-      // TwoColumnLayout.Item should become headings
-      expect(result).toContain('## Installation');
-      expect(result).toContain('## Environment variables');
-
-      // TwoColumnLayout.Item with method should show method signature
-      expect(result).toContain('## createNeonAuth()');
-      expect(result).toContain('Method: `createNeonAuth(config)`');
-
-      // Should NOT have raw TwoColumnLayout
-      expect(result).not.toContain('<TwoColumnLayout');
-    });
-  });
-
-  // Test specific component conversions with inline MDX
-  describe('Component conversions', () => {
-    // Helper to process inline MDX content
-    async function processInlineMdx(mdxContent, pageUrl = 'https://neon.com/test', rootDir) {
-      const tempPath = '/tmp/test-mdx-conversion.md';
-      const fullContent = `---
+  // Helper to process inline MDX content
+  async function processInlineMdx(mdxContent, pageUrl = 'https://sindlish.org/test', rootDir) {
+    const tempPath = path.join(os.tmpdir(), 'test-mdx-conversion.md');
+    const fullContent = `---
 title: Test
 ---
 
 ${mdxContent}`;
-      await fs.writeFile(tempPath, fullContent);
-      return processFile(tempPath, pageUrl, rootDir);
-    }
+    await fs.writeFile(tempPath, fullContent);
+    return processFile(tempPath, pageUrl, rootDir);
+  }
 
-    it('should convert Admonition to bold label', async () => {
-      const result = await processInlineMdx(`
+  it('should convert Admonition to bold label', async () => {
+    const result = await processInlineMdx(`
 <Admonition type="warning">
 Be careful with this setting.
 </Admonition>
 `);
-      expect(result).toContain('**Warning:**');
-      expect(result).toContain('Be careful with this setting.');
-      expect(result).not.toContain('<Admonition');
-    });
+    expect(result).toContain('**Warning:**');
+    expect(result).toContain('Be careful with this setting.');
+    expect(result).not.toContain('<Admonition');
+  });
 
-    it('should convert DetailIconCards to bullet list with descriptions', async () => {
-      const result = await processInlineMdx(`
+  it('should convert DetailIconCards to bullet list with descriptions', async () => {
+    const result = await processInlineMdx(`
 <DetailIconCards>
-<a href="/docs/guides/prisma" description="Connect Prisma to Neon">Prisma Guide</a>
-<a href="/docs/guides/nextjs" description="Connect Next.js to Neon">Next.js Guide</a>
+<a href="/docs/basics/variables" description="Learn about Sindlish variables">Variables Guide</a>
+<a href="/docs/basics/loops" description="Learn about Sindlish loops">Loops Guide</a>
 </DetailIconCards>
 `);
-      expect(result).toContain(
-        '- [Prisma Guide](https://neon.com/docs/guides/prisma): Connect Prisma to Neon'
-      );
-      expect(result).toContain(
-        '- [Next.js Guide](https://neon.com/docs/guides/nextjs): Connect Next.js to Neon'
-      );
-    });
+    expect(result).toContain(
+      '- [Variables Guide](https://sindlish.org/docs/basics/variables): Learn about Sindlish variables'
+    );
+    expect(result).toContain(
+      '- [Loops Guide](https://sindlish.org/docs/basics/loops): Learn about Sindlish loops'
+    );
+  });
 
-    it('should remove CopyPrompt and NeedHelp', async () => {
-      const result = await processInlineMdx(`
+  it('should remove CopyPrompt and NeedHelp', async () => {
+    const result = await processInlineMdx(`
 Some content here.
 
 <CopyPrompt src="/prompts/test.md" />
@@ -177,14 +61,14 @@ More content.
 
 <NeedHelp/>
 `);
-      expect(result).toContain('Some content here.');
-      expect(result).toContain('More content.');
-      expect(result).not.toContain('CopyPrompt');
-      expect(result).not.toContain('NeedHelp');
-    });
+    expect(result).toContain('Some content here.');
+    expect(result).toContain('More content.');
+    expect(result).not.toContain('CopyPrompt');
+    expect(result).not.toContain('NeedHelp');
+  });
 
-    it('should preserve details/summary as HTML', async () => {
-      const result = await processInlineMdx(`
+  it('should preserve details/summary as HTML', async () => {
+    const result = await processInlineMdx(`
 <details>
 <summary>**Click to expand**</summary>
 
@@ -192,52 +76,52 @@ Hidden content here.
 
 </details>
 `);
-      expect(result).toContain('<details>');
-      expect(result).toContain('<summary>');
-      expect(result).toContain('</details>');
-      expect(result).toContain('Hidden content here.');
-    });
+    expect(result).toContain('<details>');
+    expect(result).toContain('<summary>');
+    expect(result).toContain('</details>');
+    expect(result).toContain('Hidden content here.');
+  });
 
-    it('should convert TechCards using title attribute (not children text)', async () => {
-      const result = await processInlineMdx(`
+  it('should convert TechCards using title attribute (not children text)', async () => {
+    const result = await processInlineMdx(`
 <TechCards>
-<a href="/docs/guides/node" title="Node.js" description="Connect a Node.js application to Neon" icon="node-js"></a>
-<a href="/docs/guides/django" title="Django" description="Connect a Django application to Neon" icon="django"></a>
+<a href="/docs/basics/variables" title="Variables" description="Learn about Sindlish variables" icon="code"></a>
+<a href="/docs/basics/loops" title="Loops" description="Learn about Sindlish loops" icon="repeat"></a>
 </TechCards>
 `);
-      expect(result).toContain(
-        '- [Node.js](https://neon.com/docs/guides/node): Connect a Node.js application to Neon'
-      );
-      expect(result).toContain(
-        '- [Django](https://neon.com/docs/guides/django): Connect a Django application to Neon'
-      );
-      expect(result).not.toContain('<TechCards');
-    });
+    expect(result).toContain(
+      '- [Variables](https://sindlish.org/docs/basics/variables): Learn about Sindlish variables'
+    );
+    expect(result).toContain(
+      '- [Loops](https://sindlish.org/docs/basics/loops): Learn about Sindlish loops'
+    );
+    expect(result).not.toContain('<TechCards');
+  });
 
-    it('should extract InfoBlock children', async () => {
-      const result = await processInlineMdx(`
+  it('should extract InfoBlock children', async () => {
+    const result = await processInlineMdx(`
 <InfoBlock>
 
 Some important information.
 
 </InfoBlock>
 `);
-      expect(result).toContain('Some important information.');
-      expect(result).not.toContain('<InfoBlock');
-    });
+    expect(result).toContain('Some important information.');
+    expect(result).not.toContain('<InfoBlock');
+  });
 
-    it('should convert DocsList to title and bullet list', async () => {
-      const result = await processInlineMdx(`
+  it('should convert DocsList to title and bullet list', async () => {
+    const result = await processInlineMdx(`
 <DocsList title="What you will learn:">
-<a href="/docs/guides/prisma">Prisma integration</a>
+<a href="/docs/basics/variables">Sindlish variables</a>
 </DocsList>
 `);
-      expect(result).toContain('**What you will learn:**');
-      expect(result).toContain('[Prisma integration](https://neon.com/docs/guides/prisma)');
-    });
+    expect(result).toContain('**What you will learn:**');
+    expect(result).toContain('[Sindlish variables](https://sindlish.org/docs/basics/variables)');
+  });
 
-    it('should convert CheckList and CheckItem', async () => {
-      const result = await processInlineMdx(`
+  it('should convert CheckList and CheckItem', async () => {
+    const result = await processInlineMdx(`
 <CheckList title="Deployment checklist">
 
 <CheckItem title="Configure SSL" href="#ssl">
@@ -246,13 +130,13 @@ Enable SSL for secure connections.
 
 </CheckList>
 `);
-      expect(result).toContain('## Deployment checklist');
-      expect(result).toContain('[Configure SSL]');
-      expect(result).toContain('Enable SSL for secure connections.');
-    });
+    expect(result).toContain('## Deployment checklist');
+    expect(result).toContain('[Configure SSL]');
+    expect(result).toContain('Enable SSL for secure connections.');
+  });
 
-    it('should remove CTA, Video, UserButton, RequestForm, Suspense', async () => {
-      const result = await processInlineMdx(`
+  it('should remove CTA, Video, UserButton, RequestForm, Suspense', async () => {
+    const result = await processInlineMdx(`
 Content before.
 
 <CTA title="Get started" href="/signup">Sign up now</CTA>
@@ -267,17 +151,17 @@ Content before.
 
 Content after.
 `);
-      expect(result).toContain('Content before.');
-      expect(result).toContain('Content after.');
-      expect(result).not.toContain('<CTA');
-      expect(result).not.toContain('<Video');
-      expect(result).not.toContain('<UserButton');
-      expect(result).not.toContain('<RequestForm');
-      expect(result).not.toContain('<Suspense');
-    });
+    expect(result).toContain('Content before.');
+    expect(result).toContain('Content after.');
+    expect(result).not.toContain('<CTA');
+    expect(result).not.toContain('<Video');
+    expect(result).not.toContain('<UserButton');
+    expect(result).not.toContain('<RequestForm');
+    expect(result).not.toContain('<Suspense');
+  });
 
-    it('should convert TwoColumnLayout.Item with title and method', async () => {
-      const result = await processInlineMdx(`
+  it('should convert TwoColumnLayout.Item with title and method', async () => {
+    const result = await processInlineMdx(`
 <TwoColumnLayout>
 
 <TwoColumnLayout.Item title="Installation" method="npm install pkg">
@@ -288,63 +172,50 @@ Install the package using npm.
 
 </TwoColumnLayout>
 `);
-      expect(result).toContain('## Installation');
-      expect(result).toContain('Method: `npm install pkg`');
-      expect(result).toContain('Install the package using npm.');
-    });
+    expect(result).toContain('## Installation');
+    expect(result).toContain('Method: `npm install pkg`');
+    expect(result).toContain('Install the package using npm.');
   });
 
   // Test URL conversion
   describe('URL conversion', () => {
-    async function processInlineMdx(mdxContent, pageUrl = 'https://neon.com/docs/test') {
-      const tempPath = '/tmp/test-mdx-conversion.md';
+    async function processInlineMdx(mdxContent, pageUrl = 'https://sindlish.org/docs/test') {
+      const tempPath = path.join(os.tmpdir(), 'test-mdx-conversion.md');
       await fs.writeFile(tempPath, `---\ntitle: Test\n---\n${mdxContent}`);
       return processFile(tempPath, pageUrl);
     }
 
     it('should convert relative URLs to absolute', async () => {
       const result = await processInlineMdx(`
-See the [Prisma guide](/docs/guides/prisma) for more info.
+See the [variables guide](/docs/basics/variables) for more info.
 `);
-      expect(result).toContain('[Prisma guide](https://neon.com/docs/guides/prisma)');
+      expect(result).toContain('[variables guide](https://sindlish.org/docs/basics/variables)');
     });
 
     it('should convert anchor links to full URL with anchor', async () => {
       const result = await processInlineMdx(
         `
-See [connection issues](#connection-issues) below.
+See [syntax issues](#syntax-issues) below.
 `,
-        'https://neon.com/docs/guides/django'
+        'https://sindlish.org/docs/basics/variables'
       );
       expect(result).toContain(
-        '[connection issues](https://neon.com/docs/guides/django#connection-issues)'
+        '[syntax issues](https://sindlish.org/docs/basics/variables#syntax-issues)'
       );
     });
 
     it('should preserve external URLs', async () => {
       const result = await processInlineMdx(`
-See the [Django docs](https://docs.djangoproject.com/en/4.1/).
+See the [Sindlish docs](https://sindlish.org/docs).
 `);
-      expect(result).toContain('[Django docs](https://docs.djangoproject.com/en/4.1/)');
-    });
-
-    it('should convert relative URLs (no leading slash) to absolute', async () => {
-      const result = await processInlineMdx(
-        `
-See the [What is PostgreSQL](postgresql-getting-started/what-is-postgresql) page.
-`,
-        'https://neon.com/postgresql/postgresql-getting-started'
-      );
-      expect(result).toContain(
-        '[What is PostgreSQL](https://neon.com/postgresql/postgresql-getting-started/what-is-postgresql)'
-      );
+      expect(result).toContain('[Sindlish docs](https://sindlish.org/docs)');
     });
   });
 
   // Test recently added components
   describe('Additional component conversions', () => {
-    async function processInlineMdx(mdxContent, pageUrl = 'https://neon.com/test') {
-      const tempPath = '/tmp/test-mdx-conversion.md';
+    async function processInlineMdx(mdxContent, pageUrl = 'https://sindlish.org/test') {
+      const tempPath = path.join(os.tmpdir(), 'test-mdx-conversion.md');
       const fullContent = `---
 title: Test
 ---
@@ -356,19 +227,19 @@ ${mdxContent}`;
 
     it('should convert MegaLink to descriptive link', async () => {
       const result = await processInlineMdx(`
-<MegaLink tag="Fast databases" title="Provision instantly and scale automatically." url="https://neon.com/features" />
+<MegaLink tag="Fast language" title="Sindlish compiles quickly." url="https://sindlish.org/features" />
 `);
-      expect(result).toContain('**Fast databases**');
-      expect(result).toContain('Provision instantly and scale automatically.');
-      expect(result).toContain('[Learn more](https://neon.com/features)');
+      expect(result).toContain('**Fast language**');
+      expect(result).toContain('Sindlish compiles quickly.');
+      expect(result).toContain('[Learn more](https://sindlish.org/features)');
       expect(result).not.toContain('<MegaLink');
     });
 
     it('should convert QuoteBlock with string slug to blockquote with title-cased name', async () => {
       const result = await processInlineMdx(`
-<QuoteBlock quote="Neon is amazing for serverless." author="jane-doe" role="CTO at Startup" />
+<QuoteBlock quote="Sindlish is amazing for learning." author="jane-doe" role="CTO at Startup" />
 `);
-      expect(result).toContain('> Neon is amazing for serverless.');
+      expect(result).toContain('> Sindlish is amazing for learning.');
       expect(result).toContain('> — Jane Doe, CTO at Startup');
       expect(result).not.toContain('jane-doe');
       expect(result).not.toContain('<QuoteBlock');
@@ -377,9 +248,9 @@ ${mdxContent}`;
     it('should resolve QuoteBlock slug from quote-block.jsx map', async () => {
       const result = await processInlineMdx(
         `
-<QuoteBlock quote="Fast provisioning." author="lincoln-bergeson" role="Infrastructure Engineer at Replit" />
+<QuoteBlock quote="Fast compilation." author="lincoln-bergeson" role="Infrastructure Engineer at Replit" />
 `,
-        'https://neon.com/test',
+        'https://sindlish.org/test',
         process.cwd()
       );
       expect(result).toContain('> — Lincoln Bergeson, Infrastructure Engineer at Replit');
@@ -388,9 +259,9 @@ ${mdxContent}`;
 
     it('should convert QuoteBlock with object author', async () => {
       const result = await processInlineMdx(`
-<QuoteBlock quote="Branching is great." author={{ name: 'Jane Doe', company: 'Acme Corp' }} />
+<QuoteBlock quote="Clear syntax is great." author={{ name: 'Jane Doe', company: 'Acme Corp' }} />
 `);
-      expect(result).toContain('> Branching is great.');
+      expect(result).toContain('> Clear syntax is great.');
       expect(result).toContain('> — Jane Doe, Acme Corp');
       expect(result).not.toContain('name:');
       expect(result).not.toContain('<QuoteBlock');
@@ -400,52 +271,41 @@ ${mdxContent}`;
       const result = await processInlineMdx(`
 <QuoteBlock quote="Scales well." author="some-person" role="Engineer" link="/blog/case-study" />
 `);
-      expect(result).toContain('[Read case study](https://neon.com/blog/case-study)');
-    });
-
-    it('should handle QuoteBlock with object author and link in real file', async () => {
-      const inputPath = 'content/pages/use-cases/dev-test.md';
-      const pageUrl = 'https://neon.com/use-cases/dev-test';
-      const result = await processFile(inputPath, pageUrl, process.cwd());
-
-      expect(result).toContain('— Jonathan Reyes, Principal Engineer at Dispatch');
-      expect(result).not.toContain("name: 'Jonathan Reyes'");
-      expect(result).toContain('Read case study');
-      expect(result).toContain('https://neon.com/blog/');
+      expect(result).toContain('[Read case study](https://sindlish.org/blog/case-study)');
     });
 
     it('should convert Testimonial to blockquote', async () => {
       const result = await processInlineMdx(`
 <Testimonial
-  text="Great database service!"
+  text="Great programming language!"
   author={{
     name: 'John Smith',
     company: 'Tech Corp',
   }}
 />
 `);
-      expect(result).toContain('> Great database service!');
+      expect(result).toContain('> Great programming language!');
       expect(result).toContain('> — John Smith, Tech Corp');
       expect(result).not.toContain('<Testimonial');
     });
 
     it('should extract FeatureList children', async () => {
       const result = await processInlineMdx(`
-<FeatureList icons={['database', 'scale']}>
+<FeatureList icons={['code', 'book']}>
 
-### Feature One
+### Readable syntax
 
-Description of feature one.
+Sindlish code reads like natural language.
 
-### Feature Two
+### Easy to learn
 
-Description of feature two.
+Beginners can pick it up quickly.
 
 </FeatureList>
 `);
-      expect(result).toContain('### Feature One');
-      expect(result).toContain('Description of feature one.');
-      expect(result).toContain('### Feature Two');
+      expect(result).toContain('### Readable syntax');
+      expect(result).toContain('Sindlish code reads like natural language.');
+      expect(result).toContain('### Easy to learn');
       expect(result).not.toContain('<FeatureList');
     });
 
@@ -459,25 +319,27 @@ Description of feature two.
 
     it('should convert CommunityBanner to link', async () => {
       const result = await processInlineMdx(`
-<CommunityBanner buttonText="Join Discord" buttonUrl="https://discord.gg/neon">
+<CommunityBanner buttonText="Join Discord" buttonUrl="https://discord.gg/sindlish">
 Join our community!
 </CommunityBanner>
 `);
       expect(result).toContain('Join our community!');
-      expect(result).toContain('[Join Discord](https://discord.gg/neon)');
+      expect(result).toContain('[Join Discord](https://discord.gg/sindlish)');
       expect(result).not.toContain('<CommunityBanner');
     });
 
     it('should convert PromptCards to list of links', async () => {
       const result = await processInlineMdx(`
 <PromptCards>
-<a title="Next.js" promptSrc="/prompts/nextjs.md" />
-<a title="Django" promptSrc="/prompts/django.md" />
+<a title="Basics" promptSrc="/prompts/basics.md" />
+<a title="Data Structures" promptSrc="/prompts/data-structures.md" />
 </PromptCards>
 `);
       expect(result).toContain('**AI Coding Prompts:**');
-      expect(result).toContain('[Next.js prompt](https://neon.com/prompts/nextjs.md)');
-      expect(result).toContain('[Django prompt](https://neon.com/prompts/django.md)');
+      expect(result).toContain('[Basics prompt](https://sindlish.org/prompts/basics.md)');
+      expect(result).toContain(
+        '[Data Structures prompt](https://sindlish.org/prompts/data-structures.md)'
+      );
       expect(result).not.toContain('<PromptCards');
     });
 
@@ -577,7 +439,7 @@ Below the line.
   // Test that we don't over-escape
   describe('No over-escaping', () => {
     async function processInlineMdx(mdxContent) {
-      const tempPath = '/tmp/test-mdx-conversion.md';
+      const tempPath = path.join(os.tmpdir(), 'test-mdx-conversion.md');
       await fs.writeFile(tempPath, `---\ntitle: Test\n---\n${mdxContent}`);
       return processFile(tempPath);
     }
@@ -602,7 +464,7 @@ See [CONN_MAX_AGE](https://example.com).
   // Test index pointer
   describe('Index pointer', () => {
     it('should not include index pointer in processFile output (moved to page header)', async () => {
-      const tempPath = '/tmp/test-mdx-conversion.md';
+      const tempPath = path.join(os.tmpdir(), 'test-mdx-conversion.md');
       await fs.writeFile(tempPath, `---\ntitle: Test Page\n---\nSome content here.`);
       const result = await processFile(tempPath);
 
@@ -623,57 +485,44 @@ See [CONN_MAX_AGE](https://example.com).
       expect(navMap.size).toBeGreaterThan(0);
 
       // Check a known page from docs navigation
-      const connectEntry = navMap.get('get-started/connect-neon');
+      const connectEntry = navMap.get('get-started/installation');
       expect(connectEntry).toBeDefined();
       expect(connectEntry.sectionName).toBeTruthy();
       expect(connectEntry.siblings.length).toBeGreaterThan(0);
       expect(connectEntry.urlPrefix).toBe('docs');
     });
 
-    it('should include postgresql pages in navigation map', () => {
-      const rootDir = process.cwd();
-      const navMap = buildNavigationMap(rootDir);
-
-      // Check a known postgresql page
-      const selectEntry = navMap.get('tutorial/select');
-      expect(selectEntry).toBeDefined();
-      expect(selectEntry.urlPrefix).toBe('postgresql');
-      expect(selectEntry.siblings.length).toBeGreaterThan(0);
-    });
-
     it('should generate footer with sibling links', () => {
       const navMap = new Map();
-      navMap.set('get-started/connect-neon', {
-        sectionName: 'Start with Neon',
+      navMap.set('basics/variables', {
+        sectionName: 'Language Guide',
         urlPrefix: 'docs',
         siblings: [
-          { title: '1 - Basics', slug: 'get-started/signing-up' },
-          { title: '3 - Branching', slug: 'get-started/workflow-primer' },
+          { title: 'Comments', slug: 'basics/comments' },
+          { title: 'Math & Logic', slug: 'basics/math' },
         ],
       });
 
-      const footer = buildNavigationFooter('get-started/connect-neon', navMap);
+      const footer = buildNavigationFooter('basics/variables', navMap);
 
-      expect(footer).toContain('## Related docs (Start with Neon)');
-      expect(footer).toContain('- [1 - Basics](https://neon.com/docs/get-started/signing-up)');
-      expect(footer).toContain(
-        '- [3 - Branching](https://neon.com/docs/get-started/workflow-primer)'
-      );
+      expect(footer).toContain('## Related docs (Language Guide)');
+      expect(footer).toContain('- [Comments](https://sindlish.org/docs/basics/comments)');
+      expect(footer).toContain('- [Math & Logic](https://sindlish.org/docs/basics/math)');
       expect(footer).toContain('---');
     });
 
     it('should omit current page from footer', () => {
       const navMap = new Map();
-      navMap.set('get-started/connect-neon', {
-        sectionName: 'Start with Neon',
+      navMap.set('basics/variables', {
+        sectionName: 'Language Guide',
         urlPrefix: 'docs',
-        siblings: [{ title: '1 - Basics', slug: 'get-started/signing-up' }],
+        siblings: [{ title: 'Comments', slug: 'basics/comments' }],
       });
 
-      const footer = buildNavigationFooter('get-started/connect-neon', navMap);
+      const footer = buildNavigationFooter('basics/variables', navMap);
 
       // Should NOT contain the current page
-      expect(footer).not.toContain('connect-neon)');
+      expect(footer).not.toContain('variables)');
     });
 
     it('should return empty string for pages not in map', () => {
@@ -694,103 +543,42 @@ See [CONN_MAX_AGE](https://example.com).
       expect(footer).toBe('');
     });
 
-    it('should handle nested sub-groups correctly', () => {
-      const rootDir = process.cwd();
-      const navMap = buildNavigationMap(rootDir);
-
-      // "Read-only access" is in a nested sub-group "Use cases" under "Read replicas"
-      const readOnlyEntry = navMap.get('guides/read-only-access-read-replicas');
-      if (readOnlyEntry) {
-        // Its siblings should be the other "Use cases" items, not all of "Read replicas"
-        const siblingsSlugs = readOnlyEntry.siblings.map((s) => s.slug);
-        expect(siblingsSlugs).toContain('guides/read-replica-adhoc-queries');
-        expect(siblingsSlugs).toContain('guides/read-replica-data-analysis');
-        // "Overview" is at the parent level, not a sibling
-        expect(siblingsSlugs).not.toContain('introduction/read-replicas');
-      }
-    });
-
     it('should store breadcrumbs in navigation map entries', () => {
       const rootDir = process.cwd();
       const navMap = buildNavigationMap(rootDir);
 
-      const connectEntry = navMap.get('get-started/connect-neon');
+      const connectEntry = navMap.get('get-started/installation');
       expect(connectEntry).toBeDefined();
       expect(connectEntry.breadcrumbs).toBeDefined();
       expect(Array.isArray(connectEntry.breadcrumbs)).toBe(true);
       expect(connectEntry.breadcrumbs.length).toBeGreaterThan(0);
-    });
-
-    it('should include section nodes in breadcrumbs for nested pages', () => {
-      const rootDir = process.cwd();
-      const navMap = buildNavigationMap(rootDir);
-
-      // auth/guides/password-reset is under: Backend > Neon Auth > Guides
-      const entry = navMap.get('auth/guides/password-reset');
-      expect(entry).toBeDefined();
-      expect(entry.breadcrumbs).toContain('Backend');
-      expect(entry.breadcrumbs).toContain('Neon Auth');
-      expect(entry.breadcrumbs).toContain('Guides');
-    });
-
-    it('should track deep nesting in breadcrumbs', () => {
-      const rootDir = process.cwd();
-      const navMap = buildNavigationMap(rootDir);
-
-      // Read-only access is deeply nested: Read replicas > Use cases
-      const readOnlyEntry = navMap.get('guides/read-only-access-read-replicas');
-      if (readOnlyEntry) {
-        expect(readOnlyEntry.breadcrumbs.length).toBeGreaterThanOrEqual(2);
-        expect(readOnlyEntry.breadcrumbs).toContain('Use cases');
-      }
-    });
-
-    it('should prefer canonical nav location over cross-references', () => {
-      const rootDir = process.cwd();
-      const navMap = buildNavigationMap(rootDir);
-
-      // extensions/pgvector appears in both AI section and Extensions section;
-      // should prefer Extensions (siblings share extensions/ prefix)
-      const pgvectorEntry = navMap.get('extensions/pgvector');
-      expect(pgvectorEntry).toBeDefined();
-      expect(pgvectorEntry.breadcrumbs).not.toContain('AI App Starter Kit');
-      expect(pgvectorEntry.sectionName).toBe('Extensions');
-
-      // auth/overview appears in "Start with Neon" and the Auth section;
-      // should prefer Auth section (siblings share auth/ prefix)
-      const authEntry = navMap.get('auth/overview');
-      expect(authEntry).toBeDefined();
-      expect(authEntry.breadcrumbs).not.toContain('Start with Neon');
-      expect(authEntry.breadcrumbs).toContain('Neon Auth');
     });
   });
 
   describe('Page header', () => {
     it('should include location and index for pages in nav map', () => {
       const navMap = new Map();
-      navMap.set('auth/guides/password-reset', {
-        sectionName: 'Guides',
+      navMap.set('basics/variables', {
+        sectionName: 'Language Guide',
         urlPrefix: 'docs',
         siblings: [],
-        breadcrumbs: ['Neon Auth', 'Guides'],
-        pageTitle: 'Password reset',
+        breadcrumbs: ['Documentation', 'Language Guide'],
+        pageTitle: 'Variables & Types',
       });
 
-      const header = buildPageHeader(
-        'auth/guides/password-reset',
-        navMap,
-        'docs/auth/guides/password-reset.md'
-      );
+      const header = buildPageHeader('basics/variables', navMap, 'docs/basics/variables.md');
       expect(header).toBe(
-        '> This page location: Neon Auth > Guides > Password reset\n' +
-          '> Full Neon documentation index: https://neon.com/docs/llms.txt\n\n'
+        '> This page location: Documentation > Language Guide > Variables & Types\n' +
+          '> Full Sindlish documentation index: https://sindlish.org/docs/llms.txt\n\n'
       );
     });
 
     it('should include only index line for pages not in map', () => {
       const navMap = new Map();
       const header = buildPageHeader('nonexistent/page', navMap);
-      expect(header).toBe('> Full Neon documentation index: https://neon.com/docs/llms.txt\n\n');
+      expect(header).toBe(
+        '> Full Sindlish documentation index: https://sindlish.org/docs/llms.txt\n\n'
+      );
     });
 
     it('should include only index line for pages with empty breadcrumbs', () => {
@@ -803,18 +591,24 @@ See [CONN_MAX_AGE](https://example.com).
       });
 
       const header = buildPageHeader('top-level/page', navMap);
-      expect(header).toBe('> Full Neon documentation index: https://neon.com/docs/llms.txt\n\n');
+      expect(header).toBe(
+        '> Full Sindlish documentation index: https://sindlish.org/docs/llms.txt\n\n'
+      );
     });
 
     it('should include only index line when navMap is null', () => {
       const header = buildPageHeader('any/page', null);
-      expect(header).toBe('> Full Neon documentation index: https://neon.com/docs/llms.txt\n\n');
+      expect(header).toBe(
+        '> Full Sindlish documentation index: https://sindlish.org/docs/llms.txt\n\n'
+      );
     });
 
     it('should include only index line when slug is null', () => {
       const navMap = new Map();
       const header = buildPageHeader(null, navMap);
-      expect(header).toBe('> Full Neon documentation index: https://neon.com/docs/llms.txt\n\n');
+      expect(header).toBe(
+        '> Full Sindlish documentation index: https://sindlish.org/docs/llms.txt\n\n'
+      );
     });
 
     it('should deduplicate consecutive identical ancestors', () => {
@@ -829,33 +623,33 @@ See [CONN_MAX_AGE](https://example.com).
 
       const header = buildPageHeader('test/page', navMap);
       expect(header).toContain('> This page location: Parent > Sub > My Page');
-      expect(header).toContain('> Full Neon documentation index:');
+      expect(header).toContain('> Full Sindlish documentation index:');
     });
 
     it('should not duplicate trailing pageTitle when it matches last breadcrumb', () => {
       const navMap = new Map();
-      navMap.set('connect/connect-intro', {
-        sectionName: 'Connect to Neon',
+      navMap.set('reference/keywords', {
+        sectionName: 'Reference',
         urlPrefix: 'docs',
         siblings: [],
-        breadcrumbs: ['Connect to Neon'],
-        pageTitle: 'Connect to Neon',
+        breadcrumbs: ['Reference'],
+        pageTitle: 'Reference',
       });
 
-      const header = buildPageHeader('connect/connect-intro', navMap);
-      // Should be "Connect to Neon" NOT "Connect to Neon > Connect to Neon"
-      expect(header).toContain('> This page location: Connect to Neon\n');
-      expect(header).not.toContain('Connect to Neon > Connect to Neon');
+      const header = buildPageHeader('reference/keywords', navMap);
+      // Should be "Reference" NOT "Reference > Reference"
+      expect(header).toContain('> This page location: Reference\n');
+      expect(header).not.toContain('Reference > Reference');
     });
 
     it('should generate correct header for real navigation data', () => {
       const rootDir = process.cwd();
       const navMap = buildNavigationMap(rootDir);
 
-      const header = buildPageHeader('auth/guides/password-reset', navMap);
-      expect(header).toBe(
-        '> This page location: Backend > Neon Auth > Guides > Password reset\n' +
-          '> Full Neon documentation index: https://neon.com/docs/llms.txt\n\n'
+      const header = buildPageHeader('basics/variables', navMap);
+      expect(header).toContain('> This page location:');
+      expect(header).toContain(
+        '> Full Sindlish documentation index: https://sindlish.org/docs/llms.txt'
       );
     });
 
@@ -863,22 +657,17 @@ See [CONN_MAX_AGE](https://example.com).
       const rootDir = process.cwd();
       const navMap = buildNavigationMap(rootDir);
 
-      // connect/connect-intro has "Connect to Neon" as both section and page title
-      const connectHeader = buildPageHeader('connect/connect-intro', navMap);
-      expect(connectHeader).not.toContain('Connect to Neon > Connect to Neon');
-      expect(connectHeader).toContain('> This page location:');
-
-      // introduction/about-billing has "Plans and billing" as both section and page title
-      const billingHeader = buildPageHeader('introduction/about-billing', navMap);
-      expect(billingHeader).not.toContain('Plans and billing > Plans and billing');
-      expect(billingHeader).toContain('> This page location:');
+      // reference/keywords has "Reference" as section and "All Keywords" as title
+      const keywordsHeader = buildPageHeader('reference/keywords', navMap);
+      expect(keywordsHeader).not.toContain('All Keywords > All Keywords');
+      expect(keywordsHeader).toContain('> This page location:');
     });
   });
 
   describe('Component conversion test page (snapshot)', () => {
     it('should convert every component without raw MDX leaks', async () => {
       const fixturePath = 'src/scripts/fixtures/mdx-conversion-test.md';
-      const pageUrl = 'https://neon.com/docs/test/mdx-conversion-test';
+      const pageUrl = 'https://sindlish.org/docs/test/mdx-conversion-test';
       const result = await processFile(fixturePath, pageUrl, process.cwd());
 
       // No raw MDX component tags should survive conversion

@@ -38,11 +38,11 @@ Current structure (as of Jan 2025):
 | Nav | Purpose | Subnav? | Pattern |
 |-----|---------|---------|---------|
 | Get started | Onboarding | No | Learning path |
-| About | Product concepts | No | Conceptual |
-| Connect | Connection methods | Yes | Task-oriented |
-| Develop | Build applications | Yes | Technology-focused |
-| Manage | Administration | Yes | Admin tasks |
-| Postgres | PostgreSQL learning | No | Educational |
+| About | Language concepts | No | Conceptual |
+| Basics | Core syntax | No | Learning path |
+| Data structures | Collections | No | Educational |
+| Intermediate | Advanced features | Yes | Technology-focused |
+| Reference | Language/spec | Yes | Reference |
 | Resources | Support/community | Yes | Utility |
 
 ---
@@ -62,13 +62,13 @@ Before recommending placement:
 
 **Ask: Should this content be in a top navbar dropdown?**
 
-Current subnav categories (Connect, Develop, Manage, Resources) share these characteristics:
+Current subnav categories (Intermediate, Reference, Resources) share these characteristics:
 - **Breadth:** Multiple distinct subcategories or technology choices
 - **Frequent reference:** Developers access during active work
 - **Known needs:** Users arrive knowing what they're looking for
-- **Major functional areas:** Core workflows (connecting, building, managing)
+- **Major functional areas:** Core workflows (language features, tooling)
 
-Current sidebar-only categories (Get started, About, Postgres) tend to be:
+Current sidebar-only categories (Get started, About, Basics) tend to be:
 - **Sequential/cohesive:** Linear learning paths or grouped concepts
 - **Exploratory:** Users browse to understand, not reference during work
 - **Less frequent access:** Read once or occasionally, not daily reference
@@ -211,7 +211,7 @@ If you need more depth → create hub page or flatten hierarchy
 
 **External links:** Full URLs work in subnav
 ```yaml
-slug: https://github.com/neondatabase/toolkit
+slug: https://github.com/sindlish/toolkit
 ```
 
 **Tags:** Add visual indicators

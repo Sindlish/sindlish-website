@@ -34,6 +34,7 @@ greet("Amanat")
 ```
 
 ### Default Parameters
+
 You can provide default values for parameters. If the caller doesn't provide a value, the default will be used.
 
 ```sd
@@ -52,6 +53,7 @@ khush_amdeed("Ali")     # Prints: Khush Amdeed, Ali
 Functions in Sindlish can return values in two ways:
 
 ### A. Explicit Return (`wapas`)
+
 The `wapas` keyword immediately stops the function and sends a value back to the caller. You can optionally specify the return type using the `->` arrow.
 
 ```sd
@@ -61,6 +63,7 @@ kaam add(a: adad, b: adad) -> adad {
 ```
 
 ### B. Implicit Return
+
 If the last line of a function is an expression (and you haven't used `wapas`), Sindlish will automatically return the result of that expression.
 
 ```sd

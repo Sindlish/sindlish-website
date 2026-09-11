@@ -5,18 +5,25 @@ require('dotenv').config({ path: '.env' });
 const fs = require('fs/promises');
 const path = require('path');
 
-const API_URL = 'https://api.github.com/repos/neondatabase/neon';
+const API_URL = 'https://api.github.com/repos/Sindlish/Sindlish';
 const SNAPSHOT_PATH = path.join(process.cwd(), 'src/utils/data/github-stars.generated.json');
 const SNAPSHOT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 const FAILED_FETCH_RETRY_DELAY_MS = 60 * 60 * 1000;
-const DEFAULT_STARS_COUNT = 21500;
+const DEFAULT_STATS = {
+  stargazers_count: 2,
+  language: 'Python',
+  language_percentage: 98,
+  files_count: 30,
+  commits_count: 33,
+  topics: ['interpreter', 'vscode-extension', 'bytecode-vm', 'sindhi-grammar'],
+};
 const FETCH_TIMEOUT_MS = 10000;
 
 function getHeaders() {
   const token = process.env.GITHUB_TOKEN;
   const headers = {
     Accept: 'application/vnd.github+json',
-    'User-Agent': 'neon-next-github-stars-updater',
+    'User-Agent': 'sindlish-next-github-stars-updater',
   };
 
   if (token) {
@@ -51,7 +58,18 @@ function normalizeSnapshot(snapshot) {
     checked_at: snapshot?.checked_at ?? null,
     stargazers_count: Number.isFinite(snapshot?.stargazers_count)
       ? snapshot.stargazers_count
-      : DEFAULT_STARS_COUNT,
+      : DEFAULT_STATS.stargazers_count,
+    language: snapshot?.language || DEFAULT_STATS.language,
+    language_percentage: Number.isFinite(snapshot?.language_percentage)
+      ? snapshot.language_percentage
+      : DEFAULT_STATS.language_percentage,
+    files_count: Number.isFinite(snapshot?.files_count)
+      ? snapshot.files_count
+      : DEFAULT_STATS.files_count,
+    commits_count: Number.isFinite(snapshot?.commits_count)
+      ? snapshot.commits_count
+      : DEFAULT_STATS.commits_count,
+    topics: Array.isArray(snapshot?.topics) ? snapshot.topics : DEFAULT_STATS.topics,
   };
 }
 
@@ -74,11 +92,11 @@ async function writeSnapshot(snapshot) {
   await fs.writeFile(SNAPSHOT_PATH, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
 }
 
-async function fetchStarsCount() {
-  let response;
+async function fetchGitHubStats() {
+  let repoResponse;
 
   try {
-    response = await fetch(API_URL, {
+    repoResponse = await fetch(API_URL, {
       headers: getHeaders(),
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
@@ -90,58 +108,125 @@ async function fetchStarsCount() {
     throw error;
   }
 
-  const text = await response.text();
+  const repoText = await repoResponse.text();
 
-  if (!response.ok) {
-    throw new Error(`GitHub API ${response.status}: ${text.slice(0, 200)}`);
+  if (!repoResponse.ok) {
+    throw new Error(`GitHub API ${repoResponse.status}: ${repoText.slice(0, 200)}`);
   }
 
-  const payload = JSON.parse(text);
-  const starsCount = payload?.stargazers_count;
+  const repoPayload = JSON.parse(repoText);
+  const starsCount = repoPayload?.stargazers_count;
+  const language = repoPayload?.language;
+  const defaultBranch = repoPayload?.default_branch;
+  const topics = repoPayload?.topics || [];
 
   if (!Number.isFinite(starsCount)) {
     throw new Error('GitHub API response did not include a numeric stargazers_count');
   }
 
-  return starsCount;
+  let languagesPercentage = DEFAULT_STATS.language_percentage;
+
+  try {
+    const langsResponse = await fetch(`${API_URL}/languages`, {
+      headers: getHeaders(),
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
+
+    if (langsResponse.ok) {
+      const langsPayload = await langsResponse.json();
+      const totalBytes = Object.values(langsPayload).reduce((sum, bytes) => sum + bytes, 0);
+      const languageBytes = langsPayload[language] || 0;
+      languagesPercentage = Math.round((languageBytes / totalBytes) * 100);
+    }
+  } catch {
+    // Use default
+  }
+
+  let commitsCount = DEFAULT_STATS.commits_count;
+
+  try {
+    const commitsResponse = await fetch(`${API_URL}/commits?sha=${defaultBranch}&per_page=1`, {
+      headers: getHeaders(),
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
+
+    if (commitsResponse.ok) {
+      const linkHeader = commitsResponse.headers.get('Link');
+      const match = linkHeader?.match(/&page=(\d+)>; rel="last"/);
+
+      if (match) {
+        commitsCount = parseInt(match[1], 10);
+      }
+    }
+  } catch {
+    // Use default
+  }
+
+  let filesCount = DEFAULT_STATS.files_count;
+
+  try {
+    const treeResponse = await fetch(`${API_URL}/git/trees/${defaultBranch}?recursive=1`, {
+      headers: getHeaders(),
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
+
+    if (treeResponse.ok) {
+      const treePayload = await treeResponse.json();
+      filesCount = treePayload.tree?.filter((item) => item.type === 'blob').length || filesCount;
+    }
+  } catch {
+    // Use default
+  }
+
+  return {
+    stargazers_count: starsCount,
+    language: language || DEFAULT_STATS.language,
+    language_percentage: languagesPercentage,
+    files_count: filesCount,
+    commits_count: commitsCount,
+    topics: topics.length > 0 ? topics : DEFAULT_STATS.topics,
+  };
 }
 
 async function main() {
   const snapshot = normalizeSnapshot(await readSnapshot());
 
   if (isFresh(snapshot)) {
-    console.log(`GitHub stars: using cached snapshot from ${snapshot.checked_at}`);
+    console.log(`GitHub stats: using cached snapshot from ${snapshot.checked_at}`);
     return;
   }
 
   const now = new Date().toISOString();
-  const currentStarsCount = snapshot.stargazers_count;
+  const currentStats = snapshot;
 
   try {
-    const starsCount = await fetchStarsCount();
+    const stats = await fetchGitHubStats();
     const nextSnapshot = {
-      stargazers_count: starsCount,
+      ...stats,
       checked_at: now,
     };
 
     await writeSnapshot(nextSnapshot);
 
-    if (starsCount !== currentStarsCount) {
+    if (stats.stargazers_count !== currentStats.stargazers_count) {
       console.log(
-        `GitHub stars: updated tracked fallback from ${currentStarsCount} to ${starsCount}`
+        `GitHub stats: stars updated from ${currentStats.stargazers_count} to ${stats.stargazers_count}`
       );
     } else {
-      console.log(`GitHub stars: count unchanged at ${starsCount}`);
+      console.log(`GitHub stats: stars unchanged at ${stats.stargazers_count}`);
     }
+
+    console.log(`GitHub stats: language=${stats.language} (${stats.language_percentage}%)`);
+    console.log(`GitHub stats: files=${stats.files_count} commits=${stats.commits_count}`);
   } catch (error) {
     await writeSnapshot({
+      ...currentStats,
       checked_at: new Date(
         Date.now() - (SNAPSHOT_MAX_AGE_MS - FAILED_FETCH_RETRY_DELAY_MS)
       ).toISOString(),
-      stargazers_count: currentStarsCount,
     });
-    console.warn(`GitHub stars: ${error.message}`);
-    console.warn(`GitHub stars: keeping tracked fallback at ${currentStarsCount} stars`);
+    console.warn(`GitHub stats: ${error.message}`);
+    console.warn(`GitHub stats: keeping cached fallback`);
   }
 }
 

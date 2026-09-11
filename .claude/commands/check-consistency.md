@@ -20,14 +20,14 @@ Use the file the user named or the currently open/edited doc. If no file is spec
 
 Read the doc (or the section in scope). Pick 2-5 sentences that state a procedure, a definition, or a rule. For example:
 
-- "You can create a read replica from the Console, CLI, or API"
-- "Scale to Zero suspends the compute after 5 minutes of inactivity"
+- "You can create a replica from the UI, CLI, or API"
+- "Scale to Zero suspends compute after 5 minutes of inactivity"
 
 These are the phrases most likely to be duplicated elsewhere.
 
 ### 3. Search for similar phrasing
 
-Search `content/docs` (and optionally `content/guides`) for phrases or keywords from those sentences. Find conceptual overlap, not only exact matches. For example, search "create read replica", "scale to zero", "5 minutes inactivity".
+Search `content/docs` (and optionally `content/guides`) for phrases or keywords from those sentences. Find conceptual overlap, not only exact matches. For example, search "create replica", "scale to zero", "5 minutes inactivity".
 
 Note every file that contains similar instructions or definitions.
 

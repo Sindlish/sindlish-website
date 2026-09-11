@@ -6,7 +6,7 @@ description: 'DEPRECATED — use /create-pr-report instead. Generate changelog f
 
 > **Deprecated.** `/create-pr-report` is the primary tool for generating the weekly PR report and changelog. This command still works but is no longer maintained. Use `/create-pr-report` for all new work.
 
-You are the Neon Changelog Orchestrator. Your job is to coordinate extraction agents, compile their analysis, and generate a publication-ready changelog.
+You are the Changelog Orchestrator. Your job is to coordinate extraction agents, compile their analysis, and generate a publication-ready changelog.
 
 ## Architecture
 
@@ -24,9 +24,9 @@ You are the Neon Changelog Orchestrator. Your job is to coordinate extraction ag
 
 ```
 /triage-changelog              # All repos (default)
-/triage-changelog console      # Console only
-/triage-changelog mcp          # MCP Server only
-/triage-changelog console,mcp  # Multiple repos
+/triage-changelog core         # Language repo only
+/triage-changelog docs         # Docs repo only
+/triage-changelog core,docs    # Multiple repos
 ```
 
 ## Step 1: Determine Repositories to Process
@@ -34,22 +34,16 @@ You are the Neon Changelog Orchestrator. Your job is to coordinate extraction ag
 Check if user provided repo selection, otherwise default to all.
 
 **Available repositories:**
-- `console` - Neon Console (neon-cloud repo)
-- `mcp` - MCP Server (mcp-server-neon repo)
-- `cli` - Neon CLI (neonctl repo)
-- `storage` - Storage (hadron repo, release-storage branch)
-- `compute` - Compute (hadron repo, release-compute branch)
+- `core` - Sindlish language repo (Sindlish/Sindlish)
+- `docs` - Sindlish website/docs repo (current repository)
 
 **Default:** Process all repositories
 
-If no parameter provided, ask user: "Which repositories would you like to process? (console, mcp, cli, storage, compute, or all - default: all)"
+If no parameter provided, ask user: "Which repositories would you like to process? (core, docs, or all - default: all)"
 
 Parse user response and set flags:
-- `PROCESS_CONSOLE=true/false`
-- `PROCESS_MCP=true/false`
-- `PROCESS_CLI=true/false`
-- `PROCESS_STORAGE=true/false`
-- `PROCESS_COMPUTE=true/false`
+- `PROCESS_CORE=true/false`
+- `PROCESS_DOCS=true/false`
 
 ## Step 2: Calculate Date Range
 
@@ -100,51 +94,29 @@ mkdir -p "$OUTPUT_DIR"
 echo "📁 Output directory: $OUTPUT_DIR"
 
 # Auto-detect repositories
-NEON_CLOUD_REPO="$HOME/Documents/GitHub/neon-cloud"
-MCP_REPO="$HOME/Documents/GitHub/mcp-server-neon"
-CLI_REPO="$HOME/Documents/GitHub/neonctl"
-HADRON_REPO="$HOME/Documents/GitHub/hadron"
+CORE_REPO="$HOME/Documents/GitHub/Sindlish"
+DOCS_REPO="$HOME/Documents/GitHub/sindlish-website"
 
 # Check if repos exist and warn if not
-if [ "$PROCESS_CONSOLE" = "true" ] && [ ! -d "$NEON_CLOUD_REPO" ]; then
-  echo "⚠️  Console repo not found at $NEON_CLOUD_REPO"
+if [ "$PROCESS_CORE" = "true" ] && [ ! -d "$CORE_REPO" ]; then
+  echo "⚠️  Core repo not found at $CORE_REPO"
 fi
-if [ "$PROCESS_MCP" = "true" ] && [ ! -d "$MCP_REPO" ]; then
-  echo "⚠️  MCP repo not found at $MCP_REPO"
-fi
-if [ "$PROCESS_CLI" = "true" ] && [ ! -d "$CLI_REPO" ]; then
-  echo "⚠️  CLI repo not found at $CLI_REPO"
-fi
-if [ "$PROCESS_STORAGE" = "true" ] || [ "$PROCESS_COMPUTE" = "true" ]; then
-  if [ ! -d "$HADRON_REPO" ]; then
-    echo "⚠️  Hadron repo not found at $HADRON_REPO"
-  fi
+if [ "$PROCESS_DOCS" = "true" ] && [ ! -d "$DOCS_REPO" ]; then
+  echo "⚠️  Docs repo not found at $DOCS_REPO"
 fi
 
 # Fetch latest changes from all repositories
 echo ""
 echo "📥 Fetching latest changes from repositories..."
 
-if [ "$PROCESS_CONSOLE" = "true" ] && [ -d "$NEON_CLOUD_REPO" ]; then
-  echo "Updating Console..."
-  (cd "$NEON_CLOUD_REPO" && git fetch origin)
+if [ "$PROCESS_CORE" = "true" ] && [ -d "$CORE_REPO" ]; then
+  echo "Updating Sindlish core..."
+  (cd "$CORE_REPO" && git fetch origin)
 fi
 
-if [ "$PROCESS_MCP" = "true" ] && [ -d "$MCP_REPO" ]; then
-  echo "Updating MCP Server..."
-  (cd "$MCP_REPO" && git fetch origin)
-fi
-
-if [ "$PROCESS_CLI" = "true" ] && [ -d "$CLI_REPO" ]; then
-  echo "Updating CLI..."
-  (cd "$CLI_REPO" && git fetch origin)
-fi
-
-if [ "$PROCESS_STORAGE" = "true" ] || [ "$PROCESS_COMPUTE" = "true" ]; then
-  if [ -d "$HADRON_REPO" ]; then
-    echo "Updating Hadron..."
-    (cd "$HADRON_REPO" && git fetch origin)
-  fi
+if [ "$PROCESS_DOCS" = "true" ] && [ -d "$DOCS_REPO" ]; then
+  echo "Updating docs..."
+  (cd "$DOCS_REPO" && git fetch origin)
 fi
 
 echo "✅ All repositories updated"
@@ -205,50 +177,36 @@ Prompt: [formatted prompt with env vars]
 Subagent: general-purpose
 ```
 
-**If PROCESS_CLI:**
+**If PROCESS_CORE:**
 ```
-Task: extract-analyze-cli
-Description: Extract and analyze CLI commits
-Prompt: [formatted prompt with env vars]
-Subagent: general-purpose
-```
-
-**If PROCESS_STORAGE:**
-```
-Task: extract-analyze-storage
-Description: Extract and analyze Storage PRs
-Prompt: [formatted prompt with env vars]
+Task: extract-analyze-core
+Description: Extract and analyze Sindlish core PRs
+Prompt: [formatted prompt with env vars as above]
 Subagent: general-purpose
 Model: haiku
 ```
 
-**If PROCESS_COMPUTE:**
+**If PROCESS_DOCS:**
 ```
-Task: extract-analyze-compute
-Description: Extract and analyze Compute PRs (exploratory)
+Task: extract-analyze-docs
+Description: Extract and analyze docs PRs
 Prompt: [formatted prompt with env vars]
 Subagent: general-purpose
-Model: haiku
 ```
 
-**Note:** Console, Storage, and Compute use Haiku model for faster, more efficient analysis with lower token usage (they process high PR volumes).
-
-**Example of launching 3 agents in parallel:**
+**Example of launching 2 agents in parallel:**
 ```
-I'm launching 3 extraction agents in parallel: Console, MCP, and CLI.
+I'm launching 2 extraction agents in parallel: core and docs.
 
-[Three Task tool calls in a single message]
+[Two Task tool calls in a single message]
 ```
 
 ## Step 5: Collect Agent Results
 
 Each agent will return a structured summary. Save their outputs:
 
-- Console: `CONSOLE_SUMMARY`
-- MCP: `MCP_SUMMARY`
-- CLI: `CLI_SUMMARY`
-- Storage: `STORAGE_SUMMARY`
-- Compute: `COMPUTE_SUMMARY`
+- Core: `CORE_SUMMARY`
+- Docs: `DOCS_SUMMARY`
 
 Check for failures. If any agent failed, note it and continue with successful agents.
 
@@ -299,35 +257,17 @@ Create a high-level triage report that summarizes findings and links to detailed
 
 ## Summary by Repository
 
-### Console
+### Core
 - **Total PRs:** [X] ([Y] releases)
 - **Customer-Facing:** [Z]
 - **Top Recommendations:** [List 2-3 H2-worthy items with brief titles]
-- 📋 **[Detailed Analysis](./console_analysis_report.md)** - Full PR list with clickable links
+- 📋 **[Detailed Analysis](./core_analysis_report.md)** - Full PR list with clickable links
 
-### MCP Server
+### Docs
 - **Total PRs:** [X]
 - **Customer-Facing:** [Z]
 - **Top Recommendations:** [List H2-worthy items]
-- 📋 **[Detailed Analysis](./mcp_analysis_report.md)** - Full PR list with clickable links
-
-### CLI
-- **Total Commits:** [X]
-- **Customer-Facing:** [Z]
-- **Summary:** [Brief note or "No activity this week"]
-- 📋 **[Detailed Analysis](./cli_analysis_report.md)** - Full commit details
-
-### Storage
-- **Total PRs:** [X] ([Y] releases)
-- **Customer-Facing:** [Z]
-- **Top Recommendations:** [List any extension updates or capacity changes]
-- 📋 **[Detailed Analysis](./storage_analysis_report.md)** - Full PR list with clickable links
-
-### Compute
-- **Total PRs:** [X] ([Y] releases)
-- **Customer-Facing:** [Z]
-- **Top Recommendations:** [List any Postgres updates or user-facing changes]
-- 📋 **[Detailed Analysis](./compute_analysis_report.md)** - Full PR list with clickable links
+- 📋 **[Detailed Analysis](./docs_analysis_report.md)** - Full PR list with clickable links
 
 ---
 
@@ -357,14 +297,10 @@ Create a high-level triage report that summarizes findings and links to detailed
 
 This directory contains:
 - `triage_report.md` (this file) - Executive summary
-- `console_analysis_report.md` - Detailed Console analysis with all 59 PRs
-- `mcp_analysis_report.md` - Detailed MCP analysis with all PRs
-- `cli_analysis_report.md` - Detailed CLI analysis
-- `storage_analysis_report.md` - Detailed Storage analysis with all PRs
-- `compute_analysis_report.md` - Detailed Compute analysis with all PRs
-- `pr_data_console_YYYY-MM-DD.txt` - Raw Console extraction
-- `pr_data_storage_YYYY-MM-DD.txt` - Raw Storage extraction
-- `pr_data_compute_YYYY-MM-DD.txt` - Raw Compute extraction
+- `core_analysis_report.md` - Detailed Sindlish core analysis with all PRs
+- `docs_analysis_report.md` - Detailed docs analysis with all PRs
+- `pr_data_core_YYYY-MM-DD.txt` - Raw core extraction
+- `pr_data_docs_YYYY-MM-DD.txt` - Raw docs extraction
 - [Additional pr_data files as needed]
 
 ---
@@ -416,7 +352,7 @@ fi
 
 ### Drafting Process
 
-Read the golden examples file: `.claude/golden_changelog_examples.md`
+Read the golden examples file: use `/golden-corpus` for style and structure reference.
 
 ### CRITICAL: Read Agent Analysis Files
 
@@ -424,11 +360,8 @@ Before drafting the changelog, you MUST read each agent's detailed analysis repo
 
 ```bash
 # Read each agent's analysis report
-cat "$OUTPUT_DIR/console_analysis_report.md"
-cat "$OUTPUT_DIR/mcp_analysis_report.md"
-cat "$OUTPUT_DIR/cli_analysis_report.md"
-cat "$OUTPUT_DIR/storage_analysis_report.md"
-cat "$OUTPUT_DIR/compute_analysis_report.md"
+cat "$OUTPUT_DIR/core_analysis_report.md"
+cat "$OUTPUT_DIR/docs_analysis_report.md"
 ```
 
 These files contain the Draft H2 Descriptions that agents wrote. The brief summaries you received in Step 5 do NOT include the draft descriptions.
@@ -447,25 +380,25 @@ These files contain the Draft H2 Descriptions that agents wrote. The brief summa
    - Do not rewrite agent drafts from scratch - they contain specific details from PRs
 
 4. **Cross-repo coordination:**
-   - If multiple agents have related H2 items (e.g., MCP + CLI), combine into one H2
+   - If multiple agents have related H2 items (e.g., core + docs), combine into one H2
    - Merge the agent drafts together, preserving details from both
-   - Example: MCP onboarding + CLI init command = one "Get started" H2
+   - Example: core compiler change + docs update = one "Compiler update" H2
 
 5. **Consolidate same-component items:**
    - **CRITICAL:** If multiple H2-worthy items are from the same component/product, consolidate into one H2
-   - Example: 3 separate MCP Server features → One "MCP Server enhancements" H2 with bullet points
-   - Example: Multiple Console UI improvements → One "Console improvements" H2
+   - Example: 3 separate language feature changes → One "Language enhancements" H2 with bullet points
+   - Example: Multiple docs improvements → One "Docs improvements" H2
    - Each bullet should be concise (1-2 sentences) highlighting the specific feature
    - Only create separate H2s if the items are major launches or significantly different in scope
 
 6. **Verify all documentation links exist:**
    - **CRITICAL:** Never include links to documentation that doesn't exist
    - Before adding any link like `[Text](/docs/path)`, verify the file exists in `content/docs/`
-   - Use Glob tool to check: `content/docs/guides/data-masking.md`, `content/docs/reference/cli.md`, etc.
+   - Use Glob tool to check: `content/docs/reference/standard-library.md`, `content/docs/basics/variables.md`, etc.
    - If doc doesn't exist, either:
      - Omit the link entirely (preferred)
-     - Link to a parent page that exists (e.g., `/docs/reference` instead of `/docs/reference/nonexistent`)
-   - Common valid paths: `/docs/guides/`, `/docs/reference/`, `/docs/introduction/`, `/docs/ai/`
+     - Link to a parent page that exists (e.g., `/docs/basics` instead of `/docs/basics/nonexistent`)
+   - Common valid paths: `/docs/basics/`, `/docs/reference/`, `/docs/get-started/`, `/docs/data-structures/`
    - Agent drafts may suggest links - you must validate them
 
 7. **For Fixes items:**

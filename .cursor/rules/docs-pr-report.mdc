@@ -1,5 +1,5 @@
 ---
-description: Automated documentation review system for analyzing PRs across Neon repositories and identifying documentation updates needed
+description: Automated documentation review system for analyzing PRs across Sindlish repositories and identifying documentation updates needed
 alwaysApply: true
 tags: ["docs-review", "pr-analysis", "documentation"]
 ---
@@ -13,7 +13,7 @@ local clones of non-public repos.
 
 WHAT THIS TOOL DOES (for humans reading this file)
 
-This is an automated documentation review system for the Neon documentation team.
+This is an automated documentation review system for the Sindlish documentation team.
 
 PURPOSE:
 - Replaces manual weekly review of code changes across multiple repositories
@@ -22,7 +22,7 @@ PURPOSE:
 - Saves hours of manual work filtering through GitHub PRs and commits
 
 HOW IT WORKS:
-1. Monitors 14 Neon repositories
+1. Monitors Sindlish repositories
 2. Fetches recent merged PRs based on time window (default: since last Friday)
 3. Groups PRs by category tags, release component, or direct merges
 4. Adds documentation impact indicators (✅ ❓ ❌)
@@ -113,8 +113,8 @@ When the user wants to investigate a PR more deeply to determine documentation i
 ### Workflow
 
 **Step 1: Identify the repository**
-- **First:** Look at the last generated docs PR report in `~/docs-reviews/` (the most recent `docs-pr-report-*.md` file). Reports group PRs by repo (e.g. `## neon-cloud`, `## hadron`); search the report for the PR number (e.g. `#4369`) to see which repo section it appears in. Use that repo for `gh pr view` / `gh pr diff`.
-- If the PR number is not in the latest report, or the user specifies a repo, use that. Common repos: neon-cloud (databricks-eng), hadron (databricks-eng), neondatabase/website.
+- **First:** Look at the last generated docs PR report in `~/docs-reviews/` (the most recent `docs-pr-report-*.md` file). Reports group PRs by repo (e.g. `## sindlish-website`, `## sindlish`); search the report for the PR number to see which repo section it appears in. Use that repo for `gh pr view` / `gh pr diff`.
+- If the PR number is not in the latest report, or the user specifies a repo, use that. Common repos: sindlish/sindlish-website.
 - If still unclear, ask the user which repo the PR is in.
 
 **Step 2: Check GitHub CLI:** Run `gh auth status`. If not installed or not authenticated, tell them to run `brew install gh` (if needed) and `gh auth login`, then retry.
@@ -137,14 +137,14 @@ Wait for user response before proceeding.
 
 ## Documentation PR Workflow (when user picks 1 or 3)
 
-- Identify affected docs under `content/docs/` (ai/, auth/, guides/, manage/, introduction/, reference/).
+- Identify affected docs under `content/docs/` (basics/, data-structures/, get-started/, intermediate/, reference/).
 - Present a Documentation Update Plan (files to modify/create, navigation updates). Wait for approval.
-- Create branch `docs/pr-{PR_NUMBER}-{short-slug}`, make changes, run `npm run lint:md`, then `gh pr create --repo neondatabase/website` with title and body linking to the original PR.
+- Create branch `docs/pr-{PR_NUMBER}-{short-slug}`, make changes, run `npm run lint:md`, then `gh pr create --repo sindlish/sindlish-website` with title and body linking to the original PR.
 
 ## Changelog Entry Workflow (when user picks 2 or 3)
 
 - Classify as major feature (H2 at top) or minor (bullet in `<details>`). Ask user preference if unclear.
-- Compute next Friday (America/New_York) per `.cursor/rules/neon-changelog.mdc`. Check for existing `content/changelog/YYYY-MM-DD.md` or open changelog PR.
+- Compute next Friday (America/New_York). Check for existing `content/changelog/YYYY-MM-DD.md` or open changelog PR.
 - Draft entry; present for approval. If new changelog file: create it with template; if exists: add H2 or bullet. Commit, push, create or update PR with `gh pr create` or `gh pr edit`.
 
 All paths for changelog and docs PRs are from repository root (e.g. `content/changelog/`, `content/docs/`).

@@ -43,7 +43,6 @@ export function isAIAgentRequest(request) {
 // Paths where the generic CONTENT_ROUTES resolver produces the wrong markdown
 // path (or no path at all). Maps directly to the correct static file in public/.
 const CUSTOM_MARKDOWN_PATHS = {
-  pricing: '/pricing.md',
   'docs/changelog': '/md/docs/changelog.md',
 };
 
@@ -93,12 +92,11 @@ export function getMarkdownPath(pathname) {
 export function buildAgent404Response(pathname) {
   return `# Page Not Found
 
-\`${pathname}\` does not exist in Neon documentation.
+\`${pathname}\` does not exist in Sindlish documentation.
 
 Find what you need:
 
-- [All Neon documentation](/docs/llms.txt): Table of contents for all Neon docs
-- [Full documentation text](/docs/llms-full.txt): Complete Neon docs in one file
-- [Neon API reference](/docs/reference/api-reference.md): API endpoints and usage
+- [All Sindlish documentation](/docs/llms.txt): Table of contents for all Sindlish docs
+- [Full documentation text](/docs/llms-full.txt): Complete Sindlish docs in one file
 `;
 }

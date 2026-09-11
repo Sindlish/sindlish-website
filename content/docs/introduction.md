@@ -4,7 +4,7 @@ summary: The programming language that speaks your language.
 enableTableOfContents: true
 ---
 
-# Salam, Duniay! (Hello World!)
+## Salam, Duniay! (Hello World!)
 
 Welcome to **Sindlish**, the first high-level programming language designed specifically for the Sindhi-speaking community. 
 
@@ -47,6 +47,7 @@ agar is_prime(number) {
 ```
 
 ## Study from the Source
+
 The best way to learn Sindlish is to study the official reference file. It covers everything from basic math to advanced error handling.
 
 > [!TIP]

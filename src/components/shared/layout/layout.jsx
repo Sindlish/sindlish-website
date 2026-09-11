@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 
-import CookieConsent from 'components/shared/cookie-consent';
 import Footer from 'components/shared/footer';
 import Header from 'components/shared/header';
 import { cn } from 'utils/cn';

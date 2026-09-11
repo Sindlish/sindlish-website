@@ -86,7 +86,7 @@ I'll create documentation content using an interactive workflow with user confir
 **Content creation process:**
 
 - Use identified examples for style reference
-- Follow Neon tone and terminology (developer-friendly, clear, concise)
+- Follow project tone and terminology (developer-friendly, clear, concise)
 - Apply proper MDX syntax with React components
 - Include required frontmatter (title, subtitle, enableTableOfContents)
 - Structure with clear headings (max H3, avoid H4+)
@@ -97,13 +97,13 @@ I'll create documentation content using an interactive workflow with user confir
 
 ## Step 7: Style Guide Validation
 
-**Load and apply:** Neon documentation standards from CLAUDE.md and `/golden-corpus`
+**Load and apply:** Documentation standards from CLAUDE.md and `/golden-corpus`
 
 **Check for:**
 
 - Active voice and present tense
 - Developer-friendly, clear, concise writing
-- Proper Neon terminology (Neon, Serverless Postgres, compute, branch, project)
+- Proper project terminology
 - MDX component usage (Admonition, CodeTabs, InfoBlock, DetailIconCards, Steps)
 - Technical accuracy
 - SEO-friendly subtitle/description
@@ -129,8 +129,7 @@ I'll create documentation content using an interactive workflow with user confir
 **If PR requested:**
 
 - Stage and commit changes
-- Use `mcp__proxy__github__create_pull_request`
-- Follow Databricks PR template structure
+   - Use `mcp__proxy__github__create_pull_request`
 
 ## Error Handling
 
@@ -151,7 +150,7 @@ I'll create documentation content using an interactive workflow with user confir
 `/simple-content update connection pooling documentation in content/docs/connect/connection-pooling.md`
 
 **New page request:**
-`/simple-content create tutorial for setting up Neon with Next.js`
+`/simple-content create tutorial for setting up the project with Next.js`
 
 ---
 

@@ -43,6 +43,7 @@ kaam check_password(pass) {
 Sindlish provides powerful operators and methods to deal with results without writing many `if` statements.
 
 ### A. The `?` Operator (Soft Propagate)
+
 The "Question Mark" operator is the most common way to handle errors. 
 - If the result is **Ok**, it "unwraps" the value.
 - If the result is **Ghalti**, it immediately returns the error from the current function.
@@ -56,6 +57,7 @@ kaam setup() -> Result {
 ```
 
 ### B. The `.bachao()` Method (Default/Fallback)
+
 Use this when you want to provide a safe default value if an error occurs.
 
 ```sd
@@ -64,6 +66,7 @@ content = read_file("config.txt").bachao("")
 ```
 
 ### C. The `.lazmi()` Method (Required)
+
 Use this when an error is unacceptable. If the result is a `Ghalti`, the program will crash (Panic) with the custom message you provide.
 
 ```sd
@@ -72,6 +75,7 @@ db = connect_db().lazmi("Database required!")
 ```
 
 ### D. The `!!` Operator (Panic Unwrap)
+
 Similar to `.lazmi()`, but it crashes with the **original** error message contained in the result.
 
 ```sd

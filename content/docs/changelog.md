@@ -4,8 +4,6 @@ summary: Stay up to date with the latest changes and improvements to Sindlish.
 enableTableOfContents: true
 ---
 
-# Release History
-
 ## v0.1.1 (2026-09-10)
 
 The next release after the first alpha: a complete under-the-hood rebuild across all six pipeline stages, unified error philosophy, a major performance pass, and production-ready packaging — plus the new official documentation site.

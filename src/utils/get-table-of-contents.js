@@ -1,7 +1,4 @@
-const fs = require('fs');
-
 const slugify = require('slugify');
-
 
 const parseMDXHeading = require('./parse-mdx-heading');
 
@@ -78,7 +75,7 @@ const buildNestedToc = (headings, currentLevel, currentIndex = 0) => {
   return toc;
 };
 
-const parseProps = (propsString) => {
+const _parseProps = (propsString) => {
   if (!propsString) return {};
 
   const props = {};
@@ -93,8 +90,7 @@ const parseProps = (propsString) => {
   return props;
 };
 
-const getTableOfContents = (content) => { 
-
+const getTableOfContents = (content) => {
   const codeBlockRegex = /```[\s\S]*?```/g;
   const headingRegex = /^(#+)\s(.*)$/gm;
   const contentWithoutCodeBlocks = content.replace(codeBlockRegex, '');

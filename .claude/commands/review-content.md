@@ -1,10 +1,10 @@
 ---
-description: 'Review a documentation page against Neon standards. Checks terminology, voice, structure, and MDX. Produces a structured findings report with an option to apply fixes.'
+description: 'Review a documentation page against project standards. Checks terminology, voice, structure, and MDX. Produces a structured findings report with an option to apply fixes.'
 ---
 
 # Review Content
 
-Review a documentation page against Neon standards and produce a structured findings report. Covers terminology, voice and style, structure, and MDX compliance.
+Review a documentation page against project standards and produce a structured findings report. Covers terminology, voice and style, structure, and MDX compliance.
 
 ## Usage
 
@@ -19,8 +19,7 @@ Review a documentation page against Neon standards and produce a structured find
 
 Read both of these before doing anything else:
 
-- `.claude/neon-terminology.md` — terminology rules, preferred terms, words to avoid
-- `CLAUDE.md` — writing style, MDX components, frontmatter fields
+- `CLAUDE.md` -- writing style, MDX components, frontmatter fields
 
 ---
 
@@ -30,24 +29,11 @@ Scan the file mechanically for the following. These are deterministic — flag e
 
 **Terminology violations**
 
-Check every term in the "Avoid" columns of `neon-terminology.md`. Flag any instance where a preferred term is not used. Include the line, the term found, and the preferred replacement.
-
-**Postgres / PostgreSQL**
-
-Flag any use of "PostgreSQL" in general prose that isn't:
-- Referring to the open source project specifically
-- Citing an official version release (e.g. "PostgreSQL 17")
-- In `content/postgresql/` (out of scope)
+Flag any instances where terms are inconsistent or non-standard. Include the line and the preferred replacement.
 
 **Connection strings**
 
-Flag any code example that uses `postgres://` instead of `postgresql://`.
-
-Flag any connection string example missing `?sslmode=require` (unless the surrounding text explicitly explains why SSL is omitted).
-
-**Em dashes**
-
-Flag every em dash (—) in the body text.
+Flag any code example that uses an incorrect protocol prefix.
 
 **Stray h1 headings**
 
@@ -61,7 +47,7 @@ Flag if `title` is missing. Note if `enableTableOfContents` is absent on a page 
 
 ## Step 3: Style and voice review
 
-Read the full page with Neon's voice guidelines in mind. Flag issues in these categories:
+Read the full page with the project's voice guidelines in mind. Flag issues in these categories:
 
 **Voice**
 
@@ -101,8 +87,8 @@ Output findings grouped by category. Use this format:
 [count] issue(s)
 
 LINE 12 — "utilize" → use "use"
-LINE 34 — "PostgreSQL" in general prose → use "Postgres"
-LINE 67 — connection string uses postgres:// → use postgresql://
+LINE 34 — "Sindlish Language" → use "Sindlish"
+LINE 67 — code example uses `var` → use `let`
 
 ## Voice & Style
 [count] issue(s)

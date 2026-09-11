@@ -1,32 +1,29 @@
 ---
-description: 'Prime documentation agents with essential project structure, key references, and major content categories for Neon documentation'
+description: 'Prime documentation agents with essential project structure, key references, and major content categories'
 ---
 
-# docs-prime: Neon Documentation Project Primer
+# docs-prime: Documentation Project Primer
 
-This command provides agents comprehensive knowledge of the Neon documentation project structure, key reference files, and major content categories. Use this to understand the documentation ecosystem before working on content tasks.
+This command provides agents comprehensive knowledge of the documentation project structure, key reference files, and major content categories. Use this to understand the documentation ecosystem before working on content tasks.
 
-If the user asks what doc AI tools are available (e.g. "what AI tools for docs?", "what tools are available for documentation?"), read `.cursor/doc-ai-tools-list.md` and output the list, or suggest they run the list-doc-ai-tools command.
+If the user asks what doc AI tools are available (e.g. "what AI tools for docs?", "what tools are available for documentation?"), read `.claude/doc-ai-tools-list.md` and output the list, or suggest they run the list-doc-tools command.
 
 ## Project Architecture Overview
 
 ### Directory Structure
 
 ```
-/Users/barry.grenon/website/
+website/
 ├── content/                # All markdown/MDX content
-│   ├── docs/              # Technical documentation (~600+ files)
+│   ├── docs/              # Technical documentation
 │   │   ├── introduction/  # Core concepts and architecture
-│   │   ├── get-started-with-neon/  # Onboarding content
+│   │   ├── get-started/   # Onboarding content
 │   │   ├── guides/        # How-to guides and integrations
 │   │   ├── manage/        # Administrative tasks
 │   │   ├── connect/       # Connection guides
-│   │   ├── data-api/      # Data API documentation
 │   │   └── reference/     # API, CLI, technical reference
 │   ├── changelog/         # Product updates and release notes
-│   ├── guides/            # Additional guides
-│   ├── postgresql/        # PostgreSQL tutorials (~150+ files)
-│   └── branching/         # Branching feature documentation
+│   └── guides/            # Additional guides
 ├── src/
 │   ├── app/              # Next.js app router pages
 │   ├── components/       # React components
@@ -67,16 +64,16 @@ If the user asks what doc AI tools are available (e.g. "what AI tools for docs?"
 - **Markdown files**: Use hyphens, not underscores: `connection-pooling.md` (not `connection_pooling.md`)
 - **Images**: Use underscores instead of dashes: `my_image.png` (not `my-image.png`)
 - Descriptive names: `autoscaling-guide.md` (not `scaling.md` or `auto.md`)
-- Match URL structure: `/content/docs/guides/nextjs.md` → neon.tech/docs/guides/nextjs
+- Match URL structure: `/content/docs/guides/nextjs.md` -> sindlish.org/docs/guides/nextjs
 
 **File placement rules:**
 
 - **Concepts/overviews** → `/content/docs/introduction/`
-- **Getting started** → `/content/docs/get-started-with-neon/`
-- **How-to guides** → `/content/docs/guides/`
-- **Integration guides** → `/content/docs/guides/` (framework/platform-specific)
+- **Getting started** → `/content/docs/get-started/`
+- **How-to guides** → `/content/docs/basics/` and `/content/docs/intermediate/`
+- **Integration guides** → `/content/docs/get-started/` (toolchain-specific)
 - **API/Reference** → `/content/docs/reference/`
-- **PostgreSQL tutorials** → `/content/postgresql/`
+- **Data structures** → `/content/docs/data-structures/`
 - **Feature docs** → Appropriate subdirectory based on feature category
 
 ### Content Hierarchy Patterns
@@ -99,21 +96,15 @@ Introduction/Overview (concept)
 
 ## Major Documentation Categories
 
-The Neon documentation is organized into clear categories:
+The documentation is organized into clear categories:
 
 **Core Product Documentation** (`content/docs/`):
-- **Introduction**: Concepts, architecture, features (branching, autoscaling, etc.)
-- **Get Started**: Onboarding, signing up, connecting to Neon
+- **Introduction**: Concepts, architecture, features
+- **Get Started**: Onboarding, signing up, connecting
 - **Guides**: How-to guides, framework integrations, feature guides
 - **Manage**: Administrative tasks (projects, databases, users, API keys)
-- **Connect**: Connection guides (connection pooling, serverless drivers)
-- **Data API**: Data API documentation and tutorials
+- **Connect**: Connection guides
 - **Reference**: CLI reference, API reference, compatibility, SQL reference
-
-**PostgreSQL Learning** (`content/postgresql/`):
-- PostgreSQL tutorials and educational content
-- Database concepts and best practices
-- SQL tutorials
 
 **Product Updates** (`content/changelog/`):
 - Release notes and product changes
@@ -130,7 +121,7 @@ To load the golden corpus, use the `/golden-corpus` slash command.
 ### Content Structure and Navigation
 
 - **`content/docs/navigation.yaml`**: Primary documentation navigation hierarchy
-- **`CLAUDE.md`**: Project-specific development guidelines and Neon context
+- **`CLAUDE.md`**: Project-specific development guidelines and context
 
 ### Technical Configuration
 
@@ -145,7 +136,7 @@ To load the golden corpus, use the `/golden-corpus` slash command.
 
 ## MDX and Components
 
-Neon docs use MDX (Markdown + JSX) with custom components.
+docs use MDX (Markdown + JSX) with custom components.
 
 **IMPORTANT**: For comprehensive component documentation, refer to the community guides:
 - **`content/docs/community/component-guide.md`** - Most commonly used components with examples
@@ -180,18 +171,15 @@ Neon docs use MDX (Markdown + JSX) with custom components.
 
 ## Content Style and Tone
 
-**Neon Voice Characteristics:**
+**Voice Characteristics:**
 - **Developer-first**: Practical, actionable, no marketing fluff
 - **Clear & Concise**: Short sentences, active voice
 - **Approachable**: Use contractions, conversational tone
 - **Precise**: Technically accurate without being academic
 
 **Key Terminology:**
-- **Neon** (not "the Neon platform" or "Neon database")
-- **Serverless Postgres** (capitalize both words)
-- **compute** (lowercase, Neon-specific term)
-- **branch** (database branch, not git branch - context matters)
-- **project** (top-level Neon organization unit)
+- Use project-appropriate terms consistently
+- Generic concepts are always lowercase in prose
 
 ## Navigation and Cross-References
 
@@ -237,4 +225,4 @@ Neon docs use MDX (Markdown + JSX) with custom components.
 
 ---
 
-**Usage**: This primer provides foundational knowledge for working effectively within the Neon documentation ecosystem. Reference specific sections as needed when working on documentation tasks.
+**Usage**: This primer provides foundational knowledge for working effectively within the documentation ecosystem. Reference specific sections as needed when working on documentation tasks.

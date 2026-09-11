@@ -1,17 +1,14 @@
 import PropTypes from 'prop-types';
 
 import Container from 'components/shared/container';
-import ThemeSelect from 'components/shared/footer/theme-select';
 import Link from 'components/shared/link';
 import Logo from 'components/shared/logo';
-import StatusBadge from 'components/shared/footer/status-badge';
 import LINKS from 'constants/links';
 import MENUS from 'constants/menus.js';
 import ChevronIcon from 'icons/chevron-down.inline.svg';
 import { cn } from 'utils/cn';
 
-
-const Footer = ({ hasThemesSupport = false }) => (
+const Footer = ({ hasThemesSupport: _hasThemesSupport = false }) => (
   <footer className="relative z-30 mt-auto border-t border-gray-new-90 bg-white safe-paddings dark:border-gray-new-20 dark:bg-black-pure">
     <Container className="flex justify-between gap-x-10 py-12 3xl:py-8 sm:py-5" size="1920">
       <div className="flex flex-col items-start lg:w-full">
@@ -19,7 +16,7 @@ const Footer = ({ hasThemesSupport = false }) => (
           <Logo className="sm:h-6 sm:w-auto" width={32} height={32} />
           <span
             className={cn(
-              'mt-3.5 block text-[13px] font-medium leading-none tracking-extra-tight whitespace-nowrap',
+              'mt-3.5 block text-[13px] leading-none font-medium tracking-extra-tight whitespace-nowrap',
               'text-[#E02424] dark:text-[#E02424]',
               'xl:mt-3'
             )}
@@ -29,16 +26,13 @@ const Footer = ({ hasThemesSupport = false }) => (
         </div>
 
         <div className="flex flex-col items-start justify-between gap-y-5 lg:w-full lg:flex-row sm:flex-col">
-          <StatusBadge />
           <div
             className={cn(
               'flex max-w-2xl flex-col gap-y-2 text-[13px] leading-none tracking-extra-tight text-gray-new-40',
               'dark:text-gray-new-60'
             )}
           >
-            <p>
-              © Sindlish {new Date().getFullYear()}. The first Sindhi programming language.
-            </p>
+            <p>© Sindlish {new Date().getFullYear()}. The first Sindhi programming language.</p>
             <p className="flex flex-wrap gap-x-3 gap-y-1">
               <Link
                 className="hover:text-gray-new-20 dark:hover:text-gray-new-80"

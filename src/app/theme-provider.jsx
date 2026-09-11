@@ -1,11 +1,8 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import { ThemeProvider as PreferredProvider, useTheme } from 'next-themes';
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
-
-const themesSupportPages = ['/docs', '/guides', '/postgresql'];
 
 const ThemeColorUpdater = () => {
   const { theme, resolvedTheme } = useTheme();
@@ -29,9 +26,6 @@ const ThemeColorUpdater = () => {
 };
 
 const ThemeProvider = ({ children }) => {
-  const pathname = usePathname();
-  const hasThemesSupport = themesSupportPages.some((page) => pathname.startsWith(page));
-
   return (
     <PreferredProvider
       attribute="class"

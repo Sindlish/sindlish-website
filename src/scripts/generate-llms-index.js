@@ -20,7 +20,7 @@ const { CONTENT_ROUTES } = require('../constants/content');
 
 const config = require('./llms-index-config');
 
-const BASE_URL = 'https://neon.com';
+const BASE_URL = 'https://sindlish.org';
 const OUTPUT_PATH = 'public/docs/llms.txt';
 
 const EXCLUDED_DIRS = ['shared-content', 'unused'];
@@ -36,12 +36,9 @@ const ALL_EXCLUDE_PATHS = [
 
 /** Display names for path segments and route keys */
 const SECTION_DISPLAY_NAMES = {
-  ai: 'AI',
-  'data-api': 'Data API',
-  postgresql: 'PostgreSQL',
-  'use-cases': 'Solutions',
-  programs: 'Solutions',
   'get-started': 'Get Started',
+  'data-structures': 'Data Structures',
+  'standard-library': 'Standard Library',
 };
 
 /**
@@ -261,7 +258,7 @@ function getAllDocsForSection(sectionData) {
 function generateIndexText(organized, collapsedEntries = []) {
   const lines = [];
 
-  lines.push('# Neon Postgres');
+  lines.push('# Sindlish Language Documentation');
   lines.push('');
   if (config.tagline) {
     lines.push(`> ${config.tagline}`);
@@ -385,7 +382,7 @@ function generateIndexText(organized, collapsedEntries = []) {
 function generateSubIndexText(sectionName, sectionConf, sectionData) {
   const lines = [];
 
-  lines.push(`# Neon ${sectionName}`);
+  lines.push(`# Sindlish ${sectionName}`);
   lines.push('');
 
   if (sectionConf.description) {
@@ -542,6 +539,7 @@ async function main() {
     }
   } else {
     const outputPath = path.join(projectRoot, OUTPUT_PATH);
+    await fs.mkdir(path.dirname(outputPath), { recursive: true });
     await fs.writeFile(outputPath, indexContent);
     console.log(`Written to ${outputPath}`);
 

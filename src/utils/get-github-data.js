@@ -1,5 +1,5 @@
-const API_URL = 'https://api.github.com/repos/neondatabase/neon';
-const DEFAULT_GITHUB_STARS_COUNT = 21500;
+const API_URL = 'https://api.github.com/repos/Sindlish/Sindlish';
+const DEFAULT_GITHUB_STARS_COUNT = 2;
 
 const readGitHubStarsSnapshot = async () => {
   try {

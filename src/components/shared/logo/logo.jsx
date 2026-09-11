@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 import LINKS from 'constants/links';
 import useContextMenu from 'hooks/use-context-menu';
+import logoDarkSvg from 'images/logo-dark.svg';
 import logoLightSvg from 'images/logo-light.svg';
 import { cn } from 'utils/cn';
 
@@ -32,12 +33,12 @@ const data = [
     name: 'Copy logo as SVG',
   },
   {
-        name: 'View on GitHub',
+    name: 'View on GitHub',
     url: LINKS.github,
   },
 ];
 
-const Logo = ({ className = null, width, height, isHeader = false }) => {
+const Logo = ({ className = null, width: _width, height: _height, isHeader = false }) => {
   const { clicked, setClicked } = useContextMenu();
   const [open, setOpen] = useState(false);
 
@@ -66,9 +67,7 @@ const Logo = ({ className = null, width, height, isHeader = false }) => {
             height={32}
             className={cn('h-8 w-8', className)}
           />
-          <span className="text-xl font-bold tracking-tighter text-white">
-            Sindlish
-          </span>
+          <span className="text-xl font-bold tracking-tighter text-white">Sindlish</span>
         </div>
       </Link>
       {isHeader && clicked && (

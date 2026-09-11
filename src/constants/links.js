@@ -1,24 +1,19 @@
 export default {
+  docs: '/docs',
   docsHome: '/docs/introduction',
-  changelog: '/docs/changelog',
   creator: '/creator',
   playground: '/playground',
+  changelog: '/docs/changelog',
 
   // Docs - Sindlish Language
-  standardLibrary: '/docs/standard-library',
-  examples: '/docs/examples',
+  standardLibrary: '/docs/reference/standard-library',
+  examples: '/docs/reference/examples',
   vscodeExtension: '/docs/vscode-extension',
-  keywords: '/docs/language-reference/keywords',
-  types: '/docs/language-reference/types',
-  operators: '/docs/language-reference/operators',
-  functions: '/docs/language-reference/functions',
-  controlFlow: '/docs/language-reference/control-flow',
+  keywords: '/docs/reference/keywords',
 
   // Socials
   github: 'https://github.com/Sindlish/Sindlish',
 
   // Downloads & External
   download: '/download',
-
-  cdn: 'https://cdn.neonapi.io',
 };

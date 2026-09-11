@@ -77,10 +77,10 @@ prompt: "Create documentation content based on IA plan: [IA output].
 Requirements: [parsed user requirements]
 Target files: [file list]
 Please:
-1. Write content following Neon style guide (developer-friendly, clear, concise)
+1. Write content following style guide (developer-friendly, clear, concise)
 2. Use proper MDX syntax with React components
 3. Include required frontmatter (title, subtitle, enableTableOfContents)
-4. Apply consistent Neon terminology (Neon, Serverless Postgres, compute, branch, project)
+4. Apply consistent terminology
 5. Ensure technical accuracy and completeness
 6. Create proper heading hierarchy (max H3, avoid H4+)
 7. Use appropriate MDX components (Admonition, CodeTabs, InfoBlock, Steps)
@@ -97,9 +97,9 @@ prompt: "Review the written content in: [target files].
 Please:
 1. Check style, grammar, and readability
 2. Verify flow and content organization
-3. Ensure compliance with Neon documentation standards
+3. Ensure compliance with documentation standards
 4. Use Edit tool for improvements
-5. Validate technical accuracy and Neon terminology consistency
+5. Validate technical accuracy and terminology consistency
 6. Check for proper active voice and present tense
 7. Verify MDX component usage is correct
 Apply improvements directly to the files."

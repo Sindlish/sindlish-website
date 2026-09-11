@@ -7,15 +7,15 @@ export default {
       to: LINKS.docsHome,
     },
     {
-     text: 'Examples',
+      text: 'Examples',
       to: LINKS.examples,
     },
     {
-       text: 'Playground',
+      text: 'Playground',
       to: LINKS.playground,
     },
     {
-       text: 'Creator',
+      text: 'Creator',
       to: LINKS.creator,
     },
   ],
@@ -44,6 +44,10 @@ export default {
     {
       heading: 'Resources',
       items: [
+        {
+          text: 'Playground',
+          to: LINKS.playground,
+        },
         {
           text: 'Creator',
           to: LINKS.creator,

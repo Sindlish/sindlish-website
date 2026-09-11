@@ -4,11 +4,11 @@ description: 'Update redirects when moving or renaming documentation files'
 
 # Redirect Update Workflow
 
-When moving or renaming documentation files in the Neon documentation, you must add redirects to prevent broken links.
+When moving or renaming documentation files, you must add redirects to prevent broken links.
 
-## Neon Redirect System
+## Redirect System
 
-**Neon uses frontmatter redirects** - redirects are defined directly in the markdown file's frontmatter using the `redirectFrom` field.
+The site uses frontmatter redirects -- redirects are defined directly in the markdown file's frontmatter using the `redirectFrom` field.
 
 ### Adding redirects to frontmatter
 
@@ -75,29 +75,29 @@ rg "/old-section/page" content/ --type md
 ### Update link formats
 
 Ensure consistent link formats:
-- Internal links: `/docs/guides/nextjs`
-- Not: `https://neon.tech/docs/guides/nextjs`
+- Internal links: `/docs/basics/variables`
+- Not: `https://sindlish.org/docs/basics/variables`
 - Verify anchor links still exist in target files
 
 ## Examples
 
-### Example 1: Moving a guide to a different section
+### Example 1: Moving a page to a different section
 
 **Before:**
-- File: `content/docs/connect/connection-strings.md`
-- URL: `/docs/connect/connection-strings`
+- File: `content/docs/reference/keywords.md`
+- URL: `/docs/reference/keywords`
 
 **After:**
-- File: `content/docs/guides/connection-strings.md`
-- URL: `/docs/guides/connection-strings`
+- File: `content/docs/intermediate/errors.md`
+- URL: `/docs/intermediate/errors`
 
-**Add to frontmatter of `content/docs/guides/connection-strings.md`:**
+**Add to frontmatter of `content/docs/intermediate/errors.md`:**
 ```yaml
 ---
-title: 'Connection Strings'
-subtitle: 'Learn about Neon connection strings'
+title: 'Errors'
+subtitle: 'Understanding and handling errors'
 redirectFrom:
-  - /docs/connect/connection-strings
+  - /docs/reference/keywords
 enableTableOfContents: true
 ---
 ```
@@ -105,20 +105,20 @@ enableTableOfContents: true
 ### Example 2: Renaming a page
 
 **Before:**
-- File: `content/docs/guides/neon-authorize.md`
-- URL: `/docs/guides/neon-authorize`
+- File: `content/docs/get-started/setup.md`
+- URL: `/docs/get-started/setup`
 
 **After:**
-- File: `content/docs/guides/neon-rls.md`
-- URL: `/docs/guides/neon-rls`
+- File: `content/docs/get-started/installation.md`
+- URL: `/docs/get-started/installation`
 
-**Add to frontmatter of `content/docs/guides/neon-rls.md`:**
+**Add to frontmatter of `content/docs/get-started/installation.md`:**
 ```yaml
 ---
-title: 'Neon RLS'
-subtitle: 'Row-Level Security with Neon'
+title: 'Installation'
+subtitle: 'Install the Sindlish toolchain'
 redirectFrom:
-  - /docs/guides/neon-authorize
+  - /docs/get-started/setup
 enableTableOfContents: true
 ---
 ```
@@ -129,12 +129,12 @@ If a page has been moved multiple times, keep all old paths:
 
 ```yaml
 ---
-title: 'Autoscaling'
-subtitle: 'Configure autoscaling for your compute'
+title: 'Functions'
+subtitle: 'Define and call functions'
 redirectFrom:
-  - /docs/conceptual-guides/autoscaling
-  - /docs/introduction/autoscaling
-  - /docs/manage/compute-autoscaling
+  - /docs/basics/functions
+  - /docs/introduction/functions
+  - /docs/intermediate/functions-usage
 enableTableOfContents: true
 ---
 ```
@@ -145,12 +145,12 @@ When merging multiple pages into one, add all old paths:
 
 ```yaml
 ---
-title: 'Neon CLI Reference'
-subtitle: 'Complete reference for the Neon CLI'
+title: 'Keyword Reference'
+subtitle: 'Complete reference for Sindlish keywords'
 redirectFrom:
-  - /docs/reference/neon-cli
-  - /docs/reference/cli-reference
-  - /docs/reference/cli-commands
+  - /docs/reference/keywords
+  - /docs/reference/reserved-words
+  - /docs/reference/syntax
 enableTableOfContents: true
 ---
 ```
@@ -212,7 +212,7 @@ This prevents redirect chains and ensures all historical URLs work.
 
 ## Next.js Build Integration
 
-Neon's build process automatically generates Next.js redirects from the `redirectFrom` frontmatter fields. You don't need to manually edit `next.config.js` for documentation redirects.
+The build process automatically generates Next.js redirects from the `redirectFrom` frontmatter fields. You don't need to manually edit `next.config.js` for documentation redirects.
 
 ---
 

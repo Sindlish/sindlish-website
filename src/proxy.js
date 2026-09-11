@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { checkCookie, getReferer } from 'app/actions';
 import { CONTENT_ROUTES } from 'constants/content';
-import LINKS from 'constants/links';
 
 import {
   isAIAgentRequest,
@@ -32,36 +30,6 @@ function applyDocHeaders(response) {
   return response;
 }
 
-function trackLLMPageview(req, { is404 = false } = {}) {
-  const url = req.nextUrl.href;
-  const referrer = req.headers.get('referer') || '';
-  const cookies = req.headers.get('cookie') || '';
-  const userAgent = req.headers.get('user-agent') || '';
-
-  // Match the payload shape the Zaraz JS tag sends to this endpoint
-  const payload = {
-    name: 'Pageview',
-    data: { llm_agent: true, llm_404: is404 },
-    zarazData: {
-      c: cookies, // raw cookie string — Zaraz extracts ajs_anonymous_id / ajs_user_id from here
-      l: url,
-      r: referrer,
-    },
-    system: {
-      device: {
-        ip: '192.168.0.1',
-      },
-    },
-  };
-
-  // Fire and forget — do not await to avoid blocking the response
-  fetch('https://neonapi.io/t.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'User-Agent': `LLMAGENT: ${userAgent}` },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
-}
-
 export async function proxy(req) {
   try {
     const { pathname } = req.nextUrl;
@@ -86,7 +54,6 @@ export async function proxy(req) {
           const response = await fetch(markdownUrl);
 
           if (response.ok) {
-            trackLLMPageview(req);
             const markdown = await response.text();
             return applyDocHeaders(
               new NextResponse(markdown, {
@@ -112,8 +79,6 @@ export async function proxy(req) {
           console.error('[AI Agent] Error serving markdown', { pathname, error: error.message });
         }
       }
-
-      trackLLMPageview(req, { is404: agentHit404 });
 
       if (agentHit404) {
         return applyDocHeaders(
@@ -185,33 +150,6 @@ export async function proxy(req) {
       return response;
     }
 
-    // Check if the user is logged in
-    try {
-      const isLoggedIn = await checkCookie('neon_login_indicator');
-      if (pathname === '/' && isLoggedIn) {
-        try {
-          const referer = await getReferer();
-          // If user is already browsing the site, show them the homepage
-          if (
-            referer.includes(process.env.VERCEL_BRANCH_URL) ||
-            referer.includes(process.env.NEXT_PUBLIC_DEFAULT_SITE_URL)
-          ) {
-            return NextResponse.redirect(new URL('/home', req.url));
-          }
-        } catch (error) {
-          console.error('Error getting referer:', error);
-        }
-        // If user came from external source, redirect to console
-        return NextResponse.redirect(LINKS.console);
-      }
-      // If not logged in but on /home, redirect to main homepage
-      if (pathname === '/home' && !isLoggedIn) {
-        return NextResponse.redirect(new URL(SITE_URL));
-      }
-    } catch (error) {
-      console.error('Error checking login indicator:', error);
-    }
-
     return NextResponse.next();
   } catch (error) {
     console.error('Middleware execution error:', error);
@@ -222,11 +160,8 @@ export async function proxy(req) {
 
 export const config = {
   matcher: [
-    '/', // Check if the user is logged in
-    '/home', // Check if the user is logged in
     '/llms/:path*', // Legacy .txt redirect
-    '/pricing', // Agent-friendly pricing page
-    '/(docs|postgresql|guides|branching|programs|use-cases)/:path*', // All markdown routes
-    '/:path(docs|postgresql|guides|branching|programs|use-cases).md', // Top-level .md index URLs
+    '/(docs)/:path*', // All markdown routes
+    '/:path(docs).md', // Top-level .md index URLs
   ],
 };

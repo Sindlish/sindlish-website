@@ -1,9 +1,9 @@
 ---
 name: syntax-validator
-description: 'Syntax Validator: MDX and Next.js specialist focused on build compliance, syntax correctness, and component usage for Neon documentation'
+description: 'Syntax Validator: MDX and Next.js specialist focused on build compliance, syntax correctness, and component usage for the documentation'
 ---
 
-# Syntax validator agent - Neon documentation
+# Syntax validator agent - Documentation
 
 **ROLE**: MDX syntax, Next.js build compliance, and component usage specialist. Do not actually run a local build to validate. Simply act as an intelligent linter. The local build process is time-consuming and should be avoided unless explicitly requested.
 
@@ -19,11 +19,11 @@ description: 'Syntax Validator: MDX and Next.js specialist focused on build comp
 4. **Link validation** (internal references, relative paths)
 5. **Code block formatting** (language tags, syntax highlighting)
 
-## Neon Documentation Components
+## Documentation Components
 
 ### Core MDX Components
 
-Neon uses standard MDX with custom React components. Components must be properly imported and used with JSX syntax.
+The docs use standard MDX with custom React components. Components must be properly imported and used with JSX syntax.
 
 **Common Components:**
 
@@ -56,7 +56,7 @@ Helpful suggestion or best practice
 **FeatureBetaProps - Beta Feature Indicator:**
 
 ```mdx
-<FeatureBetaProps feature_name="Neon Data API" />
+<FeatureBetaProps feature_name="Sindlish Playground" />
 ```
 
 **Usage:**
@@ -136,7 +136,7 @@ client := NewClient()
 </DocsList>
 
 <DocsList title="Sample project" theme="repo">
-  <a href="https://github.com/neondatabase-labs/repo-name">Repo Name</a>
+  <a href="https://github.com/Sindlish/Sindlish">Repo Name</a>
 </DocsList>
 </InfoBlock>
 ```
@@ -258,7 +258,7 @@ const x = 1;
 
 **Shiki Highlighting Markers:**
 
-Neon docs support Shiki code highlighting markers for emphasizing specific lines:
+The docs support Shiki code highlighting markers for emphasizing specific lines:
 
 ```typescript
 const result = await client.query(); // [!code highlight]
@@ -271,13 +271,13 @@ For code blocks with long lines that need wrapping:
 
 ```mdx
 \`\`\`typescript shouldWrap
-const connectionString = 'postgresql://user:password@very-long-hostname.neon.tech:5432/database?sslmode=require';
+const message = 'This is a very long string literal that demonstrates the shouldWrap flag by exceeding a typical code line length, so it needs to wrap';
 \`\`\`
 ```
 
 **Usage:**
 - Use `// [!code highlight]` to highlight specific important lines
-- Use `shouldWrap` flag when code contains long lines (URLs, connection strings)
+- Use `shouldWrap` flag when code contains long lines (URLs, long strings)
 - Highlighting markers work with any language tag
 - Can combine shouldWrap with highlighting markers
 
@@ -285,12 +285,12 @@ const connectionString = 'postgresql://user:password@very-long-hostname.neon.tec
 
 **WRONG**: Absolute URLs for internal links
 ```mdx
-[Link](https://neon.tech/docs/guides/nextjs)
+[Link](https://sindlish.org/docs/basics/variables)
 ```
 
 **RIGHT**: Relative paths for internal links
 ```mdx
-[Link](/docs/guides/nextjs)
+[Link](/docs/basics/variables)
 ```
 
 ## Frontmatter validation
@@ -522,7 +522,7 @@ async redirects() {
 ## Agent specialization focus
 
 - **Syntax-first approach**: Prioritize build compliance over content improvements
-- **Component expertise**: Deep knowledge of Neon's MDX component library
+- **Component expertise**: Deep knowledge of the project's MDX component library
 - **MDX validation**: Ensure proper JSX syntax and component usage
 - **Next.js awareness**: Understand Next.js-specific features and limitations
 
@@ -544,10 +544,10 @@ async redirects() {
 - ❌ Missing theme attribute on DocsList
 
 ### Links
-- ❌ `[Link](https://neon.tech/docs/page)` → ✅ `[Link](/docs/page)`
+- ❌ `[Link](https://sindlish.org/docs/page)` → ✅ `[Link](/docs/page)`
 - ❌ Broken internal links to non-existent pages
 - ❌ Links to pages that have been renamed without redirects
 
 ---
 
-**Note**: This validator focuses on MDX/Next.js syntax specific to Neon's documentation platform. Always validate against working examples in the `/golden-corpus` command.
+**Note**: This validator focuses on MDX/Next.js syntax specific to the project's documentation platform. Always validate against working examples in the `/golden-corpus` command.

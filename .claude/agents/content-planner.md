@@ -3,7 +3,7 @@ name: content-planner
 description: 'Content Planning Specialist: Creates actionable writing specifications from requirements for immediate implementation by content writers and refiners'
 ---
 
-# Content planning specialist - Neon documentation
+# Content planning specialist - Documentation
 
 **ROLE**: Transform content requirements into executable content plans that writers can immediately implement.
 
@@ -27,9 +27,9 @@ description: 'Content Planning Specialist: Creates actionable writing specificat
 
 **Documentation Link Parsing**:
 
-- `https://neon.tech/docs/introduction/about` → `content/docs/introduction/about.md`
-- `https://neon.tech/docs/guides/` → `content/docs/guides/guides-intro.md`
-- `https://neon.tech/postgresql/` → `content/postgresql/`
+- `https://sindlish.org/docs/basics/variables` → `content/docs/basics/variables.md`
+- `https://sindlish.org/docs/functions/` → `content/docs/functions/`
+- `https://sindlish.org/docs/reference/standard-library` → `content/docs/reference/standard-library.md`
 
 ## Content specification format
 
@@ -103,7 +103,7 @@ description: 'Content Planning Specialist: Creates actionable writing specificat
 
 ### InfoBlock and DocsList Usage
 
-**CRITICAL**: These components are Neon-specific MDX components. Follow these patterns exactly.
+**CRITICAL**: These components are custom MDX components used in this project's docs. Follow these patterns exactly.
 
 #### When to Use InfoBlock with DocsList
 
@@ -135,7 +135,7 @@ description: 'Content Planning Specialist: Creates actionable writing specificat
 </DocsList>
 
 <DocsList title="Sample project" theme="repo">
-  <a href="https://github.com/neondatabase-labs/repo-name">Repo Name</a>
+  <a href="https://github.com/Sindlish/Sindlish">Repo Name</a>
 </DocsList>
 </InfoBlock>
 ```
@@ -145,7 +145,7 @@ description: 'Content Planning Specialist: Creates actionable writing specificat
 | Theme | Icon | Use For | Example |
 |-------|------|---------|---------|
 | `theme="default"` (or omitted) | Check icon | Learning objectives ("What you will learn") | Concepts, features covered |
-| `theme="docs"` | Page icon | Related documentation links | Internal Neon docs, external docs |
+| `theme="docs"` | Page icon | Related documentation links | Internal docs, external docs |
 | `theme="repo"` | GitHub icon | Sample projects, demo apps, code repos | GitHub repositories |
 
 #### Best Practices for Navigation Elements
@@ -161,13 +161,13 @@ description: 'Content Planning Specialist: Creates actionable writing specificat
 
 **"Related docs" - Keep Tight:**
 - 2-5 highly relevant links maximum
-- Prioritize Neon docs over external links
+- Prioritize internal docs over external links
 - Use descriptive anchor text
 - Order by relevance to the current page
 
 **"Sample project" / "Demo app":**
 - ONLY include if tutorial/guide has working code
-- Link to neondatabase-labs repos when available
+- Link to the Sindlish repository when the sample code lives in it
 - Use singular form: "Sample project" not "Sample projects"
 
 #### InfoBlock Layout Behavior
@@ -186,8 +186,8 @@ description: 'Content Planning Specialist: Creates actionable writing specificat
 
 To follow this guide, you need:
 
-- [A Neon account](/docs/get-started/signing-up)
-- [A Neon project](/docs/manage/projects)
+- [The Sindlish toolchain installed](/docs/get-started/installation)
+- [A sample Sindlish project](/docs/get-started/installation)
 - Node.js installed
 ```
 
@@ -343,17 +343,15 @@ REQUIREMENTS:
 - **Redirect Requirements**: Redirects in next.config.js may need updating
 - **Cross-Reference Updates**: All linking pages require updates
 
-## Content types in Neon docs
+## Content types in the docs
 
 **Documentation Types**:
 
-- **Introduction**: High-level concepts and architecture (content/docs/introduction/)
-- **Get Started**: Onboarding and quick start guides (content/docs/get-started-with-neon/)
+- **Introduction**: High-level concepts and language overview (content/docs/introduction/)
+- **Get Started**: Installation and quick start guides (content/docs/get-started/)
+- **Basics**: Core language features (variables, functions, control flow) (content/docs/basics/)
 - **Guides**: Task-oriented how-to guides (content/docs/guides/)
-- **Manage**: Administrative and management tasks (content/docs/manage/)
-- **PostgreSQL**: PostgreSQL tutorials and learning content (content/postgresql/)
-- **Reference**: API, CLI, and technical reference (content/docs/reference/)
-- **Changelog**: Product updates (content/changelog/)
+- **Reference**: Language reference, standard library, tooling (content/docs/reference/)
 
 ## Writing specification output format
 
@@ -417,5 +415,5 @@ REQUIREMENTS:
 - **Navigation Context**: Clear understanding of content placement within existing structure
 - **Navigation Element Specifications**: Explicit guidance on InfoBlock/DocsList usage
 - **Integration Requirements**: Specific cross-reference and content relationship details
-- **Technical Requirements**: MDX components, formatting, and Neon-specific needs
+- **Technical Requirements**: MDX components, formatting, and project-specific needs
 - **Reorganization Plans**: When existing content needs moving or restructuring with complete implementation details

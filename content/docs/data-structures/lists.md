@@ -36,6 +36,7 @@ likh(fal[-1]) # Prints: Soof (last item)
 ```
 
 ### Nested Indexing
+
 If a list contains another list, you can chain brackets to reach the inner items.
 
 ```sd
@@ -79,6 +80,7 @@ Sindlish provides a rich set of built-in methods to manipulate lists.
 | **`.nakal()`** | **Copy**: Returns a shallow copy of the list. |
 
 ### Examples:
+
 ```sd
 nums = [30, 10, 20]
 
