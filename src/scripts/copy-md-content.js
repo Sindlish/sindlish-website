@@ -17,6 +17,7 @@ const { processAllContent } = require('./process-md-for-llms');
     const projectRoot = path.resolve(__dirname, '../..');
     await processAllContent(CONTENT_ROUTES, projectRoot);
     console.log('\nDone processing markdown content.');
+    process.exit(0);
   } catch (err) {
     console.error('Error occurred while processing markdown files:', err);
     process.exit(1);

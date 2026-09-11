@@ -539,6 +539,7 @@ async function main() {
     }
   } else {
     const outputPath = path.join(projectRoot, OUTPUT_PATH);
+    await fs.mkdir(path.dirname(outputPath), { recursive: true });
     await fs.writeFile(outputPath, indexContent);
     console.log(`Written to ${outputPath}`);
 
