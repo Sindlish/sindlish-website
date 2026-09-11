@@ -198,7 +198,7 @@ const REASONS = [
           <div className="flex gap-6">
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-white transition-colors group-hover:text-[#E02424]">
-                33
+                {githubStars.commits_count}
               </span>
               <span className="text-[10px] font-bold tracking-widest text-gray-new-50 uppercase">
                 Commits
@@ -209,12 +209,12 @@ const REASONS = [
                 {githubStars.stargazers_count}
               </span>
               <span className="text-[10px] font-bold tracking-widest text-gray-new-50 uppercase">
-                Star
+                Star{githubStars.stargazers_count !== 1 ? 's' : ''}
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-white transition-colors group-hover:text-[#E02424]">
-                30+
+                {githubStars.files_count}+
               </span>
               <span className="text-[10px] font-bold tracking-widest text-gray-new-50 uppercase">
                 Files
@@ -225,15 +225,23 @@ const REASONS = [
           <div className="space-y-2">
             <div className="flex justify-between text-[11px] font-bold tracking-tighter text-gray-new-60 uppercase">
               <span>Main Language</span>
-              <span className="text-white">Python 98.5%</span>
+              <span className="text-white">
+                {githubStars.language} {githubStars.language_percentage}%
+              </span>
             </div>
             <div className="flex h-1.5 w-full overflow-hidden rounded-none bg-gray-new-10">
-              <div className="h-full bg-[#E02424]" style={{ width: '98.5%' }} />
-              <div className="h-full bg-[#1B3A5C]" style={{ width: '1.5%' }} />
+              <div
+                className="h-full bg-[#E02424]"
+                style={{ width: `${githubStars.language_percentage}%` }}
+              />
+              <div
+                className="h-full bg-[#1B3A5C]"
+                style={{ width: `${100 - githubStars.language_percentage}%` }}
+              />
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {['interpreter', 'vscode-extension', 'bytecode-vm', 'sindhi-grammar'].map((tag) => (
+            {githubStars.topics.slice(0, 4).map((tag) => (
               <span
                 key={tag}
                 className="border border-gray-new-20 bg-gray-new-10 px-2 py-1 font-mono text-[10px] text-gray-new-70"
