@@ -27,7 +27,8 @@
     "test:unit:ui": "vitest --ui",
     "test:unit:run": "vitest run",
     "test:unit:coverage": "vitest run --coverage",
-    "check:docs": "vitest run scripts/docs-checks/**/__tests__/*.test.js"
+    "check:docs": "vitest run scripts/docs-checks/**/__tests__/*.test.js",
+    "check:examples": "python scripts/docs-checks/example-runner/run_examples.py"
   },
   "dependencies": {
     "@codemirror/lang-sql": "^6.9.1",

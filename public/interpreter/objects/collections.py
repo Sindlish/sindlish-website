@@ -1,20 +1,60 @@
-from ..errors import QisamJeGhalti
+from ..errors import IndexJeGhalti, QisamJeGhalti
 from ..frontend.tokens import TokenType
 from .base import SdShey, SdType
-from .core import SdNull
+from .core import SdNull, SdResult
 from .numbers import SdBool, SdNumber
+from .strings import SdString
 
 FEHRIST_TYPE = SdType("FEHRIST", TokenType.FEHRIST)
 LUGHAT_TYPE = SdType("LUGHAT", TokenType.LUGHAT)
 MAJMUO_TYPE = SdType("MAJMUO", TokenType.MAJMUO)
+SILSILO_TYPE = SdType("SILSILO", TokenType.FEHRIST)
+
+
+def _check_list_element(value, element_type):
+    """Reject a value that doesn't match a typed list's declared element type.
+
+    Mirrors ``VM._check_element_type`` so ``fehrist[...]`` containers stay
+    honest at mutation time (push / insert / extend / subscript write), not
+    just when the list is bound to a typed variable.
+    """
+    if element_type is None:
+        return
+    if isinstance(value, SdResult):
+        if value.is_ok():
+            value = value.value
+        else:
+            return
+    match element_type:
+        case TokenType.ADAD:
+            if not isinstance(value, SdNumber) or not isinstance(value.value, int):
+                raise QisamJeGhalti(
+                    f"Fehrist je elements jo qisam 'adad' hujjhan lazmi aahe, par '{value.type.name}' milyo."
+                )
+        case TokenType.DAHAI:
+            if not isinstance(value, SdNumber) or not isinstance(value.value, float):
+                raise QisamJeGhalti(
+                    f"Fehrist je elements jo qisam 'dahai' hujjhan lazmi aahe, par '{value.type.name}' milyo."
+                )
+        case TokenType.LAFZ:
+            if not isinstance(value, SdString):
+                raise QisamJeGhalti(
+                    f"Fehrist je elements jo qisam 'lafz' hujjhan lazmi aahe, par '{value.type.name}' milyo."
+                )
+        case TokenType.FAISLO:
+            if not isinstance(value, SdBool):
+                raise QisamJeGhalti(
+                    f"Fehrist je elements jo qisam 'faislo' hujjhan lazmi aahe, par '{value.type.name}' milyo."
+                )
 
 
 class SdList(SdShey):
-    __slots__ = ("elements",)
+    __slots__ = ("element_type", "elements")
 
-    def __init__(self, elements):
+    def __init__(self, elements, element_type=None):
         super().__init__(FEHRIST_TYPE)
         self.elements = elements
+        self.element_type = element_type
 
     def __add__(self, other):
         if not isinstance(other, SdList):
@@ -40,18 +80,19 @@ class SdList(SdShey):
         try:
             return self.elements[int(index.value)]
         except IndexError:
-            raise QisamJeGhalti(
+            raise IndexJeGhalti(
                 f"Fehrist jo index {int(index.value)} hadd khaan bahar aahe."
             )
 
     def __setitem__(self, index, value):
         if not isinstance(index, SdNumber):
             raise QisamJeGhalti("Fehrist jo index Adad hujjhan lazmi aahe.")
+        _check_list_element(value, self.element_type)
         try:
             self.elements[int(index.value)] = value
             return SdNull()
         except IndexError:
-            raise QisamJeGhalti(
+            raise IndexJeGhalti(
                 f"Fehrist jo index {int(index.value)} hadd khaan bahar aahe."
             )
 
@@ -96,7 +137,7 @@ class SdList(SdShey):
             try:
                 return self.elements.pop(idx)
             except IndexError:
-                raise QisamJeGhalti(f"Fehrist jo index {idx} hadd khaan bahar aahe.")
+                raise IndexJeGhalti(f"Fehrist jo index {idx} hadd khaan bahar aahe.")
         else:
             if len(self.elements) == 0:
                 raise QisamJeGhalti("Khaali Fehrist maan natho kadhi (pop) saghjay.")
@@ -118,6 +159,58 @@ class SdList(SdShey):
     def reverse(self):
         self.elements.reverse()
         return SdNull()
+
+
+class SdRange(SdShey):
+    __slots__ = ("start", "step", "stop")
+
+    def __init__(self, start, stop, step):
+        super().__init__(SILSILO_TYPE)
+        self.start = start
+        self.stop = stop
+        self.step = step
+
+    def __len__(self):
+        if self.step > 0:
+            return max(0, (self.stop - self.start + self.step - 1) // self.step)
+        return max(0, (self.start - self.stop - self.step - 1) // (-self.step))
+
+    def __iter__(self):
+        return iter(SdNumber(i) for i in range(self.start, self.stop, self.step))
+
+    def __getitem__(self, index):
+        if not isinstance(index, SdNumber):
+            raise QisamJeGhalti("Silsilo jo index Adad hujjhan lazmi aahe.")
+        idx = int(index.value)
+        length = len(self)
+        if idx < 0:
+            idx += length
+        if not 0 <= idx < length:
+            raise IndexJeGhalti(
+                f"Silsilo jo index {int(index.value)} hadd khaan bahar aahe."
+            )
+        return SdNumber(self.start + idx * self.step)
+
+    def __contains__(self, item):
+        if not isinstance(item, SdNumber) or isinstance(item.value, float):
+            return SdBool(False)
+        v = int(item.value)
+        if self.step > 0:
+            inside = self.start <= v < self.stop
+        else:
+            inside = self.stop < v <= self.start
+        return SdBool(inside and (v - self.start) % self.step == 0)
+
+    def __bool__(self):
+        return len(self) > 0
+
+    def __str__(self):
+        if self.step == 1:
+            return f"silsilo({self.start}, {self.stop})"
+        return f"silsilo({self.start}, {self.stop}, {self.step})"
+
+    def __hash__(self):
+        raise TypeError(f"Unhashable qisam: '{self.type.name}'.")
 
 
 class SdDict(SdShey):
@@ -147,6 +240,9 @@ class SdDict(SdShey):
 
     def __str__(self):
         return "{" + ", ".join(f"{k}: {v}" for k, v in self.pairs.items()) + "}"
+
+    def __bool__(self):
+        return bool(self.pairs)
 
     def __hash__(self):
         raise TypeError(f"Unhashable qisam: '{self.type.name}'.")
@@ -255,6 +351,9 @@ class SdSet(SdShey):
     def __str__(self):
         return "{" + ", ".join(str(el) for el in self.elements) + "}"
 
+    def __bool__(self):
+        return bool(self.elements)
+
     def __hash__(self):
         raise TypeError(f"Unhashable qisam: '{self.type.name}'.")
 
@@ -319,6 +418,7 @@ class SdSet(SdShey):
 
 # Fehrist (List) Methods
 def fehrist_wadha(obj, args):
+    _check_list_element(args[0], obj.element_type)
     obj.elements.append(args[0])
     return obj
 
@@ -327,6 +427,8 @@ def fehrist_wadhayo(obj, args):
     other = args[0]
     if not isinstance(other, SdList):
         raise QisamJeGhalti("Wadhayo laai argument Fehrist hujjhan lazmi aahe.")
+    for elem in other.elements:
+        _check_list_element(elem, obj.element_type)
     obj.elements.extend(other.elements)
     return obj
 
@@ -335,6 +437,7 @@ def fehrist_wajh(obj, args):
     if len(args) < 2:
         raise QisamJeGhalti("Wajh khe 2 arguments khapan: index aen value.")
     idx = args[0].value if hasattr(args[0], "value") else args[0]
+    _check_list_element(args[1], obj.element_type)
     obj.elements.insert(idx, args[1])
     return obj
 
@@ -384,7 +487,7 @@ def fehrist_tarteeb(obj, args):
 
     try:
         obj.elements.sort(key=compare_key)
-    except Exception as e:
+    except (TypeError, ValueError) as e:
         raise QisamJeGhalti(f"Tarteeb mein ghalti: {e!s}.")
     return obj
 
@@ -500,9 +603,9 @@ def majmuo_bade(obj, args):
     return SdSet(obj.elements.union(args[0].elements))
 
 
-def majmuo_milap(obj, args):
+def majmuo_mushtarak(obj, args):
     if not isinstance(args[0], SdSet):
-        raise QisamJeGhalti("Milap sirf Majmuo laai aahe.")
+        raise QisamJeGhalti("Mushtarak sirf Majmuo laai aahe.")
     return SdSet(obj.elements.intersection(args[0].elements))
 
 
@@ -578,7 +681,7 @@ def majmuo_update(obj, args):
 MAJMUO_TYPE.register_method("addkar", majmuo_addkar)
 MAJMUO_TYPE.register_method("chad", majmuo_chad)
 MAJMUO_TYPE.register_method("bade", majmuo_bade)
-MAJMUO_TYPE.register_method("milap", majmuo_milap)
+MAJMUO_TYPE.register_method("mushtarak", majmuo_mushtarak)
 MAJMUO_TYPE.register_method("farq", majmuo_farq)
 MAJMUO_TYPE.register_method("symmetric_farq", majmuo_symmetric_farq)
 MAJMUO_TYPE.register_method("nandohisoahe", majmuo_nandohisoahe)

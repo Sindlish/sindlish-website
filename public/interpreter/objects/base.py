@@ -1,9 +1,9 @@
 from ..errors import (
     HalndeVaktGhalti,
     IndexJeGhalti,
-    LikhaiJeGhalti,
     NaleJeGhalti,
     QisamJeGhalti,
+    SindhiBaseError,
     ZeroVindJeGhalti,
 )
 from ..frontend.tokens import TokenType
@@ -87,16 +87,17 @@ class SdType:
         if not self._bases:
             return (self,)
 
-        # C3 linearization algorithm
+        # C3 linearization: merge base MROs, then prepend self
         merge_seq = []
         for base in self._bases:
             if isinstance(base, SdType):
                 merge_seq.append(base.mro)
             else:
                 merge_seq.append((base,))
+        merge_seq.append(tuple(self._bases))
 
         result = self._c3_merge(merge_seq)
-        return tuple(result) + (self,)
+        return (self,) + tuple(result)
 
     def _c3_merge(self, sequences: list) -> list:
         """
@@ -130,7 +131,13 @@ class SdType:
                     break
 
             if not merged:
-                break
+                raise TypeError(
+                    "Bases ji consistent method resolution order (MRO) nathi banay saghjo: "
+                    + ", ".join(
+                        base.name if isinstance(base, SdType) else repr(base)
+                        for base in self._bases
+                    )
+                )
 
             # Check if all sequences are empty
             if all(not seq for seq in sequences):
@@ -177,6 +184,17 @@ class SdType:
 SHEY_TYPE = SdType("OBJECT", None)
 
 
+def sd_truthy(value) -> bool:
+    """Language-level truthiness used by conditions, aen/ya/nah."""
+    from .core import SdResult
+
+    if isinstance(value, SdResult):
+        if value.is_error():
+            return True
+        return sd_truthy(value.value)
+    return bool(value)
+
+
 class SdShey:
     """
     Base class for all Sindlish objects.
@@ -185,11 +203,10 @@ class SdShey:
     and dynamic attribute storage.
     """
 
-    __slots__ = ("_ref_count", "_type")
+    __slots__ = ("_type",)
 
     def __init__(self, type_obj: SdType):
         self._type = type_obj
-        self._ref_count = 1
 
     @property
     def type(self) -> SdType:
@@ -199,11 +216,6 @@ class SdShey:
     @type.setter
     def type(self, value: SdType):
         self._type = value
-
-    @property
-    def ref_count(self) -> int:
-        """Reference count"""
-        return self._ref_count
 
     # Python special methods - default implementations
     def __eq__(self, other) -> bool:
@@ -271,27 +283,24 @@ class SdShey:
         if protocol_method and callable(protocol_method):
             try:
                 return protocol_method(*args)
-            except (
-                QisamJeGhalti,
-                HalndeVaktGhalti,
-                NaleJeGhalti,
-                ZeroVindJeGhalti,
-                IndexJeGhalti,
-                LikhaiJeGhalti,
-            ) as e:
+            except SindhiBaseError as e:
                 if e.line is None:
                     e.line, e.column, e.code_string = line, column, code
                 raise
             except TypeError as e:
                 raise QisamJeGhalti(str(e), line, column, code)
-            except Exception as e:
+            except IndexError as e:
+                raise IndexJeGhalti(str(e), line, column, code)
+            except ZeroDivisionError as e:
+                raise ZeroVindJeGhalti(str(e), line, column, code)
+            except Exception as e:  # noqa: BLE001 - any unexpected protocol error -> runtime
                 raise HalndeVaktGhalti(str(e), line, column, code)
 
         # Second: Fallback to type's method lookup via MRO
         method = self._type.lookup_method(name)
 
         if not method:
-            raise QisamJeGhalti(
+            raise NaleJeGhalti(
                 details=f"'{self.type.name}' object mein '{name}' nale jo ko bh method na aahe.",
                 line=line,
                 column=column,
@@ -300,30 +309,13 @@ class SdShey:
 
         try:
             return method(*args)
-        except (
-            QisamJeGhalti,
-            HalndeVaktGhalti,
-            NaleJeGhalti,
-            ZeroVindJeGhalti,
-            IndexJeGhalti,
-            LikhaiJeGhalti,
-        ):
+        except SindhiBaseError:
             raise
         except TypeError as e:
             raise QisamJeGhalti(str(e), line, column, code)
-        except Exception as e:
+        except IndexError as e:
+            raise IndexJeGhalti(str(e), line, column, code)
+        except ZeroDivisionError as e:
+            raise ZeroVindJeGhalti(str(e), line, column, code)
+        except Exception as e:  # noqa: BLE001 - any unexpected method error -> runtime
             raise HalndeVaktGhalti(str(e), line, column, code)
-
-    # Reference counting
-    def incref(self):
-        """Increment reference count"""
-        self._ref_count += 1
-
-    def decref(self):
-        """Decrement reference count"""
-        self._ref_count -= 1
-        if self._ref_count <= 0:
-            self._dealloc()
-
-    def _dealloc(self):
-        """Deallocate object - override for cleanup"""

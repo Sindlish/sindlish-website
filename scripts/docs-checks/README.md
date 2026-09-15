@@ -5,14 +5,18 @@ Validate `content/**/*.md` against authoritative sources. Each check is self-con
 ## Run
 
 ```bash
-npm run check:docs              # all checks
+npm run check:docs              # all vitest-based checks
+npm run check:examples          # run every .sd example against the real interpreter
 ```
 
 Exits non-zero on any validation error.
 
 ## Checks
 
-None currently. Previous Neon-specific checks (e.g. `neonctl`) were removed with the Neon content.
+- `example-runner/` — runs every ```sd block in `content/docs/**/*.md`
+  through the bundled interpreter (`public/interpreter/`), asserts expected
+  output where declared, and times out runaway blocks. Wired as
+  `npm run check:examples`.
 
 ## Add a new check
 

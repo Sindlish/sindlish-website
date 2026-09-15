@@ -168,32 +168,50 @@ Tags (`new`, `beta`, etc.) set in frontmatter must also be added to the correspo
 
 ## Writing Style
 
-The voice should sound like one human being explaining something to another -- approachable and professional, not stiff or overly formal.
+The voice is like the Rust Book: one human explaining a language to another, warmly and precisely. Approachable, never stiff, never sloppy. What follows is the contract every doc page is written to.
 
-### Voice and language
+### Voice and tone
 
-- **Contractions:** Use them (it's, don't, you're). They make the tone more conversational. Don't overuse to the point of sacrificing clarity.
-- **Active voice:** Prefer it. "The software converts the file" not "The file is converted by the software."
-- **Simple language:** Choose simpler words. "Use the tool" not "Utilize the instrument."
-- **Concise sentences:** Keep them short. Don't pad.
-- **Address the reader:** Use "you" but don't start every sentence with it.
-- **Consistent terminology:** Pick one term per concept and stick to it.
-- **US English:** Use US spelling and grammar throughout.
-- **No emojis or exclamation marks** in documentation.
-- **No em dashes:** Restructure the sentence instead.
+- **Second person:** Talk to the reader directly. "You'll write this line, then run it."
+- **Contractions:** Use them naturally (`it's`, `you'll`, `let's`). They carry the warmth.
+- **"Let's" moments:** Open walkthroughs with "Let's write our first program." Action first, explanation right after.
+- **Short, active sentences:** "The loop checks the condition." Not "The condition is checked by the loop."
+- **Simple words:** "Use" not "utilize", "make" not "instantiate" unless instantiation is actually meant.
+- **Encouraging, never condescending:** A reader may have made mistakes before. The docs own the confusion, not the reader.
+- **No exclamation marks or emojis.** Warmth comes from contractions and "let's", not volume.
+- **No em dashes.** Restructure the sentence.
+- **US English, sentence-case titles.**
 
-### Capitalization
+### Terminology: first-use gloss
 
-- Use lowercase wherever possible.
-- Page titles: sentence case ("Create your first project", not "Create Your First Project").
-- Product names: follow official capitalization (GitHub, npm, Vercel).
-- UI text: match the interface exactly.
-- Feature names: lowercase by default.
-- Methods/methodologies: capitalize (Continuous Integration, Continuous Deployment).
+Sindlish keywords are Romanized Sindhi (`likh`, `agar`, `fehrist`). On first mention, give the English concept and the keyword together. Afterward, the keyword stands alone.
 
-### Links
+- First use: "the print function `likh` writes a line to the screen."
+- Later use: "Call `likh` and pass a string."
+- Keywords are always backticked, the English concept never is.
 
-Link to the source instead of repeating information. Explain why the linked content matters in context.
+This gives beginners a hook to hang understanding on, and keeps site search working on the keyword names.
+
+### Learner-first progression
+
+- Every tutorial page opens with a **framing paragraph**: 2-4 sentences of plain-language "what and why", then straight into a working example. No theory-only pages.
+- **No forward references.** A concept is introduced before it's used. If a page needs a concept taught elsewhere, link there instead of assuming it.
+- Tutorial pages close with a "Next up" link to the next step in dependency order.
+
+### Code examples and expected output
+
+- Examples that teach a new concept must be **complete and runnable**: no `...`, no placeholder bodies. The Run button on every `.sd` block must work.
+- Runnable examples show the interpreter's real output in a labeled block after the code.
+- Small `# Prints:` inline comments are fine for trivial notes.
+- Reference one-liners and signature fragments need not execute; they're illustration, not pedagogy.
+
+### Cross-references
+
+Link inline the first time a page mentions a concept taught elsewhere. Link to a source instead of repeating its content, and say why the linked page matters in context.
+
+### Taxonomy
+
+Diátaxis governs the structure: tutorials, how-to guides, reference, and explanation. Each mode has its own voice. Tutorials are warm and lean-forward; reference is neutral, austere, and factual.
 
 ### Fake user information
 

@@ -1,4 +1,4 @@
-from ..errors import QisamJeGhalti
+from ..errors import IndexJeGhalti, QisamJeGhalti
 from ..frontend.tokens import TokenType
 from .base import SdShey, SdType
 from .numbers import SdBool, SdNumber
@@ -28,7 +28,7 @@ class SdString(SdShey):
     def __add__(self, other):
         if not isinstance(other, SdString):
             raise QisamJeGhalti(
-                f"Lafz ke '{other.type.name}' saan bhet (compare) natho kare saghjay."
+                f"Lafz ke '{other.type.name}' saan jore (concatenate) natho kare saghjay."
             )
         return SdString(self.value + other.value)
 
@@ -81,7 +81,7 @@ class SdString(SdShey):
         try:
             return SdString(self.value[int(index.value)])
         except IndexError:
-            raise QisamJeGhalti(
+            raise IndexJeGhalti(
                 f"Lafz jo index {int(index.value)} hadd khaan bahar aahe."
             )
 

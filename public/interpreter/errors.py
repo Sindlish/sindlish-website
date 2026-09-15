@@ -114,6 +114,10 @@ class ErrorReporter:
 
 
 class LikhaiJeGhalti(SindhiBaseError):
+    """Syntax-stage error: the source *writing* (lexing) or its structure
+    (parsing) is invalid. Covers lexer + parser as one syntax pipeline; never
+    used for runtime problems."""
+
     def __init__(
         self, details, line=None, column=None, code_string=None, traceback=None
     ):
@@ -161,6 +165,28 @@ class IndexJeGhalti(SindhiBaseError):
         super().__init__("IndexJeGhalti", details, line, column, code_string, traceback)
 
 
+class TarteebJeGhalti(SindhiBaseError):
+    def __init__(
+        self, details, line=None, column=None, code_string=None, traceback=None
+    ):
+        super().__init__(
+            "TarteebJeGhalti", details, line, column, code_string, traceback
+        )
+
+
+class MatalabJeGhalti(SindhiBaseError):
+    """Arity error: the arguments passed to a call do not match what it asks
+    for — wrong count, a required parameter left empty, or an unknown
+    keyword/positional."""
+
+    def __init__(
+        self, details, line=None, column=None, code_string=None, traceback=None
+    ):
+        super().__init__(
+            "MatalabJeGhalti", details, line, column, code_string, traceback
+        )
+
+
 # Registry for dynamic error lookup
 ERROR_MAP = {
     "LikhaiJeGhalti": LikhaiJeGhalti,
@@ -169,4 +195,6 @@ ERROR_MAP = {
     "HalndeVaktGhalti": HalndeVaktGhalti,
     "ZeroVindJeGhalti": ZeroVindJeGhalti,
     "IndexJeGhalti": IndexJeGhalti,
+    "TarteebJeGhalti": TarteebJeGhalti,
+    "MatalabJeGhalti": MatalabJeGhalti,
 }

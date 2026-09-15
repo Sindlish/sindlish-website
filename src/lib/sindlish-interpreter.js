@@ -6,27 +6,62 @@ const INTERPRETER_FILES = [
   { path: '/home/pyodide/interpreter/__init__.py', url: '/interpreter/__init__.py' },
   { path: '/home/pyodide/interpreter/errors.py', url: '/interpreter/errors.py' },
   { path: '/home/pyodide/interpreter/repl.py', url: '/interpreter/repl.py' },
-  { path: '/home/pyodide/interpreter/frontend/__init__.py', url: '/interpreter/frontend/__init__.py' },
+  {
+    path: '/home/pyodide/interpreter/frontend/__init__.py',
+    url: '/interpreter/frontend/__init__.py',
+  },
   { path: '/home/pyodide/interpreter/frontend/lexer.py', url: '/interpreter/frontend/lexer.py' },
   { path: '/home/pyodide/interpreter/frontend/parser.py', url: '/interpreter/frontend/parser.py' },
   { path: '/home/pyodide/interpreter/frontend/tokens.py', url: '/interpreter/frontend/tokens.py' },
-  { path: '/home/pyodide/interpreter/frontend/ast_nodes.py', url: '/interpreter/frontend/ast_nodes.py' },
-  { path: '/home/pyodide/interpreter/frontend/keywords.py', url: '/interpreter/frontend/keywords.py' },
-  { path: '/home/pyodide/interpreter/analysis/__init__.py', url: '/interpreter/analysis/__init__.py' },
-  { path: '/home/pyodide/interpreter/analysis/resolver.py', url: '/interpreter/analysis/resolver.py' },
-  { path: '/home/pyodide/interpreter/backend/__init__.py', url: '/interpreter/backend/__init__.py' },
-  { path: '/home/pyodide/interpreter/backend/compiler.py', url: '/interpreter/backend/compiler.py' },
+  {
+    path: '/home/pyodide/interpreter/frontend/ast_nodes.py',
+    url: '/interpreter/frontend/ast_nodes.py',
+  },
+  {
+    path: '/home/pyodide/interpreter/frontend/keywords.py',
+    url: '/interpreter/frontend/keywords.py',
+  },
+  {
+    path: '/home/pyodide/interpreter/analysis/__init__.py',
+    url: '/interpreter/analysis/__init__.py',
+  },
+  {
+    path: '/home/pyodide/interpreter/analysis/resolver.py',
+    url: '/interpreter/analysis/resolver.py',
+  },
+  {
+    path: '/home/pyodide/interpreter/backend/__init__.py',
+    url: '/interpreter/backend/__init__.py',
+  },
+  {
+    path: '/home/pyodide/interpreter/backend/compiler.py',
+    url: '/interpreter/backend/compiler.py',
+  },
   { path: '/home/pyodide/interpreter/backend/vm.py', url: '/interpreter/backend/vm.py' },
   { path: '/home/pyodide/interpreter/backend/frame.py', url: '/interpreter/backend/frame.py' },
+  { path: '/home/pyodide/interpreter/backend/hints.py', url: '/interpreter/backend/hints.py' },
+  { path: '/home/pyodide/interpreter/backend/markers.py', url: '/interpreter/backend/markers.py' },
   { path: '/home/pyodide/interpreter/backend/opcodes.py', url: '/interpreter/backend/opcodes.py' },
-  { path: '/home/pyodide/interpreter/objects/__init__.py', url: '/interpreter/objects/__init__.py' },
+  {
+    path: '/home/pyodide/interpreter/objects/__init__.py',
+    url: '/interpreter/objects/__init__.py',
+  },
   { path: '/home/pyodide/interpreter/objects/base.py', url: '/interpreter/objects/base.py' },
   { path: '/home/pyodide/interpreter/objects/core.py', url: '/interpreter/objects/core.py' },
   { path: '/home/pyodide/interpreter/objects/numbers.py', url: '/interpreter/objects/numbers.py' },
   { path: '/home/pyodide/interpreter/objects/strings.py', url: '/interpreter/objects/strings.py' },
-  { path: '/home/pyodide/interpreter/objects/collections.py', url: '/interpreter/objects/collections.py' },
-  { path: '/home/pyodide/interpreter/runtime/__init__.py', url: '/interpreter/runtime/__init__.py' },
-  { path: '/home/pyodide/interpreter/runtime/builtins.py', url: '/interpreter/runtime/builtins.py' },
+  {
+    path: '/home/pyodide/interpreter/objects/collections.py',
+    url: '/interpreter/objects/collections.py',
+  },
+  {
+    path: '/home/pyodide/interpreter/runtime/__init__.py',
+    url: '/interpreter/runtime/__init__.py',
+  },
+  {
+    path: '/home/pyodide/interpreter/runtime/builtins.py',
+    url: '/interpreter/runtime/builtins.py',
+  },
   { path: '/home/pyodide/interpreter/runtime/env.py', url: '/interpreter/runtime/env.py' },
 ];
 let pyodideInstance = null;
@@ -37,7 +72,7 @@ export const initSindlish = async (onProgress = () => {}) => {
   initializationPromise = (async () => {
     try {
       onProgress('Loading Python runtime...');
-      
+
       // Check if script already exists
       if (!window.loadPyodide) {
         const script = document.createElement('script');
@@ -81,18 +116,15 @@ sys.exit = _noop_exit
 const ansiToHtml = (text) => {
   if (!text) return '';
   const colors = {
-    '0': 'reset',
-    '1': 'font-weight: bold',
-    '90': 'color: #797d86', // gray
-    '91': 'color: #E02424', // red
-    '93': 'color: #f7b983', // yellow
-    '94': 'color: #94b5f7', // blue
-    '96': 'color: #52c9e0', // cyan
+    0: 'reset',
+    1: 'font-weight: bold',
+    90: 'color: #797d86', // gray
+    91: 'color: #E02424', // red
+    93: 'color: #f7b983', // yellow
+    94: 'color: #94b5f7', // blue
+    96: 'color: #52c9e0', // cyan
   };
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const parts = html.split('\x1b[');
   if (parts.length === 1) return html;
   let result = parts[0];
@@ -106,7 +138,7 @@ const ansiToHtml = (text) => {
     }
     const codes = part.substring(0, m).split(';');
     const content = part.substring(m + 1);
-    codes.forEach(code => {
+    codes.forEach((code) => {
       if (code === '0') {
         currentStyles = [];
       } else if (colors[code]) {

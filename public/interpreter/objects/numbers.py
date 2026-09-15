@@ -1,6 +1,6 @@
 from ..errors import QisamJeGhalti
 from ..frontend.tokens import TokenType
-from .base import SdShey, SdType
+from .base import SdShey, SdType, sd_truthy
 
 ADAD_TYPE = SdType("ADAD", TokenType.ADAD)
 DAHAI_TYPE = SdType("DAHAI", TokenType.DAHAI)
@@ -80,10 +80,13 @@ class SdNumber(SdShey):
                 SdString(
                     f"Adad khe '{other.type.name}' saan puro vand natho kare saghjay."
                 ),
+                "QisamJeGhalti",
             )
         if other.value == 0:
             return SdResult(
-                SdResult.GHALTI, SdString("Zero (0) saan vand natho kare saghjay.")
+                SdResult.GHALTI,
+                SdString("Zero (0) saan vand natho kare saghjay."),
+                "ZeroVindJeGhalti",
             )
         return SdResult(SdResult.OK, SdNumber(self.value // other.value))
 
@@ -97,10 +100,13 @@ class SdNumber(SdShey):
                 SdString(
                     f"'{other.type.name}' saan pachi (remainder) natho kadhi saghjay."
                 ),
+                "QisamJeGhalti",
             )
         if other.value == 0:
             return SdResult(
-                SdResult.GHALTI, SdString("Zero (0) saan pachi natho kadhi saghjay.")
+                SdResult.GHALTI,
+                SdString("Zero (0) saan pachi natho kadhi saghjay."),
+                "ZeroVindJeGhalti",
             )
         return SdResult(SdResult.OK, SdNumber(self.value % other.value))
 
@@ -164,7 +170,7 @@ class SdNumber(SdShey):
         return SdNumber(abs(self.value))
 
     def __invert__(self):
-        return SdNumber(~int(self.value))
+        return SdBool(not sd_truthy(self))
 
     def __int__(self):
         return int(self.value)
@@ -245,7 +251,7 @@ class SdBool(SdShey):
         return SdBool(self.value >= other.value)
 
     def __str__(self):
-        return "such" if self.value else "koorh"
+        return "sach" if self.value else "koorh"
 
     def __hash__(self):
         return hash(self.value)
