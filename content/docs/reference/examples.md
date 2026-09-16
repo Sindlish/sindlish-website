@@ -1,112 +1,115 @@
 ---
-title: Code Examples
-summary: Learn Sindlish by looking at real-world code snippets.
+title: Examples
+summary: A gallery of complete runnable programs.
 enableTableOfContents: true
 ---
 
-The best way to learn any language is by reading and writing code. Here are some common algorithms implemented in Sindlish.
+This is a gallery of small, complete programs. They all run, so copy any one into a file and try it.
 
-## 1. Fibonacci Sequence (Recursion)
+### Hello world
 
 ```sd
-kaam fib(n: adad) -> adad {
-    agar n <= 1 {
-        wapas n
-    }
-    wapas fib(n - 1) + fib(n - 2)
-}
+likh("Salam, dunya!")
+```
 
-# Print the first 10 numbers
-har i mein range(10) {
-    likh(fib(i))
+### A simple calculator
+
+```sd
+a = 10
+b = 5
+likh(a + b)
+likh(a * b)
+likh(a / b)
+```
+
+### Even or odd
+
+```sd
+n = 7
+agar n % 2 == 0 {
+  likh("Jor")
+} warna {
+  likh("Feerk")
 }
 ```
 
----
-
-## 2. Filtering a List (Even Numbers)
+### Sum the first ten numbers
 
 ```sd
-kaam get_evens(nums: fehrist) -> fehrist {
-    evens = []
-    har n mein nums {
-        agar n % 2 == 0 {
-            evens.wadha(n)
-        }
-    }
-    wapas evens
+jama = 0
+har i mein silsilo(1, 11) {
+  jama = jama + i
 }
-
-numbers = [1, 2, 3, 4, 5, 6, 7, 8]
-likh(get_evens(numbers)) # Prints: [2, 4, 6, 8]
+likh(jama)
 ```
 
----
-
-## 3. Student Grade Manager
+### Count the digits in a number
 
 ```sd
-students = [
-    { "name": "Ali", "score": 85 },
-    { "name": "Hassan", "score": 42 },
-    { "name": "Sara", "score": 91 }
-]
+n = 12345
+likh("Digit ho: " + lafz(lambi(lafz(n))))
+```
 
-har s mein students {
-    result = ""
-    agar s["score"] >= 50 {
-        result = "Passed"
-    } warna {
-        result = "Failed"
-    }
-    
-    likh(s["name"] + ": " + result)
+### Build a list
+
+```sd
+items = []
+items.wadha("qalam")
+items.wadha("kaghaz")
+items.wadha("kitaab")
+likh(items)
+```
+
+### Fizzbuzz
+
+```sd
+har i mein silsilo(1, 31) {
+  agar i % 15 == 0 {
+    likh("FizzBuzz")
+  } yawari i % 3 == 0 {
+    likh("Fizz")
+  } yawari i % 5 == 0 {
+    likh("Buzz")
+  } warna {
+    likh(i)
+  }
 }
 ```
 
----
-
-## 4. Robust Input Processing (Result System)
+### Dictionary lookup with fallback
 
 ```sd
-kaam parse_age(input_text: lafz) {
-    # Typecasting can fail if the string isn't a number
-    age = adad(input_text)
-    
-    agar age < 0 {
-        wapas ghalti("Umar negative nathi thi saghjay!")
-    }
-    
-    wapas age
-}
-
-# 1. Using bachao for a safe default
-val1 = parse_age("abc").bachao(0)
-likh("Value 1: ", val1) # Prints: 0
-
-# 2. Using ? to propagate
-kaam process() {
-    age = parse_age("25")?
-    likh("Valid age processed: ", age)
-}
-
-process()
+ages = {}
+ages["Ali"] = 25
+ages["Anaya"] = 30
+likh(ages.hasil("Ali"))
+likh(ages.hasil("Zain", "nah pata"))
 ```
 
----
-
-## 5. Dictionary Operations
+### Result pattern for safe division
 
 ```sd
-inventory = { "Apple": 10, "Banana": 5 }
+r1 = 10 / 4
+likh(r1?)
 
-# Safely get a value with a fallback
-count = inventory.hasil("Mango", 0)
-likh("Mangoes in stock: " + lafz(count))
+r2 = 10 / 0
+likh(r2?)
+```
 
-# Loop through keys
-har item mein inventory {
-    stock = inventory[item]
-    likh(item + " -> " + lafz(stock))
+### Closure counter
+
+```sd
+kaam bana() {
+  counter = 0
+  kaam wadhao() {
+    bahari counter
+    counter = counter + 1
+    likh(counter)
+  }
+  wapas wadhao
 }
+f = bana()
+f()
+f()
+f()
 ```

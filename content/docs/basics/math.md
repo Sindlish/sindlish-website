@@ -1,113 +1,75 @@
 ---
-title: Math & Logic
-summary: Master arithmetic operations, logical comparisons, and complex expressions in Sindlish.
+title: Math
+summary: Arithmetic, precedence, division results, and ranges.
 enableTableOfContents: true
 ---
 
-Sindlish provides a robust set of operators for performing mathematical calculations and logical evaluations. Whether you are building a simple calculator or a complex algorithm, understanding these operators is essential.
+Numbers come in two flavors in Sindlish. Whole numbers are `adad`, decimals are `dahai`. The arithmetic operators are `+`, `-`, `*`, `/`, `%` (remainder), and `^` (power).
 
-## 1. Arithmetic Operators
-
-Arithmetic operators are used to perform common mathematical operations.
-
-| Operator | Meaning | Example | Result |
-| :--- | :--- | :--- | :--- |
-| **`+`** | Addition | `10 + 5` | `15` |
-| **`-`** | Subtraction | `10 - 5` | `5` |
-| **`*`** | Multiplication | `10 * 5` | `50` |
-| **`/`** | Division | `10 / 2` | `5.0` |
-| **`%`** | Modulo (Remainder) | `10 % 3` | `1` |
-| **`^`** | Exponent | `2 ^ 3` | `8` |
-
-### Floating Point Division
-
-In Sindlish, division (`/`) always returns a decimal number (**`dahai`**), even if both numbers are integers. This prevents precision loss.
+Like in regular math, multiplication and division happen before addition and subtraction. Parentheses override the order:
 
 ```sd
-likh(10 / 2)  # Prints: 5.0
-likh(7 / 2)   # Prints: 3.5
+likh(2 + 3 * 4)
+likh((2 + 3) * 4)
+likh(10 % 3)
+likh(2 ^ 5)
 ```
 
----
+```txt filename="Output"
+14
+20
+1
+32
+```
 
-## 2. Comparison Operators
+So `2 + 3 * 4` is `14`, not `20`. When you want the addition first, wrap it in parentheses.
 
-Comparison operators are used to compare two values. They always return a **`faislo`** (`sach` or `koorh`).
+## Decimals behave as you expect
 
-| Operator | Meaning | Example | Result |
-| :--- | :--- | :--- | :--- |
-| **`==`** | Equal to | `10 == 10` | `sach` |
-| **`!=`** | Not equal to | `10 != 5` | `sach` |
-| **`>`** | Greater than | `10 > 5` | `sach` |
-| **`<`** | Less than | `5 < 10` | `sach` |
-| **`>=`** | Greater or equal | `10 >= 10` | `sach` |
-| **`<=`** | Less or equal | `5 <= 10` | `sach` |
-
----
-
-## 3. Logical Operators
-
-Logical operators allow you to combine multiple comparisons into a single decision.
-
-| Keyword | Meaning |
-| :--- | :--- |
-| **`aen`** | True if **both** sides are true |
-| **`ya`** | True if **at least one** side is true |
-| **`nah`** (or **`!`**) | Inverts the boolean value |
+When a calculation involves a decimal, the answer comes back as a `dahai`:
 
 ```sd
-umar = 20
-has_license = sach
-
-agar umar >= 18 aen has_license == sach {
-    likh("You can drive!")
-}
+likh(10 / 4)
+likh(7 / 2)
+likh(1.5 * 2)
 ```
 
----
+```txt filename="Output"
+2.5
+3.5
+3.0
+```
 
-## 4. Operator Precedence
+## Division is gentle
 
-When you write complex expressions like `10 + 5 * 2`, Sindlish follows standard mathematical rules to decide which operation happens first.
-
-1. **Parentheses `()`**: Anything inside brackets happens first.
-2. **Unary `- + !`**: Negation or logical not.
-3. **Power `^`**: Exponentiation.
-4. **Multiplication/Division `* / %`**: These happen before addition.
-5. **Addition/Subtraction `+ -`**: These happen last.
+Division is special. Instead of crashing the moment you divide by zero, `10 / 0` prints a message and moves on, because division hands back a `Result` rather than a plain number:
 
 ```sd
-result = (10 + 5) * 2  # Result is 30
-result = 10 + 5 * 2    # Result is 20
+likh(10 / 0)
 ```
 
----
+```txt filename="Output"
+Zero (0) saan vand natho kare saghjay.
+```
 
-## 5. String Operations
+The Result model is Sindlish's way of handling failures, and the [errors](/docs/intermediate/errors) page teaches it properly. For now, remember that a division that cannot succeed reports a message instead of stopping your program.
 
-The addition operator `+` can also be used to join two strings together. This is called **concatenation**.
+## Number ranges with `silsilo`
+
+The built-in `silsilo`, Sindlish for "sequence", creates a lazy range of numbers. Give it an end (starts at 0), a start and end, or all three with a step. Printed, a range shows how it was built:
 
 ```sd
-firstName = "Amanat"
-lastName = "Ali"
-fullName = firstName + " " + lastName
-likh(fullName)  # Prints: Amanat Ali
+likh(silsilo(3))
+likh(silsilo(2, 6))
+likh(silsilo(1, 10, 3))
 ```
 
-You can also multiply a string by a number to repeat it!
-```sd
-likh("Ha" * 3)  # Prints: HaHaHa
+```txt filename="Output"
+silsilo(0, 3)
+silsilo(2, 6)
+silsilo(1, 10, 3)
 ```
 
-## 6. Multiline Expressions
+`silsilo` is the fuel for `har` loops, which you will meet in the [loops](/docs/basics/loops) page.
 
-If an expression is too long to fit on one line, you can wrap it in parentheses to spread it across multiple lines. Sindlish will treat everything inside the parentheses as a single expression.
-
-```sd
-total = (
-    item1_price +
-    item2_price +
-    item3_price +
-    tax_rate
-)
-```
+Next up: [Conditions](/docs/basics/conditions)

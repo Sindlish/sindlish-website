@@ -1,98 +1,74 @@
 ---
-title: Conditions (If/Else)
-summary: Learn how to make decisions in your code using agar, warna, and yawari.
+title: Conditions
+summary: Make decisions with agar, yawari, and warna.
 enableTableOfContents: true
 ---
 
-Conditionals are the "brains" of your program. They allow your code to take different paths depending on whether a specific statement is true (`sach`) or false (`koorh`).
+Programs make decisions. Sindlish borrows the Sindhi words for _if_, _or else if_, and _otherwise_: `agar`, `yawari`, and `warna`.
 
-## 1. The `agar` Statement
-
-The `agar` (if) statement executes a block of code ONLY if the condition inside the brackets is true.
+A condition decides which block runs. Start with `agar` and a true-or-false question, then the block to run when the answer is true:
 
 ```sd
-umar = 20
-
-agar umar >= 18 {
-    likh("You are an adult!")
+agar 5 > 3 {
+  likh("wadho aahe")
 }
 ```
 
----
+```txt filename="Output"
+wadho aahe
+```
 
-## 2. The `warna` (Else) Statement
+## True or false values
 
-If the `agar` condition is false, you can use `warna` to provide an alternative block of code to run.
+Comparisons produce a `faislo` value (Sindlish for "decision"), which is either `sach` (true) or `koorh` (false). The comparison operators are `==`, `!=`, `<`, `<=`, `>`, `>=`:
 
 ```sd
-umar = 15
+likh(5 >= 5, 3 != 3, 2 <= 1)
+```
 
-agar umar >= 18 {
-    likh("You are an adult!")
+```txt filename="Output"
+sach koorh koorh
+```
+
+Valid Sindlish text reads almost like a sentence. `3 != 3` means "3 is not equal to 3", which is `koorh`, false, and the print confirms it.
+
+## Combining conditions
+
+Join conditions with `aen` (and) and `ya` (or), and flip one with `nah` (not):
+
+```sd
+likh((5 > 3) aen (2 < 4))
+likh((5 > 3) ya (2 > 4))
+likh(nah (5 > 3))
+```
+
+```txt filename="Output"
+sach
+sach
+koorh
+```
+
+Use `aen` and `ya` with `faislo` values, like the comparisons above. If you apply them to numbers, the result is easy to misread, so keep them for true-or-false questions.
+
+## Choosing between several outcomes
+
+Chain as many `yawari` branches as you need, and finish with `warna` for everything else:
+
+```sd
+adad score = 72
+agar score >= 80 {
+  likh("A")
+} yawari score >= 60 {
+  likh("B")
 } warna {
-    likh("You are still a minor.")
+  likh("C")
 }
 ```
 
----
-
-## 3. The `yawari` (Else If) Statement
-
-When you have more than two possibilities, use `yawari` to check multiple conditions in sequence.
-
-```sd
-markoon = 75
-
-agar markoon >= 80 {
-    likh("Grade: A")
-} yawari markoon >= 60 {
-    likh("Grade: B")
-} yawari markoon >= 40 {
-    likh("Grade: C")
-} warna {
-    likh("Grade: F")
-}
+```txt filename="Output"
+B
 ```
 
----
+Sindlish checks the branches top to bottom and runs the first one that is true. With a score of 72, the second branch wins.
 
-## 4. Truthiness Rules
-
-In Sindlish, you don't always have to use a comparison operator inside an `agar`. Values themselves have an inherent "Truthiness":
-
-| Value | Truthiness |
-| :--- | :--- |
-| **`0` / `0.0`** | `koorh` (False) |
-| **`""` (Empty string)** | `koorh` (False) |
-| **`khali` (Null)** | `koorh` (False) |
-| **Any other number** | `sach` (True) |
-| **Any non-empty string** | `sach` (True) |
-
-```sd
-naalo = "Sindlish"
-
-agar naalo {
-    likh("Name is set!") # This will run because "Sindlish" is not empty.
-}
-```
-
----
-
-## 5. Nested Conditions
-
-You can place an `agar` statement inside another `agar` statement to create complex logic trees.
-
-```sd
-is_logged_in = sach
-is_admin = koorh
-
-agar is_logged_in {
-    agar is_admin {
-        likh("Welcome, Admin!")
-    } warna {
-        likh("Welcome, User!")
-    }
-} warna {
-    likh("Please log in first.")
-}
-```
+Next up: [Loops](/docs/basics/loops)

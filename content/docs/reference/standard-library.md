@@ -1,63 +1,99 @@
 ---
-title: Standard Library
-summary: Explore the built-in functions that come with Sindlish.
+title: Standard library
+summary: The six built-in functions available everywhere.
 enableTableOfContents: true
 ---
 
-Sindlish comes with a essential set of built-in functions that are available in the global scope without any extra setup.
+Sindlish ships six built-in functions that are available in every program. Beyond these, the standard library lives on the [collection methods](/docs/reference/collection-methods) page and the [casting functions](/docs/reference/data-types) page.
 
-## Console I/O
+## likh
 
-### `likh(...)`
+`likh(...)` prints its arguments to the terminal, separated by spaces and followed by a newline:
 
-The primary output function. It accepts any number of arguments, converts them to strings, and prints them to the console separated by spaces.
 ```sd
-likh("Salam", "Sindh", 2024) # Prints: Salam Sindh 2024
+likh("Salam", 42, sach)
 ```
 
-### `puch(prompt)`
-
-The input function. It displays the `prompt` string to the user and waits for them to type something. It returns the user's input as a **lafz** (string).
-```sd
-naalo = puch("Tawaan jo naalo cha aahe? ")
-likh("Salam, " + naalo)
+```txt filename="Output"
+Salam 42 sach
 ```
 
----
+## qisam
 
-## Collections & Ranges
+`qisam(x)` returns the type of `x` as a text name, in capitals. Handy for checking what you are dealing with:
 
-### `lambi(collection)`
-
-Returns the number of items in a **fehrist**, **lughat**, or **majmuo**, or the number of characters in a **lafz**.
 ```sd
-likh(lambi("Sindh")) # Prints: 5
-likh(lambi([1, 2, 3])) # Prints: 3
+likh(qisam([1, 2]))
+likh(qisam({"a": 1}))
 ```
 
-### `range(start, end, step)`
-
-Generates a list of integers.
-- `range(5)` -> `[0, 1, 2, 3, 4]`
-- `range(1, 6)` -> `[1, 2, 3, 4, 5]`
-- `range(0, 10, 2)` -> `[0, 2, 4, 6, 8]`
-
-### `majmuo(iterable)`
-
-Creates a new **majmuo** (Set). If an iterable (like a List or String) is provided, it converts it into a set, automatically removing any duplicates.
-```sd
-unique = majmuo([1, 2, 2, 3]) # {1, 2, 3}
+```txt filename="Output"
+FEHRIST
+LUGHAT
 ```
 
----
+## lambi
 
-## Type Conversion (Cast Functions)
+`lambi(x)` returns the length of a string or collection as a number:
 
-As detailed in the **[Variables & Types](/docs/basics/variables#typecasting-qisam-badli---in-detail)** section, the type keywords themselves act as functions to convert data:
+```sd
+likh(lambi("salam"))
+likh(lambi([1, 2, 3]))
+```
 
-- `adad(value)`: Convert to Integer.
-- `dahai(value)`: Convert to Float.
-- `lafz(value)`: Convert to String.
-- `faislo(value)`: Convert to Boolean.
-- `fehrist(value)`: Convert to List.
-- `majmuo(value)`: Convert to Set.
+```txt filename="Output"
+5
+3
+```
+
+## silsilo
+
+`silsilo(...)` produces a range of numbers. Give it one, two, or three arguments, and it works like the classic range: start, stop, and an optional step. The stop value is never included:
+
+```sd
+har i mein silsilo(3) {
+  likh(i)
+}
+```
+
+```txt filename="Output"
+0
+1
+2
+```
+
+```sd
+har i mein silsilo(2, 8, 2) {
+  likh(i)
+}
+```
+
+```txt filename="Output"
+2
+4
+6
+```
+
+## majmuo
+
+`majmuo(...)` builds a set. With no arguments it returns an empty set; with one argument, typically a list, it keeps only the unique values:
+
+```sd
+s = majmuo([1, 2, 2, 3])
+likh(s)
+```
+
+```txt filename="Output"
+{1, 2, 3}
+```
+
+## puch
+
+`puch(...)` reads a line of text from the terminal and returns it as a `lafz`. Its arguments form the prompt, printed with no trailing newline:
+
+```sd illustrative
+n = puch("Tuhandjo naalo: ")
+likh("Salam, " + n)
+```
+
+You must run this in the real CLI with a terminal, because the online interpreter cannot read keyboard input. The [parse input](/docs/how-to/parse-input) guide shows how to turn the returned text into a number safely.

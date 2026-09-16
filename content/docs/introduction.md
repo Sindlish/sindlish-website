@@ -1,65 +1,42 @@
 ---
-title: Welcome to Sindlish
-summary: The programming language that speaks your language.
+title: Introduction
+summary: What Sindlish is and how this guide teaches it to you, step by step.
 enableTableOfContents: true
 ---
 
-## Salam, Duniay! (Hello World!)
+Sindlish is a small programming language that speaks your language. Its keywords are Romanized Sindhi: the print function is `likh`, a function is a `kaam`, a list is a `fehrist`. You write code the same way you would in any modern language, but the words that drive it mean what they say, so you read your program without translating.
 
-Welcome to **Sindlish**, the first high-level programming language designed specifically for the Sindhi-speaking community. 
+This guide teaches Sindlish the way you would learn any spoken language, one step at a time. You will write a working program in the next few pages, then build on it until you can read and write real programs on your own.
 
-Sindlish is not just a translation; it is a full-featured, stack-based bytecode virtual machine that allows you to write professional, high-performance software using the words you already know.
+## What makes Sindlish different
 
-## Why Sindlish?
+Sindlish keeps the ideas that make other languages powerful and drops the ones that confuse newcomers:
 
-For decades, the world of programming has been dominated by English. This creates a barrier for millions of talented people who think and speak in Sindhi. Sindlish breaks that barrier by providing:
+- **Hybrid typing.** You can let Sindlish figure out a value's type for you (`umar = 25`), or declare it yourself (`adad umar = 25`). Same language, both speeds.
+- **A Result model for errors.** Functions that can fail hand you a `Result` instead of crashing your program. You check it, unwrap it, or fall back to a default.
+- **Natural data structures.** Lists, dictionaries, and sets have comfortable Sindlish names, and their methods read like Sindhi verbs.
 
-- **Native Keywords**: Use `kaam`, `agar`, `har`, and `lafz` instead of `function`, `if`, `for`, and `string`.
-- **Hybrid Typing**: Enjoy the flexibility of dynamic typing or the safety of static typing.
-- **Crash-Proof Design**: A modern `Result` system for error handling using `Result`, `ghalti`, and `?`.
-- **High Performance**: A bytecode VM that ensures your code runs fast.
+## How this guide is organized
 
-## A Quick Preview
+The documentation is split into four parts, and you are in the first one:
 
-Here is how a simple prime number checker looks in Sindlish:
+- **Learn** walks you through the language in dependency order. Each page ends with a next-up link. Work through them in order and you will never meet a concept before its turn.
+- **How-to guides** solve real problems, like building a number guessing game. Read these after the Learn path.
+- **Reference** pages are lookup tables. You consult them, you do not memorize them.
+- **Concepts** explain the thinking behind the language, like why it exists and how its type system works.
+
+## Your first word
+
+Let's write something before you even install anything. Sindlish's print function is `likh`, and it writes a line to the screen. Run this anywhere Sindlish is available:
 
 ```sd
-kaam is_prime(n) {
-    agar n <= 1 { wapas koorh }
-    
-    # har loop for iteration
-    har i mein silsilo(2, n) {
-        agar i * i > n { tor } # Exit early using 'tor'
-        
-        agar n % i == 0 {
-            wapas koorh
-        }
-    }
-    
-    wapas sach
-}
-
-# Let's test it
-number = 17
-agar is_prime(number) {
-    likh(lafz(number) + " is a prime number!")
-}
+likh("Salam, Sindh!")
 ```
 
-## Study from the Source
+```txt filename="Output"
+Salam, Sindh!
+```
 
-The best way to learn Sindlish is to study the official reference file. It covers everything from basic math to advanced error handling.
+That is your first Sindlish program. Everything else is a detail, and the next pages cover every one of them.
 
-> [!TIP]
-> Check out the `hello.sd` file in the root of the repository for a complete feature demonstration!
-
-## Getting Started
-
-Ready to start your journey? Follow these steps:
-
-1. **[Setup & Installation](/docs/get-started/installation)**: Get Sindlish running on your machine.
-2. **[VS Code Extension](/docs/vscode-extension)**: Install the official extension for syntax highlighting.
-3. **[Language Guide](/docs/basics/variables)**: Learn about variables, loops, and logic.
-4. **[Data Structures](/docs/data-structures/lists)**: Master lists, dictionaries, and sets.
-
-Sindh has a rich history of literature and knowledge. With Sindlish, we are bringing that legacy into the digital age. **Bismillah!**
+Next up: [Install Sindlish](/docs/get-started/installation)

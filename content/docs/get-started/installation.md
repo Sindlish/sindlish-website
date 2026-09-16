@@ -4,56 +4,60 @@ summary: How to install Sindlish on your machine.
 enableTableOfContents: true
 ---
 
-## Installation Guide
-
-You can run Sindlish directly from your terminal! Follow the instructions for your operating system below.
+Before we write programs, let's get the `sindlish` command onto your machine. It runs files, opens a prompt, and ships with a small offline reference. Follow the steps for your operating system.
 
 ## Windows
 
-1. Download the latest installer: `sindlish-installer-win64.exe`.
+1. Download the latest installer, `sindlish-installer-win64.exe`.
 2. Run the wizard and follow the on-screen instructions.
-3. Open a new terminal (PowerShell or Command Prompt).
+3. Open a new terminal.
 4. Verify the installation by typing:
-   ```bash
-   sindlish --version
-   ```
-
-## Mac & Linux
-
-1. Download the `install.sh` script from the repository.
-2. Open your terminal and navigate to the directory where you downloaded the script.
-3. Run the installation script:
-   ```bash
-   bash install.sh
-   ```
-4. Restart your terminal.
-5. Verify the installation:
-   ```bash
-   sindlish --version
-   ```
-
-## Running Your First Program
-
-Once installed, you can run any Sindlish file (ending in `.sd`) by typing:
 
 ```bash
-sindlish your_file.sd
+sindlish --version
 ```
 
-Try creating a file called `salam.sd` with the following content:
+## Mac and Linux
+
+1. Download the `install.sh` script from the repository.
+2. Open a terminal and navigate to the folder where you saved the script.
+3. Run the installer:
+
+```bash
+bash install.sh
+```
+
+4. Restart your terminal.
+5. Verify the installation:
+
+```bash
+sindlish --version
+```
+
+## Run your first file
+
+Sindlish source files end in `.sd`. Create a file called `salam.sd` with this content:
 
 ```sd
 likh("Salam, Sindh!")
 ```
 
-Then run it:
+```txt filename="Output"
+Salam, Sindh!
+```
+
+Then run it from the terminal:
 
 ```bash
 sindlish salam.sd
 ```
 
-## Next Steps
+## Next steps
 
-Now that you have Sindlish installed, you should:
-- [Setup VS Code](/docs/vscode-extension) for the best coding experience.
-- Dive into the [Language Guide](/docs/basics/variables) to start learning.
+From here, the fun starts:
+
+- Write your [first program by hand](/docs/get-started/hello-world).
+- Grab the [VS Code extension](/docs/vscode-extension) for syntax highlighting.
+- Or open the offline reference anytime with `sindlish docs`.
+
+Next up: [Hello, world](/docs/get-started/hello-world)

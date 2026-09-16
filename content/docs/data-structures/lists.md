@@ -1,124 +1,111 @@
 ---
-title: Lists (fehrist)
-summary: Manage ordered collections of data with the fehrist type.
+title: Lists
+summary: Ordered collections of values called fehrist.
 enableTableOfContents: true
 ---
 
-A **`fehrist`** (List) is an ordered, mutable collection of items. In Sindlish, lists are dynamic, meaning they can grow or shrink in size, and they can hold any mix of data types.
+A **list** holds several values in order. Sindlish calls a list a `fehrist`, and you write one with square brackets: `[10, 20, 30]`.
 
-## 1. Creating a List
-
-You can create a list using square brackets `[]`. Lists in Sindlish support multiple lines for better readability.
+You reach a list's items by index, counting from `0`, and `-1` reaches the last item. `lambi` tells you how many items the list holds:
 
 ```sd
-fal = ["Ambu", "Kela", "Soof"]
-empty_list = []
-
-# Multiline support
-shahar = [
-    "Karachi",
-    "Hyderabad",
-    "Sukkur"
-]
+fehrist f = [10, 20, 30]
+likh(f[0], f[-1])
+likh(lambi(f))
 ```
 
----
+```txt filename="Output"
+10 30
+3
+```
 
-## 2. Indexing and Slicing
+## Building a list step by step
 
-Every item in a list has a position, starting from **0**. Sindlish also supports **negative indexing** to access items from the end of the list.
+Start with an empty list and add items with the `wadha` method, Sindlish for "add":
 
 ```sd
-fal = ["Ambu", "Kela", "Soof"]
-
-likh(fal[0])  # Prints: Ambu
-likh(fal[-1]) # Prints: Soof (last item)
+shopping = []
+shopping.wadha("qara qalam")
+shopping.wadha("kaghaz")
+likh(shopping, lambi(shopping))
 ```
 
-### Nested Indexing
+```txt filename="Output"
+[qara qalam, kaghaz] 2
+```
 
-If a list contains another list, you can chain brackets to reach the inner items.
+## Sort, reverse, and insert
+
+Lists come with a small toolkit of methods. `wajh` inserts at an index, `tarteeb` sorts, `ulto` reverses:
 
 ```sd
-matrix = [
-    [1, 2, 3],
-    [4, 5, 6]
-]
-
-likh(matrix[1][0]) # Prints: 4
+fehrist f = [3, 1, 2]
+f.wajh(0, 9)
+likh(f)
+f.tarteeb()
+likh(f)
+f.ulto()
+likh(f)
 ```
 
----
+```txt filename="Output"
+[9, 3, 1, 2]
+[1, 2, 3, 9]
+[9, 3, 2, 1]
+```
 
-## 3. Modifying Lists
+## Take items out
 
-Lists are **mutable**, meaning you can change their contents after creation using the index.
+`kadh` (pull out) removes and returns the last item. `hata` removes the first matching value. You can also ask where an item lives with `index`, and count how many times a value appears with `garn` (count):
 
 ```sd
-names = ["Amanat", "Sindh"]
-names[1] = "Sindlish" # Changes "Sindh" to "Sindlish"
+fehrist f = [1, 2, 3, 4]
+likh(f.kadh())
+likh(f)
+f.hata(3)
+likh(f)
+likh(f.index(2), f.garn(1))
 ```
 
----
+```txt filename="Output"
+4
+[1, 2, 3]
+[1, 2]
+1 1
+```
 
-## 4. List Methods
+## Extend, copy, clear
 
-Sindlish provides a rich set of built-in methods to manipulate lists.
-
-| Method | Description |
-| :--- | :--- |
-| **`.wadha(item)`** | **Append**: Adds an item to the end of the list. |
-| **`.wadhayo(fehrist)`** | **Extend**: Adds all items from another list to this one. |
-| **`.wajh(index, item)`** | **Insert**: Adds an item at the specific index. |
-| **`.hata(item)`** | **Remove**: Removes the first occurrence of the specified item. |
-| **`.kadh(index)`** | **Pop**: Removes and returns the item at the specified index (default is last). |
-| **`.saf()`** | **Clear**: Removes all items from the list. |
-| **`.index(item)`** | **Index**: Returns the index of the first occurrence of an item. |
-| **`.garn(item)`** | **Count**: Returns how many times an item appears in the list. |
-| **`.tarteeb()`** | **Sort**: Sorts the list in ascending order. |
-| **`.ulto()`** | **Reverse**: Reverses the order of items in the list. |
-| **`.nakal()`** | **Copy**: Returns a shallow copy of the list. |
-
-### Examples:
+`wadhayo` (extend) joins another list onto the end. `nakal` (copy) makes an independent clone. `saf` (clear) empties the list:
 
 ```sd
-nums = [30, 10, 20]
-
-nums.wadha(40)      # [30, 10, 20, 40]
-nums.tarteeb()      # [10, 20, 30, 40]
-nums.kadh(0)        # Removes 10, returns 10
-likh(lambi(nums))   # Prints: 3 (using the global lambi function)
+f = [1]
+f.wadhayo([2, 3])
+likh(f)
+g = f.nakal()
+likh(g)
+f.saf()
+likh(f)
 ```
 
----
+```txt filename="Output"
+[1, 2, 3]
+[1, 2, 3]
+[]
+```
 
-## 5. Iterating over Lists
+## A list from a string
 
-Use the **`har ... mein`** loop to iterate through every item in a list.
+The built-in `fehrist` also works as a constructor: feed it a string and every character becomes an item:
 
 ```sd
-todo = ["Code", "Eat", "Sleep"]
-
-har task mein todo {
-    likh("Today I will: " + task)
-}
+likh(fehrist("Sindh"))
 ```
 
----
-
-## 6. Typed Lists
-
-For extra safety, you can restrict a list to only hold a specific type of data.
-
-```sd
-fehrist[adad] scores = [90, 85, 88]
-
-# This would cause a QisamJeGhalti (Type Error):
-# scores.wadha("Excellent") 
+```txt filename="Output"
+[S, i, n, d, h]
 ```
 
----
+That covers the common list moves. For the full method list, see the [collection methods](/docs/reference/collection-methods) reference.
 
-## 7. Important: Unhashable Type
-
-In Sindlish, Lists are **unhashable**. This means you **cannot** use a list as a key in a Dictionary (`lughat`) or as an element in a Set (`majmuo`). Doing so will result in an error.
+Next up: [Dictionaries](/docs/data-structures/dictionaries)
