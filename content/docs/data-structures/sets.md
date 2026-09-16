@@ -1,97 +1,101 @@
 ---
-title: Sets (majmuo)
-summary: Store unique, unordered items using the majmuo type.
+title: Sets
+summary: Unordered collections of unique values called majmuo.
 enableTableOfContents: true
 ---
 
-A **`majmuo`** (Set) is an unordered collection of items where every item must be **unique**. Duplicate values are automatically removed.
+A **set** holds unique values: every value appears at most once. Sindlish calls it a `majmuo`, and you write one with curly braces, `{3, 1, 2}`.
 
-## 1. Creating a Set
-
-You can create a set using curly braces `{}` (without colons) or the `majmuo()` function. To create an empty set, you **must** use `majmuo()`, as `{}` is reserved for empty dictionaries.
+Sets cheerfully ignore duplicates, and when you print a small set of numbers, the interpreter shows them in a tidy order:
 
 ```sd
-numbers = {1, 2, 3, 3, 3}
-likh(numbers) # Prints: {1, 2, 3}
-
-# Create an empty set
-empty = majmuo()
-
-# Create from a list to remove duplicates
-names = ["Ali", "Ali", "Hassan"]
-unique_names = majmuo(names) # {"Ali", "Hassan"}
+majmuo m = {3, 1, 2}
+likh(m)
+m.addkar(4)
+likh(lambi(m))
 ```
 
----
-
-## 2. Basic Operations
-
-Since sets are unordered, they do not have indexes like `[0]`.
-
-| Method | Description |
-| :--- | :--- |
-| **`.addkar(item)`** | Adds a single item to the set. |
-| **`.hata(item)`** | Removes an item. Errors if item is missing. |
-| **`.chad(item)`** | Removes an item if it exists. Does nothing if missing. |
-| **`.kadh()`** | Removes and returns a random item from the set. |
-| **`.update(bi_majmuo)`** | Adds all items from another set to the current one. |
-| **`.saf()`** | Removes all items from the set. |
-
-```sd
-s = {1, 2}
-s.addkar(3)
-s.hata(1)
+```txt filename="Output"
+{1, 2, 3}
+4
 ```
 
----
-
-## 3. Set Mathematics
-
-Sets excel at comparing groups of data using mathematical operations.
-
-| Method | English Name | Description |
-| :--- | :--- | :--- |
-| **`.bade(other)`** | Union | Items present in **either** set. |
-| **`.milap(other)`** | Intersection | Items present in **both** sets. |
-| **`.farq(other)`** | Difference | Items in the first set but **not** in the second. |
-| **`.symmetric_farq(other)`** | Symmetric Diff | Items in either set, but **not in both**. |
+The `addkar` method (add) puts a new value in. `lambi` counts the members. A set's whole point is fast membership checks, so `har` loops and lookups are a natural fit:
 
 ```sd
-setA = {1, 2, 3}
-setB = {3, 4, 5}
-
-likh(setA.bade(setB))            # {1, 2, 3, 4, 5}
-likh(setA.milap(setB))           # {3}
-likh(setA.farq(setB))            # {1, 2}
-likh(setA.symmetric_farq(setB)) # {1, 2, 4, 5}
-```
-
----
-
-## 4. Comparisons & Logic
-
-| Method | Description |
-| :--- | :--- |
-| **`.nandohisoahe(other)`** | **Is Subset**: Returns sach if all items are in the other set. |
-| **`.wadohisoahe(other)`** | **Is Superset**: Returns sach if it contains all items of the other set. |
-| **`.alaghahe(other)`** | **Is Disjoint**: Returns sach if the sets have NO items in common. |
-
----
-
-## 5. Iterating over Sets
-
-You can loop through a set, but the order of items is not guaranteed.
-
-```sd
-tags = {"sindh", "coding", "education"}
-
-har t mein tags {
-    likh("#" + t)
+m = majmuo([1, 2, 2, 3])
+har x mein m {
+  likh(x)
 }
 ```
 
----
+```txt filename="Output"
+1
+2
+3
+```
 
-## 6. Important: Unhashable Elements
+The list `[1, 2, 2, 3]` becomes the set `{1, 2, 3}`. The duplicate `2` vanishes. That trick, turning a list into a set, is the quickest way to remove duplicates.
 
-Just like Dictionaries, Sets can only store **immutable** items. You can store Strings, Numbers, and Booleans. You **cannot** store a List, a Dictionary, or another Set inside a Set.
+## Set math
+
+Sets shine at the operations you learned in school. `bade` unions two sets, `mushtarak` intersects them, `farq` subtracts one from the other, and `symmetric_farq` keeps everything that is in one set but not both:
+
+```sd
+majmuo a = {1, 2, 3}
+majmuo b = {2, 3, 4}
+likh(a.bade(b))
+likh(a.mushtarak(b))
+likh(a.farq(b))
+likh(a.symmetric_farq(b))
+```
+
+```txt filename="Output"
+{1, 2, 3, 4}
+{2, 3}
+{1}
+{1, 4}
+```
+
+## Relative sizes and relations
+
+A few methods describe how two sets relate. `nandohisoahe` asks "is this set a subset of that one?", `wadohisoahe` asks "is this a superset?", and `alaghahe` asks "are these two sets completely separate?":
+
+```sd
+majmuo m = {1, 2, 3}
+likh(m.nandohisoahe({1, 2, 3, 4}))
+likh(m.wadohisoahe({1}))
+likh(m.alaghahe({7}))
+```
+
+```txt filename="Output"
+sach
+sach
+sach
+```
+
+## Removing members
+
+`chad` (discard) drops a value without complaining if it was already absent. `hata` removes and requires the value to exist. `saf` empties the set:
+
+```sd
+majmuo m = {1, 2, 3}
+m.chad(1)
+likh(m)
+m.hata(2)
+likh(m)
+m.saf()
+likh(m)
+```
+
+```txt filename="Output"
+{2, 3}
+{3}
+{}
+```
+
+One construction note: an empty dictionary and an empty set both look like `{}` in source, so Sindlish parses `{}` as an empty `lughat`. Build an empty set with the constructor instead: `majmuo m = majmuo()`.
+
+The full set method list is on the [collection methods](/docs/reference/collection-methods) reference page.
+
+Next up: [Functions](/docs/intermediate/functions)

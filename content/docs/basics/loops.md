@@ -1,100 +1,101 @@
 ---
-title: Loops (Iterators)
-summary: Repeat actions efficiently using har and jistain loops.
+title: Loops
+summary: Repeat work with har and jistain loops.
 enableTableOfContents: true
 ---
 
-Loops are used to repeat a block of code multiple times. Sindlish provides two main types of loops: `har` for iteration and `jistain` for condition-based looping.
+When a program needs to do something more than once, it uses a **loop**. Sindlish has two of them: `har` runs over the items of something, and `jistain` runs as long as a condition stays true.
 
-## 1. The `har` (For) Loop
+## The `har` loop
 
-The `har` loop is used to iterate over a collection (like a list, dictionary, or set) or a range of numbers. The **`mein`** keyword is mandatory between the iterator variable and the collection.
-
-### Numeric Range
-
-The `range()` function generates a sequence of numbers. It can be used in three ways:
-1. `range(end)`: 0 to end (exclusive).
-2. `range(start, end)`: start to end (exclusive).
-3. `range(start, end, step)`: start to end with a custom increment.
+`har` means "each" in Sindhi, and it pairs with `mein` (in). Read `har i mein silsilo(3)` as _for each i in the sequence from 0 to 2_. The body runs once per item:
 
 ```sd
-# Loops from 0 to 4
-har i mein range(5) {
-    likh("Count: " + lafz(i))
-}
-
-# Loops from 10 down to 2, skipping 2 each time
-har i mein range(10, 0, -2) {
-    likh("Down: " + lafz(i))
+har i mein silsilo(3) {
+  likh(i)
 }
 ```
 
-### Iterating over Collections
+```txt filename="Output"
+0
+1
+2
+```
 
-You can use `har` to process items in any collection.
+A `silsilo(start, end)` range includes the start and stops before the end:
 
 ```sd
-fal = ["Ambu", "Kela", "Soof"]
-
-har f mein fal {
-    likh("Khadaaseen: " + f)
+har i mein silsilo(1, 4) {
+  likh(i)
 }
 ```
 
----
+```txt filename="Output"
+1
+2
+3
+```
 
-## 2. The `jistain` (While) Loop
+## Looping over anything
 
-The `jistain` loop continues to run as long as a specific condition remains **sach** (true).
+`har` is not picky about what it loops over. The same shape works for lists, strings, and everything the [data structures](/docs/data-structures/lists) pages describe:
 
 ```sd
-adad count = 1
-
-jistain count <= 3 {
-    likh("Iteration: " + lafz(count))
-    count = count + 1
+har naalo mein ["Ali", "Anaya", "Sana"] {
+  likh("Salam, " + naalo)
 }
 ```
 
----
+```txt filename="Output"
+Salam, Ali
+Salam, Anaya
+Salam, Sana
+```
 
-## 3. Loop Control: `tor` & `jari`
+## The `jistain` loop
 
-### `tor` (Break)
-
-The `tor` keyword exits the loop immediately.
+`jistain` (while) repeats its body as long as its condition is true. The classic counter loop counts up to five:
 
 ```sd
-har i mein range(100) {
-    agar i == 5 {
-        tor # Stops the loop entirely
-    }
-    likh(i)
+x = 0
+jistain x < 5 {
+  likh(x)
+  x = x + 1
 }
 ```
 
-### `jari` (Continue)
-
-The `jari` keyword skips the current iteration and jumps to the next one.
-
-```sd
-har i mein range(5) {
-    agar i == 2 {
-        jari # Skip 2 and continue with 3
-    }
-    likh(i)
-}
-# Output: 0, 1, 3, 4
+```txt filename="Output"
+0
+1
+2
+3
+4
 ```
 
----
+Note there is no `+=` shorthand in Sindlish yet, so the counting line is `x = x + 1`.
 
-## 4. Infinite Loops
+## Escaping mid-loop
 
-If you need a loop that runs forever (e.g., for a server or a game engine), you can use `jistain sach`.
+`tor` (break) leaves the loop immediately. `jari` (continue) skips the rest of the current round and goes straight to the next item. Together they shape the loop's rhythm:
 
 ```sd
-jistain sach {
-    likh("Press Ctrl+C to stop me!")
+har i mein silsilo(6) {
+  agar i == 2 {
+    jari
+  }
+  agar i == 4 {
+    tor
+  }
+  likh(i)
 }
 ```
+
+```txt filename="Output"
+0
+1
+3
+```
+
+The loop skips `2` entirely, prints `3`, then `tor` stops it before it reaches `4` and `5`.
+
+Next up: [Lists](/docs/data-structures/lists)

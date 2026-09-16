@@ -1,108 +1,100 @@
 ---
-title: Dictionaries (lughat)
-summary: Store data in key-value pairs for fast lookup using lughat.
+title: Dictionaries
+summary: Key-value pairs called lughat.
 enableTableOfContents: true
 ---
 
-A **`lughat`** (Dictionary) is an unordered collection of key-value pairs. Each key is unique and acts as a shortcut to its corresponding value.
+A **dictionary** stores values under names called keys. Sindlish calls it a `lughat`, and you would use it for anything you would naturally look up: a phone number for a friend, a score for a student, a stock count for a fruit.
 
-## 1. Creating a Dictionary
-
-Dictionaries use curly braces `{}` and colons `:` to separate keys from values. Sindlish supports multiline declarations.
+Write a dictionary with `{key: value}`. To read a value, look it up by key:
 
 ```sd
-user = {
-    "naalo": "Amanat",
-    "umar": 25,
-    "shahr": "Karachi"
-}
-
-empty_dict = {}
+lughat phonebook = {}
+phonebook["Ali"] = 111
+phonebook["Anaya"] = 222
+likh(phonebook.hasil("Ali"))
+likh(phonebook.hasil("Zain", "nah milo"))
 ```
 
----
-
-## 2. Accessing & Modifying
-
-You can access values using square brackets `[]` or the `.hasil()` method.
-
-```sd
-likh(user["naalo"]) # Prints: Amanat
-
-# Adding or updating a value:
-user["kaam"] = "Programmer"
-user["umar"] = 26
+```txt filename="Output"
+111
+nah milo
 ```
 
----
+The `hasil` method (Sindlish for "get") looks up a key. Pass a second argument and that value comes back when the key is missing, instead of an error. That makes `hasil` the friendly way to read dictionaries.
 
-## 3. The Unhashable Rule (Keys)
+## Add and update
 
-In Sindlish, a **key** must be an "immutable" type. This means you can use **Strings**, **Numbers**, and **Booleans** as keys. You **cannot** use a List, Set, or another Dictionary as a key.
+The `[]` form is a two-way street. Reading `phonebook["Ali"]` gives the value, and writing `phonebook["Ali"] = 9` creates the key or replaces its value:
 
 ```sd
-# Valid:
-data = { 100: "Score", sach: "Status" }
-
-# Invalid (Will Error):
-# data = { [1, 2]: "Invalid" } 
+lughat score = {"Ali": 8}
+score["Ali"] = 9
+likh(score.hasil("Ali"))
 ```
 
----
-
-## 4. Dictionary Methods
-
-Sindlish provides several methods to manage your data pairs.
-
-| Method | Description |
-| :--- | :--- |
-| **`.hasil(key, default)`** | Returns the value for a key. Returns the `default` (or khali) if key doesn't exist. |
-| **`.update(bi_lughat)`** | Merges another dictionary into the current one. |
-| **`.cabeyon()`** | Returns a list of all **keys** in the dictionary. |
-| **`.raqamon()`** | Returns a list of all **values** in the dictionary. |
-| **`.syon()`** | Returns a list of all **items** (as [key, value] lists). |
-| **`.kadh(key)`** | Removes the specified key and returns its value. |
-| **`.syonkadh()`** | Removes and returns the last key-value pair added. |
-| **`.defaultrakh(k, v)`** | If key exists, returns its value. If not, inserts key with value `v`. |
-| **`.saf()`** | Removes all items from the dictionary. |
-| **`.nakal()`** | Returns a shallow copy of the dictionary. |
-
-### Examples:
-
-```sd
-scores = { "Ali": 90, "Sara": 95 }
-
-likh(scores.hasil("Ali"))      # 90
-likh(scores.hasil("Zaid", 0))  # 0 (fallback used)
-
-keys = scores.cabeyon()        # ["Ali", "Sara"]
+```txt filename="Output"
+9
 ```
 
----
+## Look inside
 
-## 5. Iterating over Dictionaries
-
-When you use a **`har`** loop on a dictionary, you iterate over its **keys**.
+`cabeyon` (keys) lists the keys, `raqamon` (values) lists the values, and `syon` (items) lists key-value pairs together:
 
 ```sd
-prices = { "Ambu": 100, "Kela": 50 }
+lughat d = {"a": 1}
+d["b"] = 2
+likh(d.cabeyon())
+likh(d.raqamon())
+likh(d.syon())
+```
 
-har phal mein prices {
-    qimat = prices[phal]
-    likh(phal + " ji qimat aahe " + lafz(qimat))
+```txt filename="Output"
+[a, b]
+[1, 2]
+[[a, 1], [b, 2]]
+```
+
+## Smart defaults and merges
+
+`defaultrakh` (set default) stores a value only if the key is missing, leaving an existing key untouched. `update` merges another dictionary in. `kadh` removes a key and returns its value:
+
+```sd
+lughat d = {"a": 1}
+d.defaultrakh("a", 99)
+likh(d.hasil("a"))
+d.update({"b": 2})
+likh(d.hasil("b"))
+likh(d.kadh("a"))
+likh(d.hasil("a", "natho"))
+```
+
+```txt filename="Output"
+1
+2
+1
+natho
+```
+
+## Loop over a dictionary
+
+`har` loops over a dictionary's keys. Look up each one inside the loop for the value:
+
+```sd
+lughat d = {"a": 1}
+d["b"] = 2
+har key mein d {
+  likh(key, d.hasil(key))
 }
 ```
 
----
-
-## 6. Typed Dictionaries
-
-You can enforce types for both keys and values in a dictionary.
-
-```sd
-# A dictionary where keys are Strings and values are Integers
-lughat[lafz, adad] inventory = { "Pen": 10, "Book": 5 }
-
-# This would cause an error:
-# inventory["Eraser"] = "Out of stock" 
+```txt filename="Output"
+a 1
+b 2
 ```
+
+One honest warning: do not build logic around the order of a `lughat`. Sindlish does not promise that entries stay in the order you wrote them. A literal like `{"a": 1, "b": 2}` can even come out as `b` before `a`. Always look things up by key, as the examples here do.
+
+That is the everyday dictionary toolkit. The full method list lives on the [collection methods](/docs/reference/collection-methods) reference page.
+
+Next up: [Sets](/docs/data-structures/sets)

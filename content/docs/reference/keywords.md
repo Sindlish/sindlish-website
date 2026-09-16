@@ -1,79 +1,77 @@
 ---
-title: All Keywords
-summary: A quick reference table for every keyword in the Sindlish language.
+title: Keywords
+summary: The 29 reserved words in Sindlish and what they mean.
 enableTableOfContents: true
 ---
 
-This page serves as a quick lookup for all reserved keywords in Sindlish and their English equivalents.
+Every programming language reserves certain words so that its parser can recognize them. In Sindlish these words are Romanized Sindhi, and none of them can be used as variable names. The list is short: 29 words.
 
-## Data Types & Literals
+## Data type keywords
 
-| Sindlish | English | Purpose |
-| :--- | :--- | :--- |
-| **`adad`** | Integer | Whole numbers (e.g., `10`). |
-| **`dahai`** | Float | Decimal numbers (e.g., `3.14`). |
-| **`lafz`** | String | Text and characters (e.g., `"Salam"`). |
-| **`faislo`** | Boolean | Data type for `sach` and `koorh`. |
-| **`sach`** | True | Boolean true value. |
-| **`koorh`** | False | Boolean false value. |
-| **`khali`** | Null | Represents nothingness or empty value. |
-| **`pakko`** | Constant | Declares a variable that cannot be changed. |
+These keywords name the five primitive types and three collection types. You use them to declare variables or build collections:
 
-## Collections
+| Keyword   | Sindhi meaning | What it holds                             |
+| --------- | -------------- | ----------------------------------------- |
+| `adad`    | number         | Whole numbers like `0`, `5`, `-3`         |
+| `dahai`   | decimal        | Decimal numbers like `3.14`, `-0.5`       |
+| `lafz`    | word           | Text strings like `"Salam"`               |
+| `faislo`  | decision       | Boolean: `sach` (true) or `koorh` (false) |
+| `khali`   | empty          | Nothing at all                            |
+| `fehrist` | list           | Ordered collection: `[1, 2]`              |
+| `lughat`  | dictionary     | Key-value pairs: `{"a": 1}`               |
+| `majmuo`  | set            | Unique values: `{1, 2}`                   |
 
-| Sindlish | English | Purpose |
-| :--- | :--- | :--- |
-| **`fehrist`** | List | An ordered, mutable collection. |
-| **`lughat`** | Dictionary | A collection of key-value pairs. |
-| **`majmuo`** | Set | A collection of unique items. |
+## Literal keywords
 
-## Control Flow
+Two keywords are also values:
 
-| Sindlish | English | Purpose |
-| :--- | :--- | :--- |
-| **`agar`** | If | Starts a conditional block. |
-| **`yawari`** | Else If | Checks an alternative condition. |
-| **`warna`** | Else | Block to run if all conditions fail. |
-| **`har`** | For | Iterates over a collection or range. |
-| **`mein`** | In | Used in `har` loops: `har i mein list`. |
-| **`jistain`** | While | Loops as long as a condition is true. |
-| **`tor`** | Break | Stops a loop immediately. |
-| **`jari`** | Continue | Skips to the next loop iteration. |
+| Keyword | Meaning         |
+| ------- | --------------- |
+| `sach`  | The true value  |
+| `koorh` | The false value |
 
-## Functions
+## Control flow
 
-| Sindlish | English | Purpose |
-| :--- | :--- | :--- |
-| **`kaam`** | Function | Defines a block of reusable code. |
-| **`wapas`** | Return | Exits a function and returns a value. |
+| Keyword   | Meaning                    |
+| --------- | -------------------------- |
+| `agar`    | If                         |
+| `yawari`  | Or else if                 |
+| `warna`   | Otherwise                  |
+| `jistain` | While                      |
+| `har`     | Each (for-each loop)       |
+| `tor`     | Break out of a loop        |
+| `jari`    | Skip to the next iteration |
 
-## Logic & Math
+## Functions and scope
 
-| Sindlish | English | Purpose |
-| :--- | :--- | :--- |
-| **`aen`** | And | Returns true if both sides are true. |
-| **`ya`** | Or | Returns true if at least one side is true. |
-| **`nah`** (or `!`) | Not | Inverts a boolean value. |
+| Keyword  | Meaning                                                   |
+| -------- | --------------------------------------------------------- |
+| `kaam`   | Declare a function                                        |
+| `wapas`  | Return a value from a function                            |
+| `mein`   | In (pairs with `har`: "each ... in ...")                  |
+| `bahari` | Declare a variable as belonging to the enclosing function |
+| `aalmi`  | Declare a variable as global to the module                |
 
-## Error Handling
+## Results and errors
 
-| Sindlish | English | Purpose |
-| :--- | :--- | :--- |
-| **`ok`** | Ok | Wraps a successful value in a Result. |
-| **`ghalti`** | Error | Wraps an error or triggers a panic. |
-| **`.bachao`** | Rescue | Provides a default value for a failed Result. |
-| **`.lazmi`** | Required | Panics with a custom message if Result is an error. |
+| Keyword  | Meaning                             |
+| -------- | ----------------------------------- |
+| `ok`     | Wrap a value in an OK Result        |
+| `ghalti` | Create an error Result or raise one |
 
-## Symbols
+## Operators written as words
 
-| Symbol | Name | Usage |
-| :--- | :--- | :--- |
-| **`?`** | Soft Unwrap | Propagate errors up the call stack. |
-| **`!!`** | Panic Unwrap | Force unwrap a value or crash. |
-| **`->`** | Arrow | Specify function return types. |
-| **`:`** | Colon | Specify variable types. |
-| **`.`** | Dot | Access methods and attributes. |
-| **`[` `]`** | Brackets | Indexing and List creation. |
-| **`{` `}`** | Braces | Code blocks, Dict/Set creation. |
-| **`#`** | Hash | Single-line comment. |
-| **`/* */`** | Multiline | Comments spanning multiple lines. |
+| Keyword | Meaning                           |
+| ------- | --------------------------------- |
+| `aen`   | Logical and                       |
+| `ya`    | Logical or                        |
+| `nah`   | Logical not                       |
+| `pakko` | Make a variable read-only (const) |
+
+## Coming soon
+
+| Keyword | Status                                                                                         |
+| ------- | ---------------------------------------------------------------------------------------------- |
+| `match` | Reserved for pattern matching. Not implemented yet. The parser rejects it with a roadmap note. |
+
+The keywords page is a quick lookup. To see a keyword in action, follow the link from the relevant Learn page.

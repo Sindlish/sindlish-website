@@ -1,48 +1,33 @@
 ---
 title: Comments
-summary: Learn how to write single-line and multi-line notes inside your code to explain your logic.
+summary: Annotate your Sindlish code with line and block comments.
 enableTableOfContents: true
 ---
 
-When writing code, you will often want to leave notes for yourself or other programmers explaining *why* a piece of code exists. These notes are called **comments**. 
+Comments are notes you leave in your code for your future self and for anyone who reads it. The interpreter ignores them completely, so you can write anything you like, in any language you like.
 
-The Sindlish interpreter completely ignores comments when running your program, so they don't affect your logic or performance at all. Comments are purely for human readability.
-
-## 1. Single-Line Comments
-
-If you just need to leave a quick note on a single line, use the hash symbol `#`. Everything after the `#` on that exact line will be ignored by the interpreter.
+Sindlish has two comment styles. A line comment starts with `#` and runs to the end of the line. A block comment starts with `/*` and ends with `*/`, and it can span several lines.
 
 ```sd
-# This is a single-line comment. Sindlish will ignore this completely.
-naalo = "Sindlish"  # You can also put comments at the end of a line of code!
+# This is a line comment. The interpreter skips it.
 
-# likh("This won't print because it is commented out")
+likh("salam")  # You can attach a comment to the end of a line too.
+
+/* This is a block comment.
+   It can stretch across many lines. */
+
+likh("dua")
 ```
 
-Single-line comments are best for briefly explaining a complex calculation or temporarily disabling a line of code while you are testing.
-
-## 2. Multi-Line Comments
-
-Sometimes you need to write a long explanation, a warning, or document how a complex algorithm works. Instead of putting a `#` on every single line, you can use multi-line comments. 
-
-Start the comment with `/*` and end it with `*/`. Everything inside those symbols will be ignored, even if it spans across 100 lines.
-
-```sd
-/*
-  This is a multi-line comment!
-  It is incredibly useful for writing detailed documentation
-  directly inside your source code files.
-  
-  You can safely write paragraphs of text here without 
-  worrying about breaking your program.
-  
-  Author: Amanat
-  Date: 2026
-*/
-
-kaam complex_math() {
-    # Some complex math here
-}
+```txt filename="Output"
+salam
+dua
 ```
 
-Multi-line comments are generally placed at the top of a file to explain its purpose, or right above a large function to document what parameters it expects and what it returns.
+## What comments are for
+
+Use comments to say _why_, not _what_. The code already shows what it does. A good comment explains a decision, warns about a subtle trap, or labels a section of a longer program.
+
+In the example above, the `# Prints:` style you will see on some sample lines is just a regular line comment: it tells you the expected output without the interpreter noticing.
+
+Next up: [Variables](/docs/basics/variables)

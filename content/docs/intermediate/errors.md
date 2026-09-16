@@ -1,108 +1,85 @@
 ---
-title: Handling Errors
-summary: Build crash-proof software using the Result system and the ghalti keyword.
+title: Errors
+summary: Learn the eight error classes and the Result model.
 enableTableOfContents: true
 ---
 
-Most programming languages use "Exceptions" (try/catch), which can make code unpredictable and hard to follow. Sindlish uses a modern **Result Model**. Instead of crashing, functions that might fail return a **Result** object that must be handled.
+Sindlish divides bad news into two kinds. Some problems stop the program the moment they happen, like reaching past the end of a list. Others are expected business, like a lookup that finds nothing, and those things should be decisions, not crashes.
 
-## 1. The Result Object
+For the second kind, Sindlish uses a `Result`. A Result is a value that is either an **OK** (Sindlish `ok`) or an error (`ghalti`). You create one, inspect it, and decide what to do.
 
-Every function call in Sindlish returns a Result. A result can be in one of two states:
-- **Ok**: The operation was successful and contains the value.
-- **Ghalti**: The operation failed and contains an error message or object.
+## Creating a Result
 
-You can check the state of a result using the `.ok` and `.ghalti` properties:
+`ok(value)` wraps a value in success. `ghalti(message)` wraps a message in failure. Print a Result that is an `ok` and you see its value:
 
 ```sd
-res = some_function()
-agar res.ghalti {
-    likh("Something went wrong!")
-}
+r = ok(42)
+likh(r?)
 ```
 
----
+```txt filename="Output"
+42
+```
 
-## 2. Returning Errors (`ghalti`)
+The `?` operator unwraps an OK result and hands you the value inside.
 
-To signal an error from a function, use the `ghalti()` constructor.
+## Falling back with `bachao`
+
+The comfortable move with a `Result` is `bachao` (rescue). It returns the wrapped value when the result is `ok`, and your fallback when it is `ghalti`. No crashing either way:
 
 ```sd
-kaam check_password(pass) {
-    agar lambi(pass) < 8 {
-        wapas ghalti("Password is too short!")
-    }
-    wapas sach
-}
+r = ghalti("boo")
+likh(r.bachao(99))
 ```
 
----
-
-## 3. Handling Results (The 5 Methods)
-
-Sindlish provides powerful operators and methods to deal with results without writing many `if` statements.
-
-### A. The `?` Operator (Soft Propagate)
-
-The "Question Mark" operator is the most common way to handle errors. 
-- If the result is **Ok**, it "unwraps" the value.
-- If the result is **Ghalti**, it immediately returns the error from the current function.
-
-```sd
-kaam setup() -> Result {
-    user = get_user()?  # If this fails, setup() returns the error here.
-    likh("Welcome " + user)
-    wapas sach
-}
+```txt filename="Output"
+99
 ```
 
-### B. The `.bachao()` Method (Default/Fallback)
+Unwrap a `ghalti` with `?` and you see its message on its own line instead of stopping the program:
 
-Use this when you want to provide a safe default value if an error occurs.
-
-```sd
-# If the file doesn't exist, 'content' becomes an empty string instead of an error.
-content = read_file("config.txt").bachao("") 
+```sd illustrative
+r = ghalti("boo")
+likh(r?)
 ```
 
-### C. The `.lazmi()` Method (Required)
+It prints `boo`. That is the Result philosophy in miniature: failures become values you can look at.
 
-Use this when an error is unacceptable. If the result is a `Ghalti`, the program will crash (Panic) with the custom message you provide.
+## The eight error classes
 
-```sd
-# If this fails, the program stops immediately with the message "Database required!"
-db = connect_db().lazmi("Database required!")
+When a problem is serious enough to stop the program, the interpreter raises one of eight error classes, each named in Romanized Sindhi:
+
+| Error class        | English meaning      | When it stops you                                                         |
+| ------------------ | -------------------- | ------------------------------------------------------------------------- |
+| `LikhaiJeGhalti`   | syntax error         | The program text does not parse                                           |
+| `MatalabJeGhalti`  | argument error       | A function got the wrong number of arguments                              |
+| `QisamJeGhalti`    | type error           | A value of the wrong type showed up                                       |
+| `NaleJeGhalti`     | name error           | A name or attribute does not exist                                        |
+| `IndexJeGhalti`    | index error          | An index is out of range                                                  |
+| `TarteebJeGhalti`  | order error          | A statement is out of place, like `wapas` at top level                    |
+| `HalndeVaktGhalti` | runtime error        | Anything else at runtime, like changing a `pakko` value or failing a cast |
+| `ZeroVindJeGhalti` | divide-by-zero error | Division by zero in a context that demands a value                        |
+
+A failed cast is a great example of a `HalndeVaktGhalti`. It raises, so it does not hand back a Result to rescue. This program stops and reports how it could not turn `"abc"` into a number:
+
+```sd illustrative
+likh(adad("abc"))
 ```
 
-### D. The `!!` Operator (Panic Unwrap)
+The interpreter prints `HalndeVaktGhalti: Value 'abc' khe adad mein badli natho kare saghjay.` with the line that caused it. In plain words: `abc` cannot be changed into a number. The golden rule that follows: never chain `.bachao()` onto a cast. A cast either succeeds or raises, so fallbacks on casts are useless.
 
-Similar to `.lazmi()`, but it crashes with the **original** error message contained in the result.
+Other errors are similarly plain. Reaching past the end of a string raises `IndexJeGhalti`. Calling a function that does not exist raises `NaleJeGhalti`:
 
-```sd
-val = divide(10, 0)!! # CRASHES with "Zero saan vand natho kare saghjay"
+```sd illustrative
+likh("abc"[10])
 ```
 
----
-
-## 4. Triggering a Panic (`ghalti` statement)
-
-When `ghalti` is used as a **standalone statement** (not inside a `wapas`), it acts as an immediate panic. Use this for unrecoverable system failures.
-
-```sd
-agar critical_system_failure {
-    ghalti("CRITICAL ERROR: Reactor overheating!") # Program stops here.
-}
+```sd illustrative
+likh(range(5))
 ```
 
----
+The first prints `Lafz jo index 10 hadd khaan bahar aahe.` The second reports `Nalo 'range' na milyo` (the name `range` was not found). The hint says it best: check that you spelled the name right. It is `silsilo` in Sindlish, not `range`.
 
-## 5. Summary Table
+Division deserves a mention. Inside an expression, dividing by zero raises `ZeroVindJeGhalti`. The same division on its own prints a message instead, because division returns a `Result`. When you want to guard a division, check the divisor before you divide.
 
-| Tool | Behavior on Ok | Behavior on Ghalti |
-| :--- | :--- | :--- |
-| **`?`** | Returns Value | **Returns Error** from function |
-| **`.bachao(v)`** | Returns Value | Returns **`v`** |
-| **`.lazmi(m)`** | Returns Value | **Panics** with message `m` |
-| **`!!`** | Returns Value | **Panics** with original error |
-| **`res.ok`** | `sach` | `koorh` |
-| **`res.ghalti`** | `koorh` | `sach` |
+Next up: [Typed collections](/docs/advanced/typed-collections)

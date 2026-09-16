@@ -1,6 +1,6 @@
-- title: Documentation
+- nav: Learn
   slug: introduction
-  icon: docs
+  icon: start
   items:
     - section: Getting Started
       icon: book
@@ -9,40 +9,100 @@
           slug: introduction
         - title: Installation
           slug: get-started/installation
-        - title: VS Code Extension
-          slug: vscode-extension
-    - section: Language Guide
-      icon: code
+        - title: Hello, world
+          slug: get-started/hello-world
+    - section: The Basics
+      icon: book
       items:
         - title: Comments
           slug: basics/comments
-        - title: Variables & Types
+        - title: Variables
           slug: basics/variables
-        - title: Math & Logic
+        - title: Strings
+          slug: basics/strings
+        - title: Math
           slug: basics/math
-        - title: Conditions (If/Else)
+        - title: Conditions
           slug: basics/conditions
-        - title: Loops (Iterators)
+        - title: Loops
           slug: basics/loops
+    - section: Data Structures
+      icon: search
+      items:
+        - title: Lists
+          slug: data-structures/lists
+        - title: Dictionaries
+          slug: data-structures/dictionaries
+        - title: Sets
+          slug: data-structures/sets
+    - section: Deeper
+      icon: api
+      items:
         - title: Functions
           slug: intermediate/functions
-        - title: Handling Errors
+        - title: Advanced Functions
+          slug: intermediate/advanced-functions
+        - title: Errors
           slug: intermediate/errors
-    - section: Data Structures
-      icon: cpu
+        - title: Typed Collections
+          slug: advanced/typed-collections
+        - title: Scope
+          slug: advanced/scope
+    - section: Extras
+      icon: extension
       items:
-        - title: Lists (fehrist)
-          slug: data-structures/lists
-        - title: Dictionaries (lughat)
-          slug: data-structures/dictionaries
-        - title: Sets (majmuo)
-          slug: data-structures/sets
-    - section: Reference
-      icon: library
+        - title: VS Code Extension
+          slug: vscode-extension
+
+- nav: How-to
+  slug: how-to/index
+  icon: tutorial
+  items:
+    - section: Guides
+      icon: tutorial
       items:
-        - title: All Keywords
+        - title: Overview
+          slug: how-to/index
+        - title: Number guessing game
+          slug: how-to/number-guessing-game
+        - title: Read and parse user input
+          slug: how-to/parse-input
+
+- nav: Reference
+  slug: reference/keywords
+  icon: glossary
+  items:
+    - section: Language Reference
+      icon: glossary
+      items:
+        - title: Keywords
           slug: reference/keywords
-        - title: Standard Library
+        - title: Data types
+          slug: reference/data-types
+        - title: Operators
+          slug: reference/operators
+        - title: Standard library
           slug: reference/standard-library
+        - title: Collection methods
+          slug: reference/collection-methods
+        - title: Errors
+          slug: reference/errors
+    - section: Cookbook
+      icon: features
+      items:
         - title: Examples
           slug: reference/examples
+
+- nav: Concepts
+  slug: concepts/why-sindhi
+  icon: info
+  items:
+    - section: Essays
+      icon: info
+      items:
+        - title: Why Sindhi
+          slug: concepts/why-sindhi
+        - title: Results
+          slug: concepts/results
+        - title: The type system
+          slug: concepts/type-system
