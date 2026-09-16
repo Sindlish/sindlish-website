@@ -1,4 +1,4 @@
-- title: Learn
+- nav: Learn
   slug: introduction
   icon: start
   items:
@@ -54,7 +54,7 @@
         - title: VS Code Extension
           slug: vscode-extension
 
-- title: How-to
+- nav: How-to
   slug: how-to/index
   icon: tutorial
   items:
@@ -68,7 +68,7 @@
         - title: Read and parse user input
           slug: how-to/parse-input
 
-- title: Reference
+- nav: Reference
   slug: reference/keywords
   icon: glossary
   items:
@@ -93,7 +93,7 @@
         - title: Examples
           slug: reference/examples
 
-- title: Concepts
+- nav: Concepts
   slug: concepts/why-sindhi
   icon: info
   items:
