@@ -731,22 +731,38 @@ render();
 ta.addEventListener('scroll', () => { hl.scrollTop = ta.scrollTop; hl.scrollLeft = ta.scrollLeft; });
 ta.addEventListener('input', render);
 
-/* --- Load: a code block in the pane fills the editor ----------------------- */
+/* --- Load: a code block in the pane fills the editor -----------------------
+   Loading changes the editor and nothing else. An earlier version also flipped
+   the workbench into tab mode, which was wrong: on a wide screen there are no
+   tabs to flip to, so it silently destroyed the split view. Tab mode is now
+   only touched when the viewport is actually narrow enough to be showing it. */
 document.querySelectorAll('.load-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const pre = btn.parentElement.querySelector('pre');
     ta.value = pre.dataset.sd;
     render();
-    document.body.classList.add('sim-narrow');
-    document.querySelector('.pane-docs').classList.remove('is-active');
-    document.querySelector('.pane-editor').classList.add('is-active');
-    syncTabs();
-    applyDock();
-    ta.focus();
-    // Focus Not Obscured (#34): the editor head is sticky, so put the caret
-    // below it rather than under it.
-    ta.setSelectionRange(0, 0);
-    ta.scrollTop = 0;
+    ta.scrollTop = 0; ta.scrollLeft = 0;
+
+    const tabsShowing = matchMedia('(max-width: 1023px)').matches;
+    if (tabsShowing) {
+      // Only one pane is visible down here, so revealing the editor is the
+      // only way the user learns the load happened — and it is the only way
+      // they can see the code they just loaded.
+      document.querySelector('.pane-docs').classList.remove('is-active');
+      document.querySelector('.pane-editor').classList.add('is-active');
+      syncTabs();
+      applyDock();
+      ta.focus();
+      // Focus Not Obscured (#34): the editor head is sticky, so start the
+      // caret below it rather than under it.
+      ta.setSelectionRange(0, 0);
+    } else {
+      // Side by side: do not move focus. Announce it instead, in the output
+      // dock's existing live region, and leave the reading position alone.
+      dot.dataset.state = 'ready';
+      state.textContent = 'Loaded';
+      out.innerHTML = '<span class="idle">Loaded into the editor. Press Run.</span>';
+    }
   });
 });
 
