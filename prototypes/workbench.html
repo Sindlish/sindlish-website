@@ -304,7 +304,7 @@ figure.out pre { margin: 0; }
 .run-btn[disabled] { opacity: 0.4; cursor: default; }
 .run-btn svg { width: 12px; height: 12px; fill: currentColor; }
 
-.editor-stack { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.editor-stack { position: relative; flex: 1; min-height: 140px; overflow: hidden; }
 .editor-stack pre, .editor-stack textarea {
   position: absolute; inset: 0;
   margin: 0; padding: 16px 18px;
@@ -360,9 +360,24 @@ figure.out pre { margin: 0; }
 .kw-pop div span { font: 400 12px/1.4 var(--sans); color: var(--text-3); margin-left: auto; }
 .kw-pop div[aria-selected="true"] { background: var(--overlay); }
 
-/* --- output dock ----------------------------------------------------------- */
+/* --- output dock, resizable ------------------------------------------------
+   Opens at 30% of the pane. The editor keeps a 140px floor via min-height, so
+   the dock cannot be dragged far enough to hide the code you are editing. */
+.dock-resize {
+  flex: none; height: 9px; margin-bottom: -1px;
+  display: grid; place-items: center;
+  cursor: row-resize; touch-action: none;
+  background: var(--page);
+}
+.dock-resize::after {
+  content: ""; width: 28px; height: 2px; background: var(--border-strong);
+  transition: background var(--step-0) var(--ease);
+}
+.dock-resize:hover::after, .dock-resize:focus-visible::after { background: var(--text); }
+
 .output {
-  flex: none; height: var(--dock-h);
+  flex: none; height: var(--dock, 30%);
+  min-height: 96px;
   display: flex; flex-direction: column;
   border-top: 1px solid var(--border);
 }
@@ -589,6 +604,9 @@ likh(score, city)</pre>
       <textarea id="code" spellcheck="false" autocomplete="off" autocapitalize="off" wrap="off"></textarea>
       <div class="kw-pop" id="kw-pop" role="listbox" aria-label="Sindlish keywords" hidden></div>
     </div>
+
+    <div class="dock-resize" id="dock-resize" role="separator" aria-orientation="horizontal"
+         aria-label="Resize output panel" aria-valuemin="15" aria-valuemax="75" aria-valuenow="30" tabindex="0"></div>
 
     <div class="output">
       <div class="output-head">
@@ -840,6 +858,74 @@ $('#tab-editor').addEventListener('click', () => {
   document.querySelector('.pane-editor').classList.add('is-active');
   document.querySelector('.pane-docs').classList.remove('is-active'); syncTabs();
 });
+
+/* --- output dock: resizable by pointer and by keyboard ----------------------
+   role="separator" with aria-valuenow, because a drag-only divider is unusable
+   without a mouse. Arrow keys step 2%, Shift+Arrow 10%, Home/End to the ends. */
+const paneEditor = document.querySelector('.pane-editor');
+const dock = document.querySelector('.output');
+const grip = $('#dock-resize');
+const MIN = 15, MAX = 75, FLOOR = 140, DOCK_MIN = 96;
+
+/* Clamp in pixels, not percent. A percentage alone overflows on a short
+   window: 75% of a 500px pane leaves 64px for the editor, under its 140px
+   floor, and the pane silently spills. So the real ceiling depends on the
+   chrome above it and has to be recomputed. */
+function limits() {
+  const h = paneEditor.clientHeight || 1;
+  const chrome = document.querySelector('.editor-head').offsetHeight + grip.offsetHeight;
+  const avail = h - chrome;
+  // The editor's 140px floor yields when the pane is genuinely too short to
+  // hold both. Invariant that must never break: editor + dock <= avail, so the
+  // pane never overflows and the code can never scroll out of sight.
+  const floor = Math.min(FLOOR, Math.max(80, avail - DOCK_MIN));
+  const room = Math.max(0, avail - floor);
+  const lo = Math.min(Math.max(MIN, (Math.min(DOCK_MIN, room) / h) * 100), MAX);
+  const hi = Math.max(lo, Math.min(MAX, (room / h) * 100));
+  return { lo, hi };
+}
+function setDock(pct, persist) {
+  const { lo, hi } = limits();
+  const v = Math.min(hi, Math.max(lo, Math.round(pct)));
+  paneEditor.style.setProperty('--dock', v + '%');
+  grip.setAttribute('aria-valuenow', v);
+  grip.setAttribute('aria-valuetext', v + '% of the pane, ' +
+    Math.round((paneEditor.clientHeight || 0) * v / 100) + ' pixels');
+  if (persist) { try { localStorage.setItem('wb-proto-dock', v); } catch (e) {} }
+  return v;
+}
+let savedDock = 30;
+try { const s = localStorage.getItem('wb-proto-dock'); if (s) savedDock = +s; } catch (e) {}
+setDock(savedDock, false);
+addEventListener('resize', () => setDock(+grip.getAttribute('aria-valuenow'), false));
+
+grip.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  grip.setPointerCapture(e.pointerId);
+  const move = ev => {
+    const r = paneEditor.getBoundingClientRect();
+    setDock(((r.bottom - ev.clientY) / r.height) * 100, true);
+  };
+  const up = ev => {
+    grip.releasePointerCapture(ev.pointerId);
+    grip.removeEventListener('pointermove', move);
+    grip.removeEventListener('pointerup', up);
+  };
+  grip.addEventListener('pointermove', move);
+  grip.addEventListener('pointerup', up);
+});
+grip.addEventListener('keydown', e => {
+  const step = e.shiftKey ? 10 : 2;
+  const now = +grip.getAttribute('aria-valuenow');
+  const k = e.key;
+  if (k === 'ArrowUp') setDock(now + step, true);
+  else if (k === 'ArrowDown') setDock(now - step, true);
+  else if (k === 'Home') setDock(MIN, true);
+  else if (k === 'End') setDock(MAX, true);
+  else return;
+  e.preventDefault();
+});
+grip.addEventListener('dblclick', () => setDock(30, true));
 
 /* --- theme ---------------------------------------------------------------- */
 function toggleTheme() {
