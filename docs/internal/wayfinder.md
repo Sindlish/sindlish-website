@@ -28,14 +28,28 @@ goes on `wayfinder/prototypes`.
 Three tickets are labelled `wayfinder:prototype`. Their resolution comes *from* the prototype,
 not before it, so the order matters:
 
-| Ticket | Prototype | Blocked by |
+| Ticket | Prototype | State |
 |---|---|---|
-| [#29](https://github.com/Sindlish/sindlish-website/issues/29) | The docs app shell: header, sidebar, content column, mobile nav | Nothing. **Start here.** |
-| [#36](https://github.com/Sindlish/sindlish-website/issues/36) | The workbench: docs pane beside the editor | #29. It is the shell plus a panel, so it cannot be drawn before the shell. |
-| [#31](https://github.com/Sindlish/sindlish-website/issues/31) | Where the mascot appears in the UI and what it does | #27, the variant art. Not blocked by anything we can do. |
+| [#29](https://github.com/Sindlish/sindlish-website/issues/29) | The docs app shell: header, sidebar, content column, drawer | **Resolved.** `prototypes/docs-shell.html`, two rounds |
+| [#36](https://github.com/Sindlish/sindlish-website/issues/36) | The workbench: docs pane beside the editor | Open. Was blocked by #29, now unblocked |
+| [#31](https://github.com/Sindlish/sindlish-website/issues/31) | Where the mascot appears in the UI and what it does | Blocked by #27, the variant art. Not blocked by anything we can do |
 
 All three live on `wayfinder/prototypes`, one file each, so they can be opened side by side and
 compared. They will not agree perfectly, and where they disagree that is signal.
+
+### A prototype is allowed to be wrong about its own question
+
+#29 is the example worth keeping. The first version had no persistent navigation, built to the
+question as originally framed, and it was rejected on sight: a docs site with nothing that stays
+in position reads as unfinished. The second version, with a sidebar, was accepted unchanged.
+
+The lesson, recorded on the ticket: the first prototype answered the question correctly and the
+*question* was wrong, because the style reference had been framed as "the Rust docs shell" when
+it should have been rust-lang.org. Building it is what exposed that. A prototype is not only a
+way to test an answer; it is also the cheapest way to find out that you asked the wrong thing.
+
+**Keep rejected versions in git history rather than overwriting them.** The rejected one is
+evidence, and it is the only record that the question was ever framed wrongly.
 
 ## How a prototype is built
 
