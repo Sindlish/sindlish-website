@@ -98,11 +98,10 @@ code, pre, kbd { font-family: var(--mono); font-size: 14px; }
 .proto-bar .note { color: #9a9; }
 .screen[hidden] { display: none; }
 .sim-narrow .workbench { grid-template-columns: minmax(0,1fr); }
-.sim-narrow .pane-editor { display: none; }
+.sim-narrow .pane-editor { display: none; border-left: 0; }
 .sim-narrow .pane-docs { display: none; }
 .sim-narrow .pane-docs.is-active,
 .sim-narrow .pane-editor.is-active { display: flex; }
-.sim-narrow .pane-divider { display: none; }
 .sim-narrow .wb-tabs { display: flex; }
 
 .skip { position: absolute; left: -9999px; top: 0; z-index: 200; background: var(--page); color: var(--link); border: 1px solid var(--border-strong); padding: 12px 16px; font-weight: 500; }
@@ -131,14 +130,17 @@ code, pre, kbd { font-family: var(--mono); font-size: 14px; }
 .icon-btn:hover { color: var(--text); border-color: var(--border); }
 .icon-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.5; }
 
-/* --- workbench: two equal columns ------------------------------------------ */
+/* --- workbench: two equal columns ------------------------------------------
+   Exactly TWO grid items. An earlier version had three — the divider was its
+   own <div> — so the editor wrapped onto a second row and the panes stacked.
+   The divider is a border on the editor pane, not an element. */
 .workbench {
   flex: 1; min-height: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 .pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
-.pane-divider { border-left: 1px solid var(--border); }
+.pane-editor { border-left: 1px solid var(--border); }
 
 /* --- pane header: compact nav, replaces the sidebar ------------------------ */
 .pane-head {
@@ -409,8 +411,7 @@ figure.out pre { margin: 0; }
 
 @media (max-width: 1023px) {
   .workbench { grid-template-columns: minmax(0, 1fr); }
-  .pane-divider { display: none; }
-  .pane-editor { display: none; }
+  .pane-editor { display: none; border-left: 0; border-top: 1px solid var(--border); }
   .pane-docs.is-active, .pane-editor.is-active { display: flex; }
   .wb-tabs { display: flex; }
   .pane-search { width: 120px; }
@@ -583,8 +584,6 @@ likh(score, city)</pre>
     </div>
   </section>
 
-  <div class="pane-divider" aria-hidden="true"></div>
-
   <!-- ================= EDITOR PANE ==================================== -->
   <section class="pane pane-editor" id="pane-editor" role="tabpanel" aria-labelledby="tab-editor">
     <div class="editor-head">
@@ -742,6 +741,7 @@ document.querySelectorAll('.load-btn').forEach(btn => {
     document.querySelector('.pane-docs').classList.remove('is-active');
     document.querySelector('.pane-editor').classList.add('is-active');
     syncTabs();
+    applyDock();
     ta.focus();
     // Focus Not Obscured (#34): the editor head is sticky, so put the caret
     // below it rather than under it.
@@ -857,6 +857,7 @@ $('#tab-docs').addEventListener('click', () => {
 $('#tab-editor').addEventListener('click', () => {
   document.querySelector('.pane-editor').classList.add('is-active');
   document.querySelector('.pane-docs').classList.remove('is-active'); syncTabs();
+  applyDock();   // pane was display:none until now, so re-clamp against real height
 });
 
 /* --- output dock: resizable by pointer and by keyboard ----------------------
@@ -866,11 +867,16 @@ const paneEditor = document.querySelector('.pane-editor');
 const dock = document.querySelector('.output');
 const grip = $('#dock-resize');
 const MIN = 15, MAX = 75, FLOOR = 140, DOCK_MIN = 96;
+let desired = 30;
 
 /* Clamp in pixels, not percent. A percentage alone overflows on a short
    window: 75% of a 500px pane leaves 64px for the editor, under its 140px
    floor, and the pane silently spills. So the real ceiling depends on the
-   chrome above it and has to be recomputed. */
+   chrome above it and has to be recomputed.
+   `desired` is kept separately from the applied value: under 1024px this pane
+   is display:none, so clientHeight is 0, and clamping against that would pin
+   the dock to its 15% minimum — then reveal a 15% dock when the Editor tab is
+   opened. Clamp only what can actually be measured. */
 function limits() {
   const h = paneEditor.clientHeight || 1;
   const chrome = document.querySelector('.editor-head').offsetHeight + grip.offsetHeight;
@@ -884,20 +890,23 @@ function limits() {
   const hi = Math.max(lo, Math.min(MAX, (room / h) * 100));
   return { lo, hi };
 }
-function setDock(pct, persist) {
+function applyDock() {
+  if (!paneEditor.clientHeight) return;   // pane hidden: nothing to measure
   const { lo, hi } = limits();
-  const v = Math.min(hi, Math.max(lo, Math.round(pct)));
+  const v = Math.min(hi, Math.max(lo, Math.round(desired)));
   paneEditor.style.setProperty('--dock', v + '%');
   grip.setAttribute('aria-valuenow', v);
   grip.setAttribute('aria-valuetext', v + '% of the pane, ' +
-    Math.round((paneEditor.clientHeight || 0) * v / 100) + ' pixels');
-  if (persist) { try { localStorage.setItem('wb-proto-dock', v); } catch (e) {} }
-  return v;
+    Math.round(paneEditor.clientHeight * v / 100) + ' pixels');
 }
-let savedDock = 30;
-try { const s = localStorage.getItem('wb-proto-dock'); if (s) savedDock = +s; } catch (e) {}
-setDock(savedDock, false);
-addEventListener('resize', () => setDock(+grip.getAttribute('aria-valuenow'), false));
+function setDock(pct, persist) {
+  desired = Math.min(MAX, Math.max(0, pct));
+  if (persist) { try { localStorage.setItem('wb-proto-dock', Math.round(desired)); } catch (e) {} }
+  applyDock();
+}
+try { const s = localStorage.getItem('wb-proto-dock'); if (s) desired = +s; } catch (e) {}
+applyDock();
+addEventListener('resize', applyDock);
 
 grip.addEventListener('pointerdown', e => {
   e.preventDefault();
