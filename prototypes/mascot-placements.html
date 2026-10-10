@@ -172,6 +172,19 @@
       .float-bar .hint {
         color: #9a9;
       }
+      .float-bar select {
+        font: inherit;
+        color: #fff;
+        background: #111;
+        border: 1px solid #444;
+        border-radius: 0;
+        padding: 2px 6px;
+        min-height: 24px;
+        cursor: pointer;
+      }
+      .float-bar select:hover {
+        border-color: #888;
+      }
 
       .skip {
         position: absolute;
@@ -666,20 +679,23 @@
         display: block;
         width: auto;
       }
+      .s300 {
+        height: 300px;
+      }
       .s180 {
         height: 180px;
       }
-      .s96 {
-        height: 96px;
+      .s160 {
+        height: 160px;
       }
-      .s64 {
-        height: 64px;
+      .s110 {
+        height: 110px;
       }
-      .s40 {
-        height: 40px;
+      .s56 {
+        height: 56px;
       }
-      .s36 {
-        height: 36px;
+      .s48 {
+        height: 48px;
       }
 
       /* Pending art. The agent cannot view images, so these are honest frames
@@ -696,71 +712,117 @@
         padding: 4px;
         overflow: hidden;
       }
-      .ph96 {
-        height: 96px;
+      .ph-hero {
+        height: 300px;
+        width: 340px;
+      }
+      .ph-err {
+        height: 180px;
+        width: 130px;
+      }
+      .ph-sit {
+        height: 56px;
         width: 84px;
       }
-      .ph64 {
-        height: 64px;
-        width: 110px;
+      .ph-point {
+        height: 110px;
+        width: 200px;
       }
-      .ph40 {
-        height: 40px;
-        width: 58px;
-      }
-      .ph36 {
-        height: 36px;
-        width: 118px;
+      .ph-run {
+        height: 48px;
+        width: 150px;
       }
 
-      /* The bubble: square, hairline, overlay fill, square tail. The only rounded
-   balloon shape on the site would be this, so it is not one. */
+      /* The bubble: a typesetter's proof, not a chat balloon. Red frame, an even
+   leader line toward the mascot with no box at the join, and three switchable
+   decors (bubble select in the bar): d1 the proof rule, d2 the cut mark,
+   d3 the double rule. Red is frame and marks only; text stays token text. */
       .bubble {
         position: relative;
         margin: 6px 0 0;
-        border: 1px solid var(--border-strong);
+        border: 2px solid var(--brand);
         background: var(--overlay);
         color: var(--text);
         font-size: 15px;
-        line-height: 1.5;
-        padding: 9px 13px;
-        max-width: 24ch;
+        line-height: 1.55;
+        padding: 12px 16px 11px;
+        max-width: 26ch;
       }
       .bubble::after {
         content: '';
         position: absolute;
-        left: -9px;
-        top: 13px;
-        width: 10px;
-        height: 9px;
-        background: var(--overlay);
+        right: -10px;
+        top: 50%;
+        width: 8px;
+        height: 2px;
+        margin-top: -1px;
+        background: var(--brand);
+      }
+      /* d1 proof rule: one hairline line set along the upper-left, like a rule in
+   a printed margin */
+      .bubble::before {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        border-top: 1px solid var(--border-strong);
         border-left: 1px solid var(--border-strong);
-        border-bottom: 1px solid var(--border-strong);
+      }
+      /* d2 cut mark: drop the rule, set a small red plate in the lower-right corner */
+      body[data-bubble='d2'] .bubble::before {
+        display: none;
+      }
+      body[data-bubble='d2'] .bubble {
+        background-image: linear-gradient(var(--brand), var(--brand));
+        background-size: 6px 6px;
+        background-position: right 8px bottom 8px;
+        background-repeat: no-repeat;
+      }
+      /* d3 double rule: the hairline line wraps all four sides inside the red frame */
+      body[data-bubble='d3'] .bubble::before {
+        border: 1px solid var(--border-strong);
+      }
+      /* the hero speaks a little larger: the star's line, not a body label */
+      .hero .bubble {
+        font-size: 17px;
+        padding: 13px 18px 12px;
       }
 
-      /* --- centered utility pages (empty state, 404, error) ---------------------- */
-      .centered {
-        max-width: 560px;
-        margin: 0 auto;
+      /* --- lost-moment pages: copy on the left, mascot on the right, clear of the
+         text. The mascot is bigger here and never wraps into the copy. -------------- */
+      .side-pad {
         padding: 56px var(--gutter) 64px;
-        text-align: left;
       }
-      .centered h1 {
+      .page-split {
+        display: flex;
+        align-items: center;
+        gap: 48px;
+        flex-wrap: wrap;
+        max-width: 880px;
+        margin: 0 auto;
+      }
+      .page-split .copy {
+        flex: 1;
+        min-width: 280px;
+      }
+      .page-split h1 {
         font-size: 28px;
         font-weight: 600;
         line-height: 1.25;
         margin: 0 0 10px;
       }
-      .centered .msg {
+      .page-split .msg {
         color: var(--text-2);
         margin: 0 0 8px;
       }
-      .centered .hint {
+      .page-split .hint {
         color: var(--text-3);
         font-size: 14px;
         margin: 0 0 22px;
       }
-      .centered .links {
+      .page-split .links {
         display: flex;
         gap: 18px;
         flex-wrap: wrap;
@@ -888,14 +950,15 @@
       }
     </style>
   </head>
-  <body data-variant="A">
+  <body data-variant="A" data-bubble="d2">
     <a class="skip" href="#content">Skip to content</a>
 
     <div class="proto-strip" role="region" aria-label="Prototype notes">
       <strong>PROTOTYPE: mascot placements</strong>
       <span>Question: where does the mascot appear, and what does it do?</span>
       <span class="note"
-        >Switch variants from the bar at the bottom, or with the left and right arrow keys.</span
+        >Variants via the bar or the arrow keys. Three bubble decors in the bar: proof frame, cut
+        mark, double rule.</span
       >
       <span class="note">Judge the art on white and on black: theme toggle is here.</span>
       <button class="theme-btn" type="button" aria-label="Theme: system">
@@ -947,8 +1010,11 @@
               <tbody>
                 <tr>
                   <td>Homepage hero</td>
-                  <td><code>mascot-standing-neutral</code></td>
-                  <td>180px</td>
+                  <td>
+                    <code>mascot-sit</code>
+                    <span class="no">pending, falls back to standing</span>
+                  </td>
+                  <td>300px</td>
                   <td>Salam, duniya!</td>
                   <td>Decorative</td>
                   <td data-col="A">yes</td>
@@ -968,8 +1034,10 @@
                 <tr>
                   <td>Search empty state</td>
                   <td><code>mascot-curious-question</code></td>
-                  <td>96px</td>
-                  <td>Kuch na melu.</td>
+                  <td>160px</td>
+                  <td title="Place not found. Did you write it correctly?">
+                    Jaga na milyo. Cha tawaan sahi likhyo aahe?
+                  </td>
                   <td>Decorative</td>
                   <td data-col="A">yes</td>
                   <td data-col="B">yes</td>
@@ -978,8 +1046,10 @@
                 <tr>
                   <td>Docs index, no match</td>
                   <td><code>mascot-curious-question</code></td>
-                  <td>96px</td>
-                  <td>Kuch na melu.</td>
+                  <td>160px</td>
+                  <td title="Place not found. Did you write it correctly?">
+                    Jaga na milyo. Cha tawaan sahi likhyo aahe?
+                  </td>
                   <td>Decorative</td>
                   <td data-col="A">yes</td>
                   <td data-col="B">yes</td>
@@ -988,8 +1058,8 @@
                 <tr>
                   <td>404 page</td>
                   <td><code>mascot-curious-question</code></td>
-                  <td>96px</td>
-                  <td>Safho na melu.</td>
+                  <td>180px</td>
+                  <td title="This place was not found.">He jaga na milyo.</td>
                   <td>Decorative</td>
                   <td data-col="A">yes</td>
                   <td data-col="B">yes</td>
@@ -998,8 +1068,8 @@
                 <tr>
                   <td>Runtime error page</td>
                   <td><code>mascot-thinking-error</code> <span class="no">pending</span></td>
-                  <td>96px</td>
-                  <td>Kuch ghalat tha.</td>
+                  <td>180px</td>
+                  <td title="A right-now-mistake happened.">HalndeVaktGhalti thi.</td>
                   <td>Decorative</td>
                   <td data-col="A">yes</td>
                   <td data-col="B">yes</td>
@@ -1018,7 +1088,7 @@
                 <tr>
                   <td>Run, failure</td>
                   <td><code>mascot-thinking-error</code> <span class="no">pending</span></td>
-                  <td>36px</td>
+                  <td>48px</td>
                   <td><span class="no">silent, alt text carries it</span></td>
                   <td>Meaningful, alt: the code did not run</td>
                   <td data-col="A">yes</td>
@@ -1030,7 +1100,7 @@
                   <td>
                     <code>mascot-sit</code> <span class="no">pending, falls back to standing</span>
                   </td>
-                  <td>40px</td>
+                  <td>56px</td>
                   <td><span class="no">silent</span></td>
                   <td>Decorative</td>
                   <td data-col="A">yes</td>
@@ -1043,8 +1113,8 @@
                     <code>mascot-point</code>
                     <span class="no">pending, falls back to standing</span>
                   </td>
-                  <td>64px</td>
-                  <td>Chalo!</td>
+                  <td>110px</td>
+                  <td title="Started (your line)">Shuru karyo</td>
                   <td>Decorative</td>
                   <td data-col="A">yes</td>
                   <td data-col="B">yes</td>
@@ -1053,7 +1123,7 @@
                 <tr>
                   <td>Creator page</td>
                   <td><code>mascot-standing-neutral</code></td>
-                  <td>64px</td>
+                  <td>110px</td>
                   <td><span class="no">silent</span></td>
                   <td>Decorative</td>
                   <td data-col="A">yes</td>
@@ -1078,12 +1148,23 @@
           </div>
 
           <p class="proto-note">
-            The Sindlish lines are drafts awaiting your approval, and your corrections go straight
-            into this file.
+            The Sindlish lines are drafts awaiting your approval. They are built only from words and
+            sentence patterns the interpreter and the docs already use, so each bubble doubles as a
+            language lesson. Hover the voice column for the literal gloss.
           </p>
           <p class="proto-note">
             Art marked pending renders as a dashed frame carrying the filename. Swap in the PNG as
             each variant is commissioned.
+          </p>
+          <p class="proto-note">
+            The mascot is the star of the site, and the sizes above treat it that way. Bubbles are
+            the one red-outlined element: accent red frame, an even leader line pointing at the
+            mascot, always sitting to its left. Red is for the mascot and its bubbles only, never
+            text.
+          </p>
+          <p class="proto-note">
+            Bubble decor settled for the ticket: cut mark (d2). The bar can still flip proof frame
+            and double rule for comparison, but cut mark is the decision.
           </p>
           <p class="proto-note">
             The docs sidebar stays bare in every variant. That was the one no the verdicts kept.
@@ -1102,7 +1183,9 @@
       <section class="scene">
         <p class="scene-label">
           <span>2 &middot; Homepage</span><span>route /</span
-          ><span class="tag">hero arrangement is a draft, react to it</span>
+          ><span class="tag pending"
+            >art pending: mascot-sit.png, the star, falls back to standing</span
+          >
         </p>
         <div class="frame">
           <header class="site-header">
@@ -1136,19 +1219,25 @@
             </div>
             <div class="mascot-block" data-include="A B C">
               <!-- a11y rule, settled: decorative by default -->
-              <img
-                class="mascot s180"
-                src="../public/images/mascot/mascot-standing-neutral.png"
-                alt=""
-                aria-hidden="true"
-              />
               <p class="bubble" lang="sd-Latn" data-include="A C">Salam, duniya!</p>
+              <div
+                class="mascot-ph ph-hero"
+                role="img"
+                aria-label="Sindlish mascot, sitting"
+                title="mascot-sit.png"
+              >
+                mascot-sit.png
+              </div>
             </div>
           </div>
           <div class="frame-pad" style="padding-top: 0">
             <p class="proto-note">
-              Brand red is permitted in the hero only, and the art carries it. The buttons stay
-              neutral on purpose.
+              The mascot is the star of the site and the hero carries it sitting and large. Red is
+              for the mascot and its bubble only; the buttons stay neutral.
+            </p>
+            <p class="proto-note">
+              mascot-sit.png is now the most wanted commission with mascot-thinking-error.png, two
+              surfaces each. Until sit exists, the hero falls back to standing-neutral.
             </p>
             <p class="proto-note">The hero is the one placement every variant keeps.</p>
           </div>
@@ -1377,7 +1466,7 @@ likh(score, city)</code></pre>
 
           <div class="state-block">
             <span class="route-chip">/search?q=varibles</span>
-            <div class="col" style="max-width: 640px">
+            <div class="col" style="max-width: 880px">
               <h1 style="font-size: 22px; font-weight: 600; margin: 0 0 6px">Search</h1>
               <p class="msg" style="margin-bottom: 18px">
                 Results for
@@ -1390,30 +1479,49 @@ likh(score, city)</code></pre>
                   >varibles</code
                 >
               </p>
-              <div class="mascot-block" data-include="A B">
-                <img
-                  class="mascot s96"
-                  src="../public/images/mascot/mascot-curious-question.png"
-                  alt=""
-                  aria-hidden="true"
-                />
-                <p class="bubble" lang="sd-Latn" data-include="A C">Kuch na melu.</p>
+              <div class="page-split">
+                <div class="copy">
+                  <p class="msg">No pages match "varibles".</p>
+                  <p class="hint">
+                    Try a shorter word, or start from the <a href="#">documentation index</a>.
+                  </p>
+                </div>
+                <div class="mascot-block" data-include="A B">
+                  <p class="bubble" lang="sd-Latn" data-include="A C">
+                    Jaga na milyo. Cha tawaan sahi likhyo aahe?
+                  </p>
+                  <img
+                    class="mascot s160"
+                    src="../public/images/mascot/mascot-curious-question.png"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </div>
               </div>
-              <p class="msg">No pages match "varibles".</p>
-              <p class="hint">
-                Try a shorter word, or start from the <a href="#">documentation index</a>.
-              </p>
             </div>
           </div>
 
           <div class="state-block">
             <span class="route-chip">/docs, empty match</span>
-            <div class="col" style="max-width: 640px">
-              <p class="msg">Nothing in the docs matches "varibles".</p>
-              <p class="hint">
-                The index lists all 33 pages grouped by pillar:
-                <a href="#">open the documentation index</a>.
-              </p>
+            <div class="page-split">
+              <div class="copy">
+                <p class="msg">Nothing in the docs matches "varibles".</p>
+                <p class="hint">
+                  The index lists all 33 pages grouped by pillar:
+                  <a href="#">open the documentation index</a>.
+                </p>
+              </div>
+              <div class="mascot-block" data-include="A B">
+                <p class="bubble" lang="sd-Latn" data-include="A C">
+                  Jaga na milyo. Cha tawaan sahi likhyo aahe?
+                </p>
+                <img
+                  class="mascot s160"
+                  src="../public/images/mascot/mascot-curious-question.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
             </div>
           </div>
 
@@ -1442,23 +1550,27 @@ likh(score, city)</code></pre>
               ><a href="#">Creator</a>
             </nav>
           </header>
-          <div class="centered">
-            <div class="mascot-block" data-include="A B">
-              <img
-                class="mascot s96"
-                src="../public/images/mascot/mascot-curious-question.png"
-                alt=""
-                aria-hidden="true"
-              />
-              <p class="bubble" lang="sd-Latn" data-include="A C">Safho na melu.</p>
+          <div class="side-pad">
+            <div class="page-split">
+              <div class="copy">
+                <h1>Page not found</h1>
+                <p class="msg">The page you were looking for does not exist.</p>
+                <p class="hint">It may have moved as the docs were reorganised.</p>
+                <p class="links">
+                  <a href="#">Go to the documentation</a><a href="#">Go to the homepage</a>
+                </p>
+                <p class="abs-note" data-absent="C">no mascot in variant C</p>
+              </div>
+              <div class="mascot-block" data-include="A B">
+                <p class="bubble" lang="sd-Latn" data-include="A C">He jaga na milyo.</p>
+                <img
+                  class="mascot s180"
+                  src="../public/images/mascot/mascot-curious-question.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
             </div>
-            <h1>Page not found</h1>
-            <p class="msg">The page you were looking for does not exist.</p>
-            <p class="hint">It may have moved as the docs were reorganised.</p>
-            <p class="links">
-              <a href="#">Go to the documentation</a><a href="#">Go to the homepage</a>
-            </p>
-            <p class="abs-note" data-absent="C">no mascot in variant C</p>
           </div>
         </div>
       </section>
@@ -1479,18 +1591,24 @@ likh(score, city)</code></pre>
               ><a href="#">Creator</a>
             </nav>
           </header>
-          <div class="centered">
-            <div class="mascot-block" data-include="A B">
-              <div class="mascot-ph ph96" title="mascot-thinking-error.png">
-                thinking-<br />error
+          <div class="side-pad">
+            <div class="page-split">
+              <div class="copy">
+                <h1>Something went wrong</h1>
+                <p class="msg">The page could not be loaded.</p>
+                <p class="hint">
+                  Try again, or report the problem on GitHub if it keeps happening.
+                </p>
+                <p class="links"><a href="#">Try again</a><a href="#">Report the problem</a></p>
+                <p class="abs-note" data-absent="C">no mascot in variant C</p>
               </div>
-              <p class="bubble" lang="sd-Latn" data-include="A C">Kuch ghalat tha.</p>
+              <div class="mascot-block" data-include="A B">
+                <p class="bubble" lang="sd-Latn" data-include="A C">HalndeVaktGhalti thi.</p>
+                <div class="mascot-ph ph-err" title="mascot-thinking-error.png">
+                  thinking-<br />error
+                </div>
+              </div>
             </div>
-            <h1>Something went wrong</h1>
-            <p class="msg">The page could not be loaded.</p>
-            <p class="hint">Try again, or report the problem on GitHub if it keeps happening.</p>
-            <p class="links"><a href="#">Try again</a><a href="#">Report the problem</a></p>
-            <p class="abs-note" data-absent="C">no mascot in variant C</p>
           </div>
         </div>
       </section>
@@ -1529,10 +1647,10 @@ likh(score)</code></pre>
                   <p class="run-out" role="status" aria-live="polite"></p>
                   <div class="run-fail" hidden>
                     <!-- Placeholder for mascot-thinking-error.png. When the art exists
-                     this becomes <img src="..." height="36" alt="The code did not run">.
+                     this becomes <img src="..." height="48" alt="The code did not run">.
                      This is the one placement that is not decorative. -->
                     <div
-                      class="mascot-ph ph36"
+                      class="mascot-ph ph-run"
                       role="img"
                       aria-label="The code did not run"
                       title="mascot-thinking-error.png"
@@ -1595,7 +1713,7 @@ likh(score)</code></pre>
             <a href="#">llms.txt</a>
             <span class="mascot-block foot-mascot" data-include="A B" style="margin: 0">
               <span
-                class="mascot-ph ph40"
+                class="mascot-ph ph-sit"
                 role="img"
                 aria-label="Sindlish mascot, sitting"
                 title="mascot-sit.png"
@@ -1647,15 +1765,15 @@ sindlish</code></pre>
                 </figure>
               </div>
               <div class="mascot-block" data-include="A B">
+                <p class="bubble" lang="sd-Latn" data-include="A C">Shuru karyo</p>
                 <div
-                  class="mascot-ph ph64"
+                  class="mascot-ph ph-point"
                   role="img"
                   aria-label="Sindlish mascot, pointing at the install steps"
                   title="mascot-point.png"
                 >
                   mascot-point
                 </div>
-                <p class="bubble" lang="sd-Latn" data-include="A C">Chalo!</p>
               </div>
             </div>
             <p class="abs-note" data-absent="C">no mascot in variant C</p>
@@ -1703,7 +1821,7 @@ sindlish</code></pre>
               </div>
               <div class="mascot-block" data-include="A B" style="align-items: center">
                 <img
-                  class="mascot s64"
+                  class="mascot s110"
                   src="../public/images/mascot/mascot-standing-neutral.png"
                   alt=""
                   aria-hidden="true"
@@ -1716,11 +1834,17 @@ sindlish</code></pre>
       </section>
     </main>
 
-    <div class="float-bar" role="region" aria-label="Prototype variants">
+    <div class="float-bar" role="region" aria-label="Prototype controls">
       <button type="button" id="v-prev" aria-label="Previous variant">&larr;</button>
       <span class="v-label" id="v-label" aria-live="polite"></span>
       <button type="button" id="v-next" aria-label="Next variant">&rarr;</button>
-      <span class="hint">or use the arrow keys</span>
+      <span class="hint">variants via arrow keys</span>
+      <label class="hint" for="bubble-sel">bubble:</label>
+      <select id="bubble-sel" aria-label="Bubble design">
+        <option value="d1">proof frame</option>
+        <option value="d2">cut mark</option>
+        <option value="d3">double rule</option>
+      </select>
     </div>
 
     <script>
@@ -1762,6 +1886,22 @@ sindlish</code></pre>
         stepVariant(e.key === 'ArrowLeft' ? -1 : 1);
       });
       applyVariant();
+
+      // ---- bubble decor -----------------------------------------------------------
+      const BUBBLES = ['d1', 'd2', 'd3'];
+      const bubbleSel = document.getElementById('bubble-sel');
+      let bubble = BUBBLES.includes(params.get('bubble')) ? params.get('bubble') : 'd2';
+      function applyBubble() {
+        document.body.dataset.bubble = bubble;
+        bubbleSel.value = bubble;
+        params.set('bubble', bubble);
+        history.replaceState(null, '', location.pathname + '?' + params.toString() + location.hash);
+      }
+      bubbleSel.addEventListener('change', () => {
+        bubble = bubbleSel.value;
+        applyBubble();
+      });
+      applyBubble();
 
       // ---- theme ------------------------------------------------------------------
       const root = document.documentElement;
