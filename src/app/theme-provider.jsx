@@ -29,7 +29,8 @@ const ThemeProvider = ({ children }) => {
   return (
     <PreferredProvider
       attribute="class"
-      forcedTheme="dark"
+      defaultTheme="system"
+      enableSystem
       storageKey="sindlish-theme"
       disableTransitionOnChange
     >

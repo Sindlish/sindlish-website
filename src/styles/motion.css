@@ -1,0 +1,25 @@
+/*
+ * Reduced-motion convention.
+ *
+ * Rule: every animation on the site must have a reduced-motion path.
+ *
+ *   - CSS keyframes and transitions are neutralised here.
+ *   - framer-motion is neutralised globally by <MotionConfig reducedMotion="user">
+ *     in src/app/motion-provider.jsx, mounted once in the root layout. Because
+ *     it lives at the root, an animation does not have to remember to opt in.
+ *   - A component that animates anything framer-motion cannot infer (a canvas,
+ *     a Web Animations API call, a manual requestAnimationFrame loop) must read
+ *     the preference itself, e.g. framer-motion's useReducedMotion().
+ *
+ * The full rule is written down in docs/internal/motion.md.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
