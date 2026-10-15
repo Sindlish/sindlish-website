@@ -9,12 +9,12 @@ this month's. This check compares the two trees and fails on any difference.
 
 ## Canonical source
 
-| | |
-| --- | --- |
-| Repository | [`Sindlish/Sindlish`](https://github.com/Sindlish/Sindlish) (public) |
-| Ref | `main` by default; override with `SINDLISH_CANONICAL_REF` |
-| Package | `interpreter/` in that repository |
-| Bundled copy | `public/interpreter/` in this repository |
+|              |                                                                      |
+| ------------ | -------------------------------------------------------------------- |
+| Repository   | [`Sindlish/Sindlish`](https://github.com/Sindlish/Sindlish) (public) |
+| Ref          | `main` by default; override with `SINDLISH_CANONICAL_REF`            |
+| Package      | `interpreter/` in that repository                                    |
+| Bundled copy | `public/interpreter/` in this repository                             |
 
 The mapping is one directory to one directory: every file under
 `Sindlish/Sindlish/interpreter/` must exist, unchanged, under
