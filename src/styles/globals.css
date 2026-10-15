@@ -10,7 +10,14 @@
   --breakpoint-2xl: initial;
 }
 
-@import './fonts';
+/*
+ * Sindlish token layer (the rebuilt site). Colour, type and surfaces live here;
+ * see ./tokens.css. The legacy tokens in the @config above and in the partials
+ * below are kept only so the old UI keeps compiling until the page tickets land
+ * (T5 #51, T6 #48, T12 #57). They die with that UI; nothing new should use them.
+ */
+@import './tokens';
+@import './motion';
 @import './main';
 @import './text';
 @import './safe-paddings';
