@@ -7,6 +7,7 @@ Validate `content/**/*.md` against authoritative sources. Each check is self-con
 ```bash
 npm run check:docs              # all vitest-based checks
 npm run check:examples          # run every .sd example against the real interpreter
+npm run check:interpreter       # fail when the bundled interpreter is stale
 ```
 
 Exits non-zero on any validation error.
@@ -17,6 +18,11 @@ Exits non-zero on any validation error.
   through the bundled interpreter (`public/interpreter/`), asserts expected
   output where declared, and times out runaway blocks. Wired as
   `npm run check:examples`.
+- `interpreter-staleness/` — compares the bundled interpreter
+  (`public/interpreter/`) with its canonical source
+  ([`Sindlish/Sindlish`](https://github.com/Sindlish/Sindlish) `interpreter/`)
+  and fails on any difference. Wired as `npm run check:interpreter`; CI fetches
+  the canonical tree with `fetch-canonical.sh`. See its own README.
 
 ## Add a new check
 
