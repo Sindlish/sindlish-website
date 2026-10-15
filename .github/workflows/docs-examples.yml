@@ -5,6 +5,7 @@ on:
     paths:
       - 'content/docs/**/*.md'
       - 'public/interpreter/**'
+      - 'src/lib/grammars/**'
       - 'scripts/docs-checks/**'
       - '.github/workflows/docs-examples.yml'
   push:
@@ -12,6 +13,7 @@ on:
     paths:
       - 'content/docs/**/*.md'
       - 'public/interpreter/**'
+      - 'src/lib/grammars/**'
       - 'scripts/docs-checks/**'
       - '.github/workflows/docs-examples.yml'
   workflow_dispatch:
@@ -70,3 +72,29 @@ jobs:
         env:
           SINDLISH_CANONICAL_DIR: ${{ steps.canonical.outputs.dir }}
         run: node scripts/docs-checks/interpreter-staleness/check.js
+
+  check-grammar-drift:
+    runs-on:
+      group: sindlish-protected-runner-group
+      labels: linux-ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: '20'
+
+      - name: Set up Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: '3.11'
+
+      - name: Check the committed grammar is not stale
+        run: node scripts/docs-checks/grammar-drift/check.js
