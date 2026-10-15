@@ -40,6 +40,8 @@ const Layout = ({
         isClient={isClient}
       />
       <main
+        id="main"
+        tabIndex={-1}
         className={cn(withOverflowHidden && 'overflow-hidden', 'flex flex-1 flex-col', className)}
       >
         {children}
