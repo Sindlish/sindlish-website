@@ -1,5 +1,6 @@
-import Hero from 'components/pages/error/hero';
+import QuietPage from 'components/pages/quiet';
 import Layout from 'components/shared/layout';
+import { NOT_FOUND } from 'constants/quiet-pages';
 import SEO_DATA from 'constants/seo-data';
 
 const NotFoundPage = () => (
@@ -12,10 +13,7 @@ const NotFoundPage = () => (
     <title>{SEO_DATA[404].title}</title>
 
     <Layout>
-      <Hero
-        title="Page not found..."
-        text="Sorry, the page you are looking for doesn’t exist or has been moved."
-      />
+      <QuietPage {...NOT_FOUND} />
     </Layout>
   </>
 );
