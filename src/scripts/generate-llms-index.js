@@ -105,7 +105,7 @@ async function scanDirectory(dirPath, baseContentPath, routeKey) {
           const subSection = pathParts.length > 2 ? toTitleCase(pathParts[1]) : null;
 
           const title = frontmatter.title || toTitleCase(path.basename(entry.name, '.md'));
-          const subtitle = frontmatter.subtitle || '';
+          const summary = frontmatter.summary || '';
 
           const mdPath = path.relative(baseContentPath, fullPath);
           const url = `${BASE_URL}/${mdPath}`;
@@ -114,7 +114,7 @@ async function scanDirectory(dirPath, baseContentPath, routeKey) {
             section,
             subSection,
             title,
-            subtitle,
+            summary,
             url,
             path: relPath,
           });
@@ -318,7 +318,7 @@ function generateIndexText(organized, collapsedEntries = []) {
       const highlightSet = new Set(sectionConf.subIndex.highlights || []);
       const highlighted = allDocs.filter((d) => highlightSet.has(d.path));
       for (const doc of highlighted) {
-        const description = doc.subtitle ? `: ${doc.subtitle}` : '';
+        const description = doc.summary ? `: ${doc.summary}` : '';
         lines.push(`- [${doc.title}](${doc.url})${description}`);
       }
       lines.push('');
@@ -327,7 +327,7 @@ function generateIndexText(organized, collapsedEntries = []) {
 
     const directFiles = sectionData._files.sort((a, b) => a.title.localeCompare(b.title));
     for (const doc of directFiles) {
-      const description = doc.subtitle ? `: ${doc.subtitle}` : '';
+      const description = doc.summary ? `: ${doc.summary}` : '';
       lines.push(`- [${doc.title}](${doc.url})${description}`);
     }
 
@@ -354,7 +354,7 @@ function generateIndexText(organized, collapsedEntries = []) {
         a.title.localeCompare(b.title)
       );
       for (const doc of subDocs) {
-        const description = doc.subtitle ? `: ${doc.subtitle}` : '';
+        const description = doc.summary ? `: ${doc.summary}` : '';
         lines.push(`- [${doc.title}](${doc.url})${description}`);
       }
     }
@@ -395,7 +395,7 @@ function generateSubIndexText(sectionName, sectionConf, sectionData) {
 
   const directFiles = sectionData._files.sort((a, b) => a.title.localeCompare(b.title));
   for (const doc of directFiles) {
-    const description = doc.subtitle ? `: ${doc.subtitle}` : '';
+    const description = doc.summary ? `: ${doc.summary}` : '';
     lines.push(`- [${doc.title}](${doc.url})${description}`);
   }
 
@@ -416,7 +416,7 @@ function generateSubIndexText(sectionName, sectionConf, sectionData) {
       a.title.localeCompare(b.title)
     );
     for (const doc of subDocs) {
-      const description = doc.subtitle ? `: ${doc.subtitle}` : '';
+      const description = doc.summary ? `: ${doc.summary}` : '';
       lines.push(`- [${doc.title}](${doc.url})${description}`);
     }
   }
