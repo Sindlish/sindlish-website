@@ -1,6 +1,6 @@
 import LINKS from './links';
 
-export const DEFAULT_IMAGE_PATH = '/images/social-previews/index.jpg';
+export const DEFAULT_IMAGE_PATH = '/images/og/default.png';
 
 export default {
   index: {
@@ -25,7 +25,6 @@ export default {
     title: 'Blog — Sindlish',
     description:
       'Read updates, tutorials, and announcements about the Sindlish programming language.',
-    imagePath: '/images/social-previews/blog.jpg',
     pathname: LINKS.blog,
   },
   guides: {

@@ -25,6 +25,12 @@ describe('quiet pages', () => {
   });
 
   it('keeps the decorative mascot out of assistive technology', () => {
-    expect(renderQuietPage(NOT_FOUND)).toContain('aria-hidden="true"');
+    const html = renderQuietPage(NOT_FOUND);
+
+    // The art has landed, so the placement now renders a real image and hides it
+    // the way decorative art should be hidden: an empty alt. Before the art
+    // existed the labelled placeholder frame used aria-hidden instead. Whichever
+    // branch renders, the mascot must never come away with an accessible name.
+    expect(html).toMatch(/<img[^>]*\salt=""|aria-hidden="true"/);
   });
 });

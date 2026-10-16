@@ -1,11 +1,11 @@
 /**
  * Mascot art manifest.
  *
- * This is the one seam between the mascot component and the art. The repo
- * currently ships no mascot PNGs, so every placement renders a clearly labelled
- * placeholder. When an art variant lands it is dropped into
- * `public/images/mascot/` and its name is added to `MASCOT_ART_AVAILABLE`; no
- * component change is needed.
+ * This is the one seam between the mascot component and the art. Art ships in
+ * `public/images/mascot/` as `mascot-<variant>.png`, and a variant is listed in
+ * `MASCOT_ART_AVAILABLE` only once that file is really in the repo — dropping
+ * art in needs no component change. Variants that are known but still artless
+ * keep rendering the clearly labelled placeholder frame.
  *
  * Availability is a static list on purpose. A filesystem check would have to run
  * at module scope, and `next.config.js` aliases `fs` to an empty stub in browser
@@ -20,10 +20,17 @@ export const MASCOT_VARIANTS = Object.freeze([
   'point',
   'thinking-error',
   'icon',
+  'celebrate',
 ]);
 
-/** Variants that have real art in `public/images/mascot/`. Empty until art lands. */
-export const MASCOT_ART_AVAILABLE = Object.freeze([]);
+/** Variants that have real art in `public/images/mascot/`. */
+export const MASCOT_ART_AVAILABLE = Object.freeze([
+  'standing-neutral',
+  'curious-question',
+  'sit',
+  'point',
+  'thinking-error',
+]);
 
 /** Public path an art variant is expected to live at. */
 export function mascotArtPath(variant) {
