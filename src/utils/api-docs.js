@@ -15,10 +15,10 @@ const getAllPosts = async () => {
 
       const slugWithoutFirstSlash = slug.slice(1);
       const {
-        data: { title, subtitle, isDraft, redirectFrom },
+        data: { title, summary, isDraft, redirectFrom },
         content,
       } = data;
-      return { slug: slugWithoutFirstSlash, title, subtitle, isDraft, content, redirectFrom };
+      return { slug: slugWithoutFirstSlash, title, summary, isDraft, content, redirectFrom };
     })
     .filter(Boolean)
     .filter((item) => process.env.NEXT_PUBLIC_VERCEL_ENV !== 'production' || !item.isDraft);

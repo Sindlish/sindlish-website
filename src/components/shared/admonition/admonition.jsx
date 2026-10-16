@@ -56,9 +56,11 @@ const Admonition = ({ children = null, type = 'note', title = null, asHTML = fal
         theme.borderClassName,
         '[&_pre]:px-4 [&_pre]:py-3 [&_pre_code]:text-sm! [&_pre[data-language]]:bg-white! [&_pre[data-language]]:dark:bg-gray-new-8!'
       )}
+      role="region"
+      aria-label={title || typeText}
     >
       <div className={cn('flex items-center gap-1', theme.titleClassName)}>
-        <Icon width={16} height={16} className="shrink-0" />
+        <Icon width={16} height={16} className="shrink-0" aria-hidden="true" />
         <h4 className="font-mono text-[13px] leading-none font-medium -tracking-snug uppercase">
           {title || typeText}
         </h4>

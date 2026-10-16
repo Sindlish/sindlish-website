@@ -1712,13 +1712,9 @@ async function processFile(inputPath, pageUrl, rootDir) {
   if (frontmatter.title) {
     output += `# ${frontmatter.title}\n\n`;
   }
-  if (frontmatter.subtitle) {
-    output += `${frontmatter.subtitle}\n\n`;
+  if (frontmatter.summary) {
+    output += `> ${frontmatter.summary}\n\n`;
   }
-  // TODO: Enable when summary frontmatter is added consistently across all content routes
-  // if (frontmatter.summary) {
-  //   output += `> ${frontmatter.summary}\n\n`;
-  // }
 
   output += `${markdown.trim()}\n`;
 

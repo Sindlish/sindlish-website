@@ -1,196 +1,164 @@
 'use client';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+
 import useCopyToClipboard from 'hooks/use-copy-to-clipboard';
+import { FENCE_KIND } from 'lib/fences';
 import { runSindlish } from 'lib/sindlish-interpreter';
 import { cn } from 'utils/cn';
-import getLanguageIcon from 'utils/get-language-icon';
-import sendGtagEvent from 'utils/send-gtag-event';
+
 import CheckIcon from './images/check.inline.svg';
 import CopyIcon from './images/copy.inline.svg';
-function extractTextFromNode(node) {
-  // Base case: if the node is a string, return it.
-  if (typeof node === 'string') return node;
-  // Check if the node is an object and has the required properties.
-  if (typeof node !== 'object' || !node.props || !node.props.children) return '';
-  // Skip removed lines of code from differences
-  if (node.props.className?.includes('remove')) return '__line_removed_in_code__';
-  // If the children are in an array, loop through them.
-  if (Array.isArray(node.props.children)) {
-    let text = '';
-    node.props.children.forEach((child) => {
-      text += extractTextFromNode(child);
-    });
-    return text;
-  }
-  // If there's only one child, process that child directly.
-  return extractTextFromNode(node.props.children);
-}
+
+/**
+ * The frame around one fenced code block.
+ *
+ * Contract (issue #50):
+ * - the code region scrolls horizontally and is keyboard reachable
+ *   (tabindex=0 on the scroll container, WCAG G202);
+ * - it carries role="region" + an accessible name only when an authored
+ *   filename exists — no invented chrome;
+ * - `sd` blocks get Run, which reports the ACTUAL output in a live region.
+ *   The expected output is a separate, always-visible block; Run verifies,
+ *   it never reveals;
+ * - `sd illustrative` blocks get a dashed border and an explicit text label,
+ *   and never a Run control, so the difference needs no colour or icon.
+ */
 const CodeBlockWrapper = ({
+  fence,
+  code,
   className = '',
   copyButtonClassName = '',
-  filename = null,
-  language = null,
-  trackingLabel = null,
-  copyCode = null,
   children,
   as: Tag = 'figure',
   ...otherProps
 }) => {
   const { isCopied, handleCopy } = useCopyToClipboard(3000);
   const [result, setResult] = useState(null);
-  const [status, setStatus] = useState('idle'); // idle, loading, running
+  const [isRunning, setIsRunning] = useState(false);
   const [loadProgress, setLoadProgress] = useState('');
-  // copyCode bypasses extractTextFromNode, which can't traverse RSC lazy chunks in children
-  const code =
-    copyCode ?? extractTextFromNode(children).replace(/(\n)?__line_removed_in_code__(\n)?/g, '');
-  const isSingleLineCode = code.trimEnd().split('\n').length === 1;
-  let copyButtonTopClassName = 'top-4';
-  if (filename) {
-    copyButtonTopClassName = 'top-[58px]';
-  } else if (isSingleLineCode) {
-    copyButtonTopClassName = 'top-[min(1rem,calc(50%-.8175rem))]';
-  }
-  const handleCopyWithTracking = () => {
-    handleCopy(code);
-    if (trackingLabel) {
-      sendGtagEvent('Button Clicked', { text: trackingLabel });
-    }
-  };
-  const handleRun = async () => {
-    if (status === 'running' || status === 'loading') return;
 
-    setStatus('running');
+  const headerLabel = fence.isOutput
+    ? fence.label
+    : fence.illustrative
+      ? 'Illustrative (not runnable)'
+      : fence.filename;
+  const accessibleName = fence.accessibleName;
+
+  const handleRun = async () => {
+    if (isRunning) return;
+
+    setIsRunning(true);
     setResult(null);
-    setLoadProgress('Initializing...');
+    setLoadProgress('Starting run...');
     try {
-      const output = await runSindlish(code, (progress) => {
-        setLoadProgress(progress);
-      });
+      // One run contract for the whole site: the seam T8 (workbench) and T56
+      // build on. Do not fork it.
+      const output = await runSindlish(code, (progress) => setLoadProgress(progress));
       setResult(output);
-      setStatus('idle');
-      setLoadProgress('');
     } catch (err) {
       setResult(`Error: ${err.message}`);
-      setStatus('idle');
+    } finally {
+      setIsRunning(false);
       setLoadProgress('');
     }
   };
-  const isSindlish = language === 'sd' || language === 'sindlish' || language === 'js' || language === 'javascript';
+
+  const actions = (
+    <>
+      {fence.kind === FENCE_KIND.RUNNABLE && (
+        <button
+          className="border border-border bg-surface-raised px-3 py-1.5 text-xs font-semibold tracking-wide text-text-primary uppercase transition-colors hover:border-border-strong disabled:cursor-not-allowed disabled:opacity-50"
+          type="button"
+          onClick={handleRun}
+          disabled={isRunning}
+        >
+          {isRunning ? 'Running' : 'Run'}
+        </button>
+      )}
+      <button
+        className={cn(
+          'border border-border bg-surface-raised p-1.5 text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary disabled:opacity-50',
+          copyButtonClassName
+        )}
+        type="button"
+        aria-label={isCopied ? 'Copied' : 'Copy'}
+        disabled={isCopied}
+        onClick={() => handleCopy(code)}
+      >
+        {isCopied ? <CheckIcon className="size-3.5" /> : <CopyIcon className="size-3.5" />}
+      </button>
+    </>
+  );
+
   return (
     <Tag
       className={cn(
-        'code-block group/code-block relative flex flex-col [&_pre]:min-w-full',
-        filename && 'overflow-hidden',
+        'code-block relative flex flex-col border border-border',
+        fence.illustrative && 'border-dashed',
         className
       )}
-      data-has-filename={filename ? 'true' : 'false'}
+      data-fence={fence.kind}
+      data-has-filename={fence.filename ? 'true' : 'false'}
       {...otherProps}
     >
-      {filename && (
-        <div className="flex h-11 items-center gap-2 truncate border-b border-gray-new-80 bg-gray-new-98 px-4 text-[13px] leading-none font-medium tracking-tight text-gray-new-40 dark:border-gray-new-20 dark:bg-gray-new-8 dark:text-gray-new-70">
-          {getLanguageIcon(language)}
-          {filename}
+      {headerLabel && (
+        <div className="flex h-11 items-center justify-between gap-3 border-b border-border px-4">
+          <span className="truncate font-mono text-[13px] leading-none font-medium tracking-tight text-text-secondary">
+            {headerLabel}
+          </span>
+          <div className="flex shrink-0 items-center gap-2">{actions}</div>
         </div>
       )}
 
-      <div className="relative">
-        {children}
-        {/* Action Buttons Container */}
-        <div className={cn(
-          'invisible absolute right-4 flex gap-2 opacity-0 transition-[opacity,visibility] duration-200 group-hover/code-block:visible group-hover/code-block:opacity-100 lg:visible lg:opacity-100',
-          copyButtonTopClassName
-        )}>
-          {/* Run Button */}
-          {isSindlish && (
-            <button
-              className="flex items-center gap-1.5 border border-gray-new-80 bg-white px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-new-40 transition-all hover:border-[#E02424] hover:text-[#E02424] dark:border-gray-new-20 dark:bg-black-pure dark:text-gray-new-60 dark:hover:border-[#E02424] dark:hover:text-[#E02424] disabled:opacity-50"
-              type="button"
-              onClick={handleRun}
-              disabled={status === 'running' || status === 'loading'}
-            >
-              {status === 'running' || status === 'loading' ? (
-                <span className="size-2 animate-spin rounded-full border border-current border-t-transparent" />
-              ) : (
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              )}
-              {status === 'loading' || status === 'running' ? 'Running' : 'Run'}
-            </button>
-          )}
-          {/* Copy Button */}
-          <button
-            className={cn(
-              'border border-gray-new-80 bg-white p-1.5 text-gray-new-40 transition-[background-color] duration-200 hover:bg-gray-new-90 dark:border-gray-new-20 dark:bg-black-pure dark:text-gray-new-60 dark:hover:bg-gray-new-8',
-              copyButtonClassName
-            )}
-            type="button"
-            aria-label={isCopied ? 'Copied' : 'Copy'}
-            disabled={isCopied}
-            onClick={handleCopyWithTracking}
-          >
-            {isCopied ? (
-              <CheckIcon className="h-3.5 w-3.5 text-current" />
-            ) : (
-              <CopyIcon className="h-3.5 w-3.5 text-current" />
-            )}
-          </button>
+      <div className="relative min-w-0">
+        <div
+          className="overflow-x-auto [&>pre]:my-0 [&>pre]:rounded-none [&>pre]:bg-surface-page! [&>pre]:py-4"
+          tabIndex={0}
+          role={accessibleName ? 'region' : undefined}
+          aria-label={accessibleName || undefined}
+        >
+          {children}
         </div>
+        {!headerLabel && (
+          <div className="absolute top-3 right-3 flex items-center gap-2">{actions}</div>
+        )}
       </div>
-      {/* Inline Console Output */}
+
       {(result !== null || loadProgress) && (
-        <div className="relative border-t border-gray-new-80 bg-gray-new-98 px-6 py-6 font-mono text-[13px] dark:border-gray-new-20 dark:bg-[#060607] sm:px-4 sm:py-5">
-          <div className="mb-5 flex items-center justify-between sm:mb-4">
-            <div className="flex items-center gap-4 sm:gap-3">
-              <div className="flex gap-1.5 sm:hidden">
-                <div className="size-2.5 rounded-full border border-red-500/20 bg-red-500/10" />
-                <div className="size-2.5 rounded-full border border-yellow-500/20 bg-yellow-500/10" />
-                <div className="size-2.5 rounded-full border border-green-500/20 bg-green-500/10" />
-              </div>
-              <div className="h-4 w-px bg-gray-new-80 dark:bg-gray-new-20 sm:hidden" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-new-40 dark:text-gray-new-50 sm:tracking-widest">
-                {loadProgress ? 'Terminal: Loading' : 'Terminal: Output'}
-              </span>
-            </div>
+        <div
+          className="border-t border-border bg-surface-raised px-4 py-3"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="text-xs font-semibold tracking-wide text-text-muted uppercase">
+              Actual output
+            </span>
             {result && (
               <button
+                className="border border-border px-2 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary"
+                type="button"
                 onClick={() => setResult(null)}
-                className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-new-40 transition-all hover:text-[#E02424] dark:text-gray-new-60"
               >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity sm:hidden">Reset</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="opacity-60 group-hover:opacity-100"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                Clear
               </button>
             )}
           </div>
-          
-          <div className="space-y-4 sm:space-y-3">
-            {loadProgress && !result && (
-              <div className="flex items-center gap-3 text-gray-new-40 italic sm:gap-2">
-                <div className="flex items-center gap-1">
-                  <span className="size-1 rounded-full bg-[#E02424] animate-[pulse_1s_infinite]" />
-                  <span className="size-1 rounded-full bg-[#E02424] animate-[pulse_1s_infinite_200ms]" />
-                  <span className="size-1 rounded-full bg-[#E02424] animate-[pulse_1s_infinite_400ms]" />
-                </div>
-                <span className="text-xs font-medium tracking-tight uppercase sm:text-[11px]">{loadProgress}</span>
-              </div>
-            )}
-            
-            {result && (
-              <div className="relative animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex items-start gap-4 sm:gap-3">
-                  <span className="mt-1 select-none text-[#E02424] font-bold tracking-tighter shrink-0 opacity-40 sm:mt-0.5">SD&gt;</span>
-                  <pre
-                    className={cn(
-                      "whitespace-pre-wrap leading-[1.6] tracking-tight text-sm sm:text-[13px]",
-                      result.toLowerCase().includes('error') || result.toLowerCase().includes('ghalti') 
-                        ? "text-red-500/90" 
-                        : "text-gray-new-20 dark:text-[#EAEAEA]"
-                    )}
-                    dangerouslySetInnerHTML={{ __html: result }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+          {loadProgress && !result && (
+            <p className="font-mono text-[13px] text-text-muted">{loadProgress}</p>
+          )}
+          {result && (
+            <pre
+              className={cn(
+                'overflow-x-auto font-mono text-sm whitespace-pre',
+                /\berror\b|ghalti/i.test(result.replace(/<[^>]+>/g, ''))
+                  ? 'text-err'
+                  : 'text-text-primary'
+              )}
+              dangerouslySetInnerHTML={{ __html: result }}
+            />
+          )}
         </div>
       )}
     </Tag>
@@ -198,13 +166,27 @@ const CodeBlockWrapper = ({
 };
 
 export default CodeBlockWrapper;
+
 CodeBlockWrapper.propTypes = {
+  fence: PropTypes.shape({
+    kind: PropTypes.oneOf([
+      FENCE_KIND.RUNNABLE,
+      FENCE_KIND.ILLUSTRATIVE,
+      FENCE_KIND.OUTPUT,
+      FENCE_KIND.SHELL,
+      FENCE_KIND.PLAIN,
+    ]).isRequired,
+    filename: PropTypes.string,
+    illustrative: PropTypes.bool.isRequired,
+    runnable: PropTypes.bool.isRequired,
+    isOutput: PropTypes.bool.isRequired,
+    label: PropTypes.string,
+    accessibleName: PropTypes.string,
+    language: PropTypes.string.isRequired,
+  }).isRequired,
+  code: PropTypes.string.isRequired,
   className: PropTypes.string,
   copyButtonClassName: PropTypes.string,
-  filename: PropTypes.string,
-  language: PropTypes.string,
-  trackingLabel: PropTypes.string,
-  copyCode: PropTypes.string,
   children: PropTypes.node,
   as: PropTypes.string,
 };

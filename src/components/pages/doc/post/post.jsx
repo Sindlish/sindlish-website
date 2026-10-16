@@ -13,11 +13,10 @@ import { cn } from 'utils/cn';
 import DropdownMenu from '../dropdown-menu';
 import Tag from '../tag';
 
-
 const Post = ({
   data: {
     title,
-    subtitle,
+    summary,
     enableTableOfContents = false,
     tag = null,
     layout = null,
@@ -29,7 +28,6 @@ const Post = ({
   navigationLinks: { previousLink, nextLink },
   navigationLinksBasePath = DOCS_BASE_PATH,
   isDocsIndex = false,
-  isPostgres = false,
   currentSlug,
   gitHubPath,
   tableOfContents,
@@ -59,11 +57,7 @@ const Post = ({
         )}
       >
         {breadcrumbs?.length > 0 && (
-          <Breadcrumbs
-            className="mb-7!"
-            breadcrumbs={breadcrumbs}
-            baseUrl={breadcrumbsBaseUrl}
-          />
+          <Breadcrumbs className="mb-7!" breadcrumbs={breadcrumbs} baseUrl={breadcrumbsBaseUrl} />
         )}
 
         <article>
@@ -74,13 +68,13 @@ const Post = ({
                   'text-[36px] leading-tight font-medium tracking-tighter text-balance md:text-[28px]',
                   tag && 'inline'
                 )}
-                >
+              >
                 {title}
               </h1>
               {tag && <Tag className="relative -top-1.5 ml-3 inline" label={tag} />}
-              {subtitle && (
+              {summary && (
                 <p className="mt-[1.125rem] text-xl leading-tight tracking-extra-tight text-gray-new-40 dark:text-gray-new-70 md:mt-1.5 md:text-lg">
-                  {subtitle}
+                  {summary}
                 </p>
               )}
             </div>
@@ -90,12 +84,11 @@ const Post = ({
           <Content
             className={cn('mt-10 lg:mt-7 md:mt-5', isSplitLayout && 'split-layout')}
             content={content}
-            isPostgres={isPostgres}
           />
         </article>
         {!isDocsIndex && <DocFooter slug={currentSlug} gitHubPath={gitHubPath} />}
 
-<NavigationLinks
+        <NavigationLinks
           className={cn(isDocsIndex ? 'mt-14' : 'mt-6')}
           previousLink={previousLink}
           nextLink={nextLink}
@@ -103,7 +96,7 @@ const Post = ({
         />
       </div>
 
-        {/* Regular pages: Show standard right sidebar (hide for wide layout) */}
+      {/* Regular pages: Show standard right sidebar (hide for wide layout) */}
       {!isWideLayout && (
         <Aside
           className="-left-20 ml-0! w-[312px] shrink-0 3xl:left-auto xl:hidden"
@@ -122,7 +115,7 @@ const Post = ({
 Post.propTypes = {
   data: PropTypes.shape({
     title: PropTypes.string,
-    subtitle: PropTypes.string,
+    summary: PropTypes.string,
     enableTableOfContents: PropTypes.bool,
     tag: PropTypes.string,
     updatedOn: PropTypes.string,
@@ -137,7 +130,6 @@ Post.propTypes = {
     nextLink: PropTypes.shape({}),
   }).isRequired,
   navigationLinksBasePath: PropTypes.string,
-  isPostgres: PropTypes.bool,
   isDocsIndex: PropTypes.bool,
   currentSlug: PropTypes.string.isRequired,
   gitHubPath: PropTypes.string.isRequired,

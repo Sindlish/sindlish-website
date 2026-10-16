@@ -7,74 +7,134 @@ import { cn } from 'utils/cn';
 
 let mermaidAPI;
 
-const getNeonTheme = (isDark) => ({
-  theme: 'base',
-  themeVariables: {
-    primaryColor: '#E02424',
-    primaryBorderColor: '#00cc88',
-    primaryTextColor: isDark ? '#ffffff' : '#0c0d0d',
-    secondaryColor: isDark ? '#303236' : '#EFEFF0',
-    secondaryBorderColor: isDark ? '#494B50' : '#C9CBCF',
-    secondaryTextColor: isDark ? '#E4E5E7' : '#131415',
-    // Tertiary colors
-    tertiaryColor: isDark ? '#18191B' : '#FAFAFA',
-    tertiaryBorderColor: isDark ? '#494B50' : '#C9CBCF',
-    tertiaryTextColor: isDark ? '#E4E5E7' : '#131415',
-    // Note colors
-    noteBkgColor: isDark ? '#303236' : '#EFEFF0',
-    noteBorderColor: isDark ? '#494B50' : '#C9CBCF',
-    noteTextColor: isDark ? '#E4E5E7' : '#131415',
-    // Text and lines
-    textColor: isDark ? '#E4E5E7' : '#131415',
-    lineColor: isDark ? '#494B50' : '#C9CBCF',
-    // Background
-    background: isDark ? '#18191B' : '#ffffff',
-    mainBkg: isDark ? '#18191B' : '#ffffff',
-    // Fonts
-    fontFamily: 'var(--font-geist-mono), ui-monospace, monospace',
-    fontSize: '14px',
-    // Git graph
-    git0: '#E02424',
-    git1: '#ff4c79',
-    git2: '#f0f075',
-    git3: '#ffa64c',
-    git4: '#aa99ff',
-    git5: '#259df4',
-    git6: '#ADE0EB',
-    git7: '#fbd0d7',
-    gitBranchLabel0: isDark ? '#131415' : '#ffffff',
-    gitBranchLabel1: '#ffffff',
-    gitBranchLabel2: '#131415',
-    gitBranchLabel3: '#131415',
-    gitBranchLabel4: '#ffffff',
-    gitBranchLabel5: '#ffffff',
-    gitBranchLabel6: '#131415',
-    gitBranchLabel7: '#131415',
-    // Flowchart
-    nodeBorder: '#00cc88',
-    clusterBkg: isDark ? '#242628' : '#F2F2F3',
-    clusterBorder: isDark ? '#494B50' : '#C9CBCF',
-    // Sequence diagram
-    actorBkg: isDark ? '#303236' : '#EFEFF0',
-    actorBorder: '#00cc88',
-    actorTextColor: isDark ? '#E4E5E7' : '#131415',
-    actorLineColor: isDark ? '#494B50' : '#C9CBCF',
-    signalColor: isDark ? '#E4E5E7' : '#131415',
-    signalTextColor: isDark ? '#E4E5E7' : '#131415',
-    labelBoxBkgColor: isDark ? '#303236' : '#EFEFF0',
-    labelBoxBorderColor: isDark ? '#494B50' : '#C9CBCF',
-    labelTextColor: isDark ? '#E4E5E7' : '#131415',
-    loopTextColor: isDark ? '#E4E5E7' : '#131415',
-    activationBorderColor: '#00cc88',
-    activationBkgColor: isDark ? '#242628' : '#F2F2F3',
-    sequenceNumberColor: '#ffffff',
-    // State diagram
-    labelColor: isDark ? '#E4E5E7' : '#131415',
-    // ER diagram
-    attributeBackgroundColorOdd: isDark ? '#242628' : '#F2F2F3',
-    attributeBackgroundColorEven: isDark ? '#303236' : '#EFEFF0',
-  },
-});
+/*
+ * Mermaid needs concrete colours, but every colour in the site lives once in
+ * `src/styles/tokens.css` as a `light-dark()` pair behind a CSS custom
+ * property. `getComputedStyle(...).getPropertyValue('--x')` returns the literal
+ * `light-dark(a, b)` string (custom properties are not resolved), so we resolve
+ * each token by assigning it to a throwaway element's `color` and reading back
+ * the computed value. The probe inherits the document's `color-scheme`, so the
+ * browser picks the light or dark half for us — no hard-coded palette, and the
+ * diagram follows the theme automatically (the MutationObserver below re-renders
+ * on scheme change).
+ */
+let probeEl;
+const resolveToken = (name) => {
+  if (!probeEl) {
+    probeEl = document.createElement('div');
+    probeEl.setAttribute('aria-hidden', 'true');
+    probeEl.style.cssText =
+      'position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none';
+    document.body.appendChild(probeEl);
+  }
+  probeEl.style.color = `var(${name})`;
+  return getComputedStyle(probeEl).color;
+};
+
+const toHex = (color) => {
+  const match = color && color.match(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i);
+  if (!match) return color;
+  const [r, g, b] = [match[1], match[2], match[3]].map((n) =>
+    Number(n).toString(16).padStart(2, '0')
+  );
+  return `#${r}${g}${b}`;
+};
+
+const getTokenColors = () => {
+  const read = (name) => toHex(resolveToken(name));
+  return {
+    page: read('--color-surface-page'),
+    raised: read('--color-surface-raised'),
+    overlay: read('--color-surface-overlay'),
+    textPrimary: read('--color-text-primary'),
+    textSecondary: read('--color-text-secondary'),
+    textMuted: read('--color-text-muted'),
+    link: read('--color-link'),
+    linkHover: read('--color-link-hover'),
+    ok: read('--color-ok'),
+    err: read('--color-err'),
+    border: read('--color-border'),
+    borderStrong: read('--color-border-strong'),
+    brand: read('--color-brand'),
+  };
+};
+
+// Categorical palette for git graphs. The token layer is semantic, not a hue
+// wheel, so this reuses the few distinct token hues available rather than
+// inventing off-palette colours.
+const gitPalette = (c) => [
+  c.brand,
+  c.link,
+  c.ok,
+  c.err,
+  c.linkHover,
+  c.textMuted,
+  c.borderStrong,
+  c.textSecondary,
+];
+
+const getTokenTheme = () => {
+  const c = getTokenColors();
+  const git = gitPalette(c);
+  return {
+    theme: 'base',
+    themeVariables: {
+      primaryColor: c.raised,
+      primaryBorderColor: c.borderStrong,
+      primaryTextColor: c.textPrimary,
+      secondaryColor: c.overlay,
+      secondaryBorderColor: c.borderStrong,
+      secondaryTextColor: c.textPrimary,
+      tertiaryColor: c.raised,
+      tertiaryBorderColor: c.border,
+      tertiaryTextColor: c.textSecondary,
+      noteBkgColor: c.overlay,
+      noteBorderColor: c.borderStrong,
+      noteTextColor: c.textSecondary,
+      textColor: c.textPrimary,
+      lineColor: c.borderStrong,
+      background: c.page,
+      mainBkg: c.page,
+      fontFamily: 'var(--font-geist-mono), ui-monospace, monospace',
+      fontSize: '14px',
+      git0: git[0],
+      git1: git[1],
+      git2: git[2],
+      git3: git[3],
+      git4: git[4],
+      git5: git[5],
+      git6: git[6],
+      git7: git[7],
+      gitBranchLabel0: c.page,
+      gitBranchLabel1: c.page,
+      gitBranchLabel2: c.page,
+      gitBranchLabel3: c.page,
+      gitBranchLabel4: c.page,
+      gitBranchLabel5: c.page,
+      gitBranchLabel6: c.textPrimary,
+      gitBranchLabel7: c.textPrimary,
+      nodeBorder: c.borderStrong,
+      clusterBkg: c.raised,
+      clusterBorder: c.border,
+      actorBkg: c.raised,
+      actorBorder: c.borderStrong,
+      actorTextColor: c.textPrimary,
+      actorLineColor: c.border,
+      signalColor: c.textSecondary,
+      signalTextColor: c.textSecondary,
+      labelBoxBkgColor: c.raised,
+      labelBoxBorderColor: c.border,
+      labelTextColor: c.textPrimary,
+      loopTextColor: c.textSecondary,
+      activationBorderColor: c.borderStrong,
+      activationBkgColor: c.raised,
+      sequenceNumberColor: c.textPrimary,
+      labelColor: c.textPrimary,
+      attributeBackgroundColorOdd: c.page,
+      attributeBackgroundColorEven: c.raised,
+    },
+  };
+};
 
 const Mermaid = ({ chart, className }) => {
   const containerRef = useRef(null);
@@ -87,13 +147,11 @@ const Mermaid = ({ chart, className }) => {
       try {
         await document.fonts.ready;
 
-        const isDark = document.documentElement.classList.contains('dark');
-
         if (!mermaidAPI) {
           const mermaid = (await import('mermaid')).default;
           mermaid.initialize({
             startOnLoad: false,
-            ...getNeonTheme(isDark),
+            ...getTokenTheme(),
             flowchart: { padding: 25 },
           });
           mermaidAPI = mermaid;
@@ -135,11 +193,11 @@ const Mermaid = ({ chart, className }) => {
       <div
         className={cn(
           'my-8 rounded-lg border p-6',
-          'border-secondary-1/50 bg-secondary-4/20 dark:bg-secondary-1/10'
+          'border-border bg-surface-raised text-text-secondary'
         )}
       >
-        <p className="text-sm font-semibold text-secondary-1">Mermaid Diagram Error</p>
-        <pre className="mt-2 overflow-auto text-xs text-secondary-1/80">{error}</pre>
+        <p className="text-sm font-semibold text-err">Mermaid Diagram Error</p>
+        <pre className="mt-2 overflow-auto text-xs text-text-secondary">{error}</pre>
       </div>
     );
   }
