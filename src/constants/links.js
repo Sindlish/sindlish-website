@@ -3,6 +3,7 @@ export default {
   docsHome: '/docs/introduction',
   creator: '/creator',
   playground: '/playground',
+  workbench: '/workbench',
   changelog: '/docs/changelog',
 
   // Docs - Sindlish Language

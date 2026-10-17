@@ -2,6 +2,7 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
+import { useWorkbench } from 'contexts/workbench-context';
 import useCopyToClipboard from 'hooks/use-copy-to-clipboard';
 import { FENCE_KIND } from 'lib/fences';
 import { runSindlish } from 'lib/sindlish-interpreter';
@@ -37,6 +38,11 @@ const CodeBlockWrapper = ({
   const [result, setResult] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [loadProgress, setLoadProgress] = useState('');
+  // Inside the workbench's docs pane, a runnable example loads into the editor
+  // instead of running in place: full docs pages keep Run, the pane shows Load.
+  // The run contract is still one seam (lib/sindlish-interpreter).
+  const workbench = useWorkbench();
+  const inWorkbench = Boolean(workbench);
 
   const headerLabel = fence.isOutput
     ? fence.label
@@ -66,7 +72,7 @@ const CodeBlockWrapper = ({
 
   const actions = (
     <>
-      {fence.kind === FENCE_KIND.RUNNABLE && (
+      {fence.kind === FENCE_KIND.RUNNABLE && !inWorkbench && (
         <button
           className="border border-border bg-surface-raised px-3 py-1.5 text-xs font-semibold tracking-wide text-text-primary uppercase transition-colors hover:border-border-strong disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
@@ -74,6 +80,15 @@ const CodeBlockWrapper = ({
           disabled={isRunning}
         >
           {isRunning ? 'Running' : 'Run'}
+        </button>
+      )}
+      {fence.kind === FENCE_KIND.RUNNABLE && inWorkbench && (
+        <button
+          className="border border-border bg-surface-raised px-3 py-1.5 text-xs font-semibold tracking-wide text-text-primary uppercase transition-colors hover:border-border-strong disabled:cursor-not-allowed disabled:opacity-50"
+          type="button"
+          onClick={() => workbench.load(code)}
+        >
+          Load
         </button>
       )}
       <button

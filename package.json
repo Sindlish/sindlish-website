@@ -7,8 +7,8 @@
     "npm": ">=8.6.0"
   },
   "scripts": {
-    "prebuild": "node src/scripts/update-github-stars.js && node src/scripts/generate-docs-icons-config.js && npm run check:content-data",
-    "predev": "node src/scripts/update-github-stars.js && node src/scripts/generate-docs-icons-config.js && npm run check:content-data",
+    "prebuild": "node src/scripts/update-github-stars.js && node src/scripts/generate-docs-icons-config.js && npm run check:content-data && node scripts/copy-pyodide.js",
+    "predev": "node src/scripts/update-github-stars.js && node src/scripts/generate-docs-icons-config.js && npm run check:content-data && node scripts/copy-pyodide.js",
     "dev": "next dev",
     "build": "next build",
     "dev:build": "next build",
@@ -92,6 +92,7 @@
     "next-themes": "^0.4.6",
     "posthog-js": "^1.298.0",
     "prop-types": "^15.8.1",
+    "pyodide": "^0.27.5",
     "react": "^19.2.4",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.4",

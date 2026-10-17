@@ -10,6 +10,7 @@ import AnchorHeading from 'components/shared/anchor-heading';
 import CodeBlock from 'components/shared/code-block';
 import ImageZoom from 'components/shared/image-zoom';
 import Mermaid from 'components/shared/mermaid';
+import { rewriteDocsHref } from 'lib/docs-href';
 import getCodeProps from 'lib/rehype-code-props';
 import { cn } from 'utils/cn';
 
@@ -22,7 +23,7 @@ import { cn } from 'utils/cn';
  * (what may join this map, and the process for removing entries) lives in
  * content/docs/README.md.
  */
-const getComponents = () => ({
+const getComponents = (linkBasePath = '/docs') => ({
   h2: AnchorHeading('h2'),
   h3: AnchorHeading('h3'),
   h4: AnchorHeading('h4'),
@@ -49,7 +50,9 @@ const getComponents = () => ({
 
     return <CodeBlock {...props} />;
   },
-  a: (props) => <DocsLink {...props} />,
+  // Inside the workbench pane, the same authored `/docs/...` links must render
+  // in the pane, so they are rewritten onto the pane's own base path.
+  a: (props) => <DocsLink {...props} href={rewriteDocsHref(props.href, linkBasePath)} />,
   img: (props) => {
     const { className, title, src, ...rest } = props;
 
@@ -76,7 +79,7 @@ const getComponents = () => ({
   Steps,
 });
 
-const Content = ({ className = null, content, asHTML = false }) => {
+const Content = ({ className = null, content, asHTML = false, linkBasePath = '/docs' }) => {
   const rootClassName = cn(
     'prose-doc post-content prose dark:prose-invert xs:prose-code:break-words',
     className
@@ -89,7 +92,7 @@ const Content = ({ className = null, content, asHTML = false }) => {
   return (
     <div className={rootClassName}>
       <MDXRemote
-        components={getComponents()}
+        components={getComponents(linkBasePath)}
         source={content}
         options={{
           mdxOptions: {
@@ -110,6 +113,7 @@ Content.propTypes = {
   className: PropTypes.string,
   content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   asHTML: PropTypes.bool,
+  linkBasePath: PropTypes.string,
 };
 
 export default Content;

@@ -24,7 +24,11 @@ const Post = ({
     {summary && (
       <p className="mt-3 mb-10 text-base leading-normal text-text-secondary">{summary}</p>
     )}
-    <Content className={summary ? undefined : 'mt-10'} content={content} />
+    <Content
+      className={summary ? undefined : 'mt-10'}
+      content={content}
+      linkBasePath={navigationLinksBasePath}
+    />
     <DocsPager basePath={navigationLinksBasePath} nextLink={nextLink} previousLink={previousLink} />
   </article>
 );
