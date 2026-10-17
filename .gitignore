@@ -73,6 +73,9 @@ public/docs/llms-full.txt
 public/pricing.md
 src/utils/data/github-stars.generated.json
 
+# ignore generated search index
+src/generated/search-index.json
+
 # Mac files
 .DS_Store
 
