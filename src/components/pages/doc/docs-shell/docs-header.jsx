@@ -50,9 +50,9 @@ export const DocsHeader = ({ menuButtonRef, isNavOpen, onMenuClick }) => (
       </NextLink>
       <NextLink
         className="text-sm text-text-secondary transition-colors hover:text-text-primary"
-        href={LINKS.playground}
+        href={LINKS.workbench}
       >
-        Playground
+        Workbench
       </NextLink>
       <NextLink
         className="text-sm text-text-secondary transition-colors hover:text-text-primary"

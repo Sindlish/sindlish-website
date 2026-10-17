@@ -5,7 +5,7 @@ import { DOCS_BASE_PATH } from 'constants/docs';
 
 import { countPages, getPillarSections } from './nav-helpers';
 
-export const DocsIndex = ({ navigation = [] }) => {
+export const DocsIndex = ({ navigation = [], basePath = DOCS_BASE_PATH }) => {
   const totalPages = countPages(navigation.map((pillar) => pillar.items).flat());
 
   return (
@@ -31,7 +31,7 @@ export const DocsIndex = ({ navigation = [] }) => {
                 <li key={page.slug} className="border-b border-border">
                   <NextLink
                     className="flex items-baseline justify-between gap-6 py-2.5 text-sm text-link transition-colors hover:text-link-hover"
-                    href={`${DOCS_BASE_PATH}${page.slug}`}
+                    href={`${basePath}${page.slug}`}
                   >
                     <span>{page.title}</span>
                     {page.section && (
@@ -52,10 +52,12 @@ export const DocsIndex = ({ navigation = [] }) => {
 
 DocsIndex.propTypes = {
   navigation: PropTypes.arrayOf(PropTypes.shape({})),
+  basePath: PropTypes.string,
 };
 
 DocsIndex.defaultProps = {
   navigation: [],
+  basePath: DOCS_BASE_PATH,
 };
 
 export default DocsIndex;

@@ -1,0 +1,35 @@
+/*
+ * Workbench split (issue #54).
+ *
+ * The narrow-screen pane switch is CSS-only: above the breakpoint both panes
+ * sit side by side and the tab bar is hidden; below it the inactive pane is
+ * removed from the layout — and so from the tab order — until the tab bar
+ * selects it. The breakpoint matches the token layer's desktop-first `lg`.
+ *
+ * Reduced motion is handled globally in ./motion.css, so the mascot's fade
+ * below needs no branch of its own: the media query there neutralises it.
+ */
+@media (max-width: 63.9375rem) {
+  [data-active-pane='docs'] .workbench-editor {
+    display: none;
+  }
+
+  [data-active-pane='editor'] .workbench-docs {
+    display: none;
+  }
+}
+
+/* The run-failure mascot fades in over ~120ms; instant under reduced motion. */
+@keyframes workbench-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.workbench-error-mascot {
+  animation: workbench-fade-in 120ms ease-out;
+}

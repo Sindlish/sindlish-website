@@ -3,6 +3,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const { CONTENT_ROUTES } = require('./src/constants/content');
+const { LEGACY_REDIRECTS } = require('./src/lib/legacy-redirects');
 const { getAllPosts } = require('./src/utils/api-docs');
 const generateDocPagePath = require('./src/utils/generate-doc-page-path');
 
@@ -140,6 +141,10 @@ const defaultConfig = {
     }, []);
 
     return [
+      // The one legacy URL change of the rebuild (spec #44): /playground
+      // retires behind a permanent (308) redirect to /workbench. Next carries
+      // the query string across a path-only redirect, so ?code= survives.
+      ...LEGACY_REDIRECTS,
       {
         source: '/docs/get-started-with-neon/:path*',
         destination: '/docs/get-started/:path*',

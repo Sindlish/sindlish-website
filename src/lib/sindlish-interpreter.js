@@ -73,17 +73,18 @@ export const initSindlish = async (onProgress = () => {}) => {
     try {
       onProgress('Loading Python runtime...');
 
-      // Check if script already exists
+      // The runtime is bundled locally (issue #54) — never a CDN at runtime.
+      // `scripts/copy-pyodide.js` copies the pyodide distribution to this path.
       if (!window.loadPyodide) {
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';
+        script.src = '/pyodide/pyodide.js';
         document.head.appendChild(script);
         await new Promise((resolve, reject) => {
           script.onload = resolve;
           script.onerror = reject;
         });
       }
-      const pyodide = await window.loadPyodide();
+      const pyodide = await window.loadPyodide({ indexURL: '/pyodide/' });
       onProgress('Loading interpreter files...');
       pyodide.FS.mkdirTree('/home/pyodide/interpreter/frontend');
       pyodide.FS.mkdirTree('/home/pyodide/interpreter/analysis');
