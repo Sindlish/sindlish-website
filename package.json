@@ -7,8 +7,8 @@
     "npm": ">=8.6.0"
   },
   "scripts": {
-    "prebuild": "node src/scripts/update-github-stars.js && node src/scripts/generate-docs-icons-config.js && npm run check:content-data",
-    "predev": "node src/scripts/update-github-stars.js && node src/scripts/generate-docs-icons-config.js && npm run check:content-data",
+    "prebuild": "node src/scripts/update-github-stars.js && node src/scripts/generate-docs-icons-config.js && npm run check:content-data && node src/scripts/generate-search-index.js",
+    "predev": "node src/scripts/update-github-stars.js && node src/scripts/generate-docs-icons-config.js && npm run check:content-data && node src/scripts/generate-search-index.js",
     "dev": "next dev",
     "build": "next build",
     "dev:build": "next build",
@@ -39,7 +39,6 @@
     "@headlessui/react": "^2.2.9",
     "@headlessui/tailwindcss": "^0.2.2",
     "@hookform/resolvers": "^3.3.4",
-    "@inkeep/cxkit-react": "^0.5.116",
     "@next/bundle-analyzer": "^16.1.6",
     "@octokit/core": "^6.1.2",
     "@radix-ui/react-collapsible": "^1.1.12",
