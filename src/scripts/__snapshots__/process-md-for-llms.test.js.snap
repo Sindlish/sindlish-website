@@ -3,7 +3,7 @@
 exports[`MDX to Markdown Conversion > Component conversion test page (snapshot) > should convert every component without raw MDX leaks 1`] = `
 "# MDX Conversion Test Page
 
-Exercises every component the processor handles
+> Exercises every component the processor handles
 
 ## Admonition variants
 

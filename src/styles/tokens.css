@@ -1,0 +1,87 @@
+/*
+ * Sindlish token layer.
+ *
+ * This file is the one place colour lives. Every token is declared ONCE with
+ * light-dark(), which resolves from the used `color-scheme` (see below). There
+ * is deliberately no `.dark { --token: ... }` override block anywhere: dark is
+ * not an override, it is the other half of every pair.
+ *
+ * The layer is fully square: no radius, no shadow and no gradient tokens are
+ * declared here. Borders are the only separator. Brand red is paint for the
+ * logo, the mascot and the hero; it is never a text or link colour.
+ *
+ * Legacy tokens still live in `../../tailwind.config.js` and the other
+ * `styles/*.css` partials so the old UI keeps compiling until the page tickets
+ * (T5 #51, T6 #48, T12 #57) land. Those tokens die with that UI; nothing new
+ * should reach for them.
+ */
+
+@theme {
+  /* Type. Self-hosted through next/font (see src/app/fonts.js): Inter for UI,
+     Geist Mono for code. No Google Fonts <link> anywhere. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Surfaces. page is the canvas (pure black in dark mode), raised sits on the
+     page, overlay floats above both (menus, dialogs, popovers). */
+  --color-surface-page: light-dark(#ffffff, #000000);
+  --color-surface-raised: light-dark(#f4f4f5, #101113);
+  --color-surface-overlay: light-dark(#fafafa, #1a1b1e);
+
+  /* Text tiers. Every value is verified >= 4.5:1 (WCAG 2.2 AA for normal text)
+     against all three surfaces in both modes. The check reads this file and
+     fails the build if a value regresses: src/styles/tokens.test.js. */
+  --color-text-primary: light-dark(#111113, #f4f4f5);
+  --color-text-secondary: light-dark(#3f3f46, #c7c9cc);
+  --color-text-muted: light-dark(#52525b, #a1a6ad);
+
+  /* Ajrak indigo: the single link/interactive colour, as a light/dark pair. */
+  --color-link: light-dark(#3730a3, #a5b4fc);
+  --color-link-hover: light-dark(#1e1b6b, #c7d2fe);
+
+  /* Semantic run states. --err is intentionally NOT brand red (#e02424); the
+     brand red is reserved and never carries text. */
+  --color-ok: light-dark(#15803d, #4ade80);
+  --color-err: light-dark(#b91c1c, #f87171);
+
+  /* Lines. Hairlines are the only separator. */
+  --color-border: light-dark(#e4e4e7, #2a2c30);
+  --color-border-strong: light-dark(#a1a1aa, #52525b);
+
+  /* Focus ring. Reuses the link indigo so it clears 3:1 on every surface. */
+  --color-focus: light-dark(#3730a3, #a5b4fc);
+
+  /* Brand red: logo, mascot, hero paint only. Never text, never a link. */
+  --color-brand: #e02424;
+}
+
+@layer base {
+  /*
+   * light-dark() resolves from the used color-scheme. `light dark` makes the
+   * default follow the OS, which also covers JavaScript-off. next-themes
+   * (defaultTheme="system") pins an explicit choice by setting .light/.dark on
+   * <html>, and its enableColorScheme option mirrors the choice as an inline
+   * color-scheme. These rules are scheme plumbing, not token overrides.
+   */
+  :root {
+    color-scheme: light dark;
+
+    /* The sticky header must never obscure a focused control the browser has
+       scrolled into view (or an in-page anchor target). 7rem clears the
+       current tallest header (the docs shell at 112px); a shorter header just
+       leaves a little more breathing room. */
+    --shell-scroll-offset: 7rem;
+  }
+
+  :root.light {
+    color-scheme: light;
+  }
+
+  :root.dark {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-padding-top: var(--shell-scroll-offset);
+  }
+}

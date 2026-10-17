@@ -1,39 +1,11 @@
 /* eslint-disable react/prop-types */
-import MobileNav from 'components/pages/doc/mobile-nav';
-import Sidebar from 'components/pages/doc/sidebar';
-import Container from 'components/shared/container';
-import Layout from 'components/shared/layout';
-import { DOCS_BASE_PATH } from 'constants/docs';
+import DocsShell from 'components/pages/doc/docs-shell/docs-shell';
 import { getNavigation } from 'utils/api-docs';
 
-const NeonDocsLayout = async ({ children }) => {
-  const navigation = await getNavigation();
+const DocsLayout = ({ children }) => {
+  const navigation = getNavigation();
 
-  return (
-    <Layout
-      headerClassName="h-28"
-      docsNavigation={navigation}
-      docsBasePath={DOCS_BASE_PATH}
-      isDocPage
-      isHeaderSticky
-      hasThemesSupport
-    >
-      <div className="flex flex-1 safe-paddings dark:bg-black-pure dark:text-white lg:flex-col">
-        <Container
-          className="flex w-full flex-1 gap-x-12 pt-12 2xl:gap-x-8 xl:pt-9 lg:block sm:pt-7"
-          size="1920"
-        >
-          <Sidebar
-            className="w-[260px] shrink-0 lg:hidden"
-            navigation={navigation}
-            basePath={DOCS_BASE_PATH}
-          />
-          {children}
-        </Container>
-        <MobileNav navigation={navigation} basePath={DOCS_BASE_PATH} />
-      </div>
-    </Layout>
-  );
+  return <DocsShell navigation={navigation}>{children}</DocsShell>;
 };
 
-export default NeonDocsLayout;
+export default DocsLayout;

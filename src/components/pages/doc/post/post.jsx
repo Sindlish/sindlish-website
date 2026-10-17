@@ -1,160 +1,55 @@
 import PropTypes from 'prop-types';
 
-import Aside from 'components/pages/doc/aside';
-import Breadcrumbs from 'components/pages/doc/breadcrumbs';
-import Modal from 'components/pages/doc/modal';
-import MODALS from 'components/pages/doc/modal/data';
 import Content from 'components/shared/content';
-import DocFooter from 'components/shared/doc-footer';
-import NavigationLinks from 'components/shared/navigation-links';
 import { DOCS_BASE_PATH } from 'constants/docs';
-import { cn } from 'utils/cn';
 
-import DropdownMenu from '../dropdown-menu';
-import Tag from '../tag';
+import DocsPager from '../docs-shell/docs-pager';
 
-
+/**
+ * A single docs page inside the app shell.
+ *
+ * The shell owns the chrome (header, sidebar, pager column); this component
+ * owns only the page's own content: exactly one `h1`, the summary rendered as
+ * the lede, and the Markdown body. Frontmatter layout affordances are gone
+ * (issue #51): a page is title + summary + body + prev/next.
+ */
 const Post = ({
-  data: {
-    title,
-    subtitle,
-    enableTableOfContents = false,
-    tag = null,
-    layout = null,
-    contentLayout = null,
-  },
+  data: { title, summary = null },
   content,
-  breadcrumbs,
-  breadcrumbsBaseUrl = DOCS_BASE_PATH,
   navigationLinks: { previousLink, nextLink },
   navigationLinksBasePath = DOCS_BASE_PATH,
-  isDocsIndex = false,
-  isPostgres = false,
-  currentSlug,
-  gitHubPath,
-  tableOfContents,
-  author,
-  aboveContent = null,
-  className = 'max-w-208 lg:max-w-none',
-}) => {
-  const modal = MODALS.find(
-    (modal) =>
-      breadcrumbs?.some((breadcrumb) => modal.pagesToShow.includes(breadcrumb.title)) ||
-      (isDocsIndex && modal.pagesToShow.includes('Neon Docs'))
-  );
-
-  // Check if wide layout is enabled (hides right sidebar/TOC)
-  const isWideLayout = layout === 'wide';
-
-  // Check if split content layout is enabled (2-column grid for SDK reference style)
-  const isSplitLayout = contentLayout === 'split';
-
-  return (
-    <>
-      <div
-        className={cn(
-          'mx-auto min-w-0 pb-32 lg:pb-24 md:pb-20',
-          className,
-          isWideLayout && 'max-w-none'
-        )}
-      >
-        {breadcrumbs?.length > 0 && (
-          <Breadcrumbs
-            className="mb-7!"
-            breadcrumbs={breadcrumbs}
-            baseUrl={breadcrumbsBaseUrl}
-          />
-        )}
-
-        <article>
-          <div className="flex items-start justify-between gap-6 sm:flex-col sm:items-stretch sm:gap-4">
-            <div className="max-w-xl 2xl:max-w-[520px]">
-              <h1
-                className={cn(
-                  'text-[36px] leading-tight font-medium tracking-tighter text-balance md:text-[28px]',
-                  tag && 'inline'
-                )}
-                >
-                {title}
-              </h1>
-              {tag && <Tag className="relative -top-1.5 ml-3 inline" label={tag} />}
-              {subtitle && (
-                <p className="mt-[1.125rem] text-xl leading-tight tracking-extra-tight text-gray-new-40 dark:text-gray-new-70 md:mt-1.5 md:text-lg">
-                  {subtitle}
-                </p>
-              )}
-            </div>
-            <DropdownMenu gitHubPath={gitHubPath} />
-          </div>
-          {aboveContent}
-          <Content
-            className={cn('mt-10 lg:mt-7 md:mt-5', isSplitLayout && 'split-layout')}
-            content={content}
-            isPostgres={isPostgres}
-          />
-        </article>
-        {!isDocsIndex && <DocFooter slug={currentSlug} gitHubPath={gitHubPath} />}
-
-<NavigationLinks
-          className={cn(isDocsIndex ? 'mt-14' : 'mt-6')}
-          previousLink={previousLink}
-          nextLink={nextLink}
-          basePath={navigationLinksBasePath}
-        />
-      </div>
-
-        {/* Regular pages: Show standard right sidebar (hide for wide layout) */}
-      {!isWideLayout && (
-        <Aside
-          className="-left-20 ml-0! w-[312px] shrink-0 3xl:left-auto xl:hidden"
-          isDocsIndex={isDocsIndex}
-          enableTableOfContents={enableTableOfContents}
-          tableOfContents={tableOfContents}
-          gitHubPath={gitHubPath}
-          author={author}
-        />
-      )}
-      {modal && <Modal {...modal} />}
-    </>
-  );
-};
+}) => (
+  <article>
+    <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{title}</h1>
+    {summary && (
+      <p className="mt-3 mb-10 text-base leading-normal text-text-secondary">{summary}</p>
+    )}
+    <Content className={summary ? undefined : 'mt-10'} content={content} />
+    <DocsPager basePath={navigationLinksBasePath} nextLink={nextLink} previousLink={previousLink} />
+  </article>
+);
 
 Post.propTypes = {
   data: PropTypes.shape({
-    title: PropTypes.string,
-    subtitle: PropTypes.string,
-    enableTableOfContents: PropTypes.bool,
-    tag: PropTypes.string,
-    updatedOn: PropTypes.string,
-    layout: PropTypes.oneOf(['wide', null]),
-    contentLayout: PropTypes.oneOf(['split', null]),
+    summary: PropTypes.string,
+    title: PropTypes.string.isRequired,
   }).isRequired,
   content: PropTypes.string.isRequired,
-  breadcrumbs: PropTypes.arrayOf(PropTypes.shape({})),
-  breadcrumbsBaseUrl: PropTypes.string,
-  navigationLinks: PropTypes.exact({
-    previousLink: PropTypes.shape({}),
-    nextLink: PropTypes.shape({}),
-  }).isRequired,
-  navigationLinksBasePath: PropTypes.string,
-  isPostgres: PropTypes.bool,
-  isDocsIndex: PropTypes.bool,
-  currentSlug: PropTypes.string.isRequired,
-  gitHubPath: PropTypes.string.isRequired,
-  tableOfContents: PropTypes.arrayOf(PropTypes.shape({})),
-  author: PropTypes.shape({
-    slug: PropTypes.string,
-    name: PropTypes.string.isRequired,
-    position: PropTypes.string,
-    bio: PropTypes.string,
-    link: PropTypes.shape({
-      url: PropTypes.string,
+  navigationLinks: PropTypes.shape({
+    nextLink: PropTypes.shape({
+      slug: PropTypes.string,
       title: PropTypes.string,
     }),
-    photo: PropTypes.string,
-  }),
-  aboveContent: PropTypes.node,
-  className: PropTypes.string,
+    previousLink: PropTypes.shape({
+      slug: PropTypes.string,
+      title: PropTypes.string,
+    }),
+  }).isRequired,
+  navigationLinksBasePath: PropTypes.string,
+};
+
+Post.defaultProps = {
+  navigationLinksBasePath: DOCS_BASE_PATH,
 };
 
 export default Post;

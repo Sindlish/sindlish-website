@@ -11,7 +11,6 @@ import { getAllPosts, getNavigationLinks, getNavigation } from 'utils/api-docs';
 import { getBreadcrumbs } from 'utils/get-breadcrumbs';
 import { getFlatSidebar } from 'utils/get-flat-sidebar';
 import getMetadata from 'utils/get-metadata';
-import getTableOfContents from 'utils/get-table-of-contents';
 
 const isUnusedOrSharedContent = (slug) =>
   slug.includes('unused/') ||
@@ -74,19 +73,12 @@ const DocPost = async (props) => {
   const sidebar = getNavigation();
   const flatSidebar = await getFlatSidebar(sidebar);
 
-  const isDocsIndex = currentSlug === 'introduction';
-
-  const breadcrumbs = getBreadcrumbs(currentSlug, flatSidebar);
   const navigationLinks = getNavigationLinks(currentSlug, flatSidebar);
-  const gitHubPath = `${DOCS_DIR_PATH}/${currentSlug}.md`;
 
   const post = getPostBySlug(currentSlug, DOCS_DIR_PATH);
   if (!post) return notFound();
 
-
-
   const { data, content } = post;
-  const tableOfContents = getTableOfContents(content);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -98,20 +90,10 @@ const DocPost = async (props) => {
     },
   };
 
-
   return (
     <>
       <JsonLd data={jsonLd} />
-      <Post
-        content={content}
-        data={data}
-        breadcrumbs={breadcrumbs}
-        navigationLinks={navigationLinks}
-        currentSlug={currentSlug}
-        gitHubPath={gitHubPath}
-        tableOfContents={tableOfContents}
-        isDocsIndex={isDocsIndex}
-      />
+      <Post content={content} data={data} navigationLinks={navigationLinks} />
     </>
   );
 };

@@ -9,7 +9,12 @@ const getPostSlugs = async (pathname) => {
   const files = await glob.sync(`${pathname}/**/*.md`, {
     ignore: ['**/README.md', '**/unused/**', '**/shared-content/**', '**/GUIDE_TEMPLATE.md'],
   });
-  return files.map((file) => file.replace(pathname, '').replace('.md', ''));
+  // glob returns platform-native separators (backslashes on Windows); normalise
+  // them to forward slashes before stripping the route prefix so slugs are
+  // identical on every platform.
+  return files.map((file) =>
+    file.replace(/\\/g, '/').replace(pathname, '').replace('.md', '')
+  );
 };
 
 const getPostBySlug = (slug, pathname) => {

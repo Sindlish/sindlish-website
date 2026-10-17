@@ -19,7 +19,7 @@ Welcome to Sindlish docs! This folder contains the source code of the [Sindlish 
 Right now Markdown files accept the following fields:
 
 1. `title` — title of the page (required)
-2. `subTitle` — subtitle of the page.
+2. `summary` — one-sentence summary of the page. Rendered under the title and reused by the `llms.txt` index and markdown exports.
 3. `tag` — tag for the page. It can be one of the following: `new`, `beta`, `coming soon`, `deprecated`, or you can use your own tag. Don't forget to add it to the `navigation.yaml` file as well.
 4. `redirectFrom` — array of strings with paths to redirect from to the page, should start and end with a slash, for example `/docs/old-path/`
 5. `isDraft` — flag that says the page is not ready yet. It won't appear in production but will appear in the development mode.
@@ -141,730 +141,136 @@ To add a new page, add a new item with keys `title` and `slug` under the appropr
 - Icons are referenced by name and should match available icon components
 - Tags like "new" or "beta" are automatically displayed with special styling
 
-## Code blocks
+## Authoring vocabulary
 
-All available languages for code blocks can be found [here](https://shiki.matsu.io/languages).
+Docs pages are written in Markdown. On top of plain Markdown, a page may use
+**only** the following: the four code fences below, `<Admonition>`, and
+`<Steps>`. Nothing else renders — any other JSX component is dropped from the
+MDX map (see `src/components/shared/content/content.jsx`) and will disappear
+from the page.
 
-You can use fenced code blocks with three backticks (```) on the lines before and after the code block. And display code with options
+### The four code fences
 
-- enable highlighting single lines, multiple lines, and ranges of code lines
+A fenced code block's info string (the word after the opening backticks)
+decides how it renders. There are exactly four:
 
-  Examples:
-  - Single line highlight
+#### 1. `sd` — runnable Sindlish
 
-    ````md
-    ```c++ {1}
-    #include <iostream>
-
-    int main() {
-        std::cout << "Hello World";
-        return 0;
-    }
-    ```
-    ````
-
-  - Multiple lines
-
-    ````md
-    ```c++ {1,2,5}
-    #include <iostream>
-
-    int main() {
-        std::cout << "Hello World";
-        return 0;
-    }
-    ```
-    ````
-
-  - Range of code lines
-
-    ````md
-    ```c++ {1-3,5}
-    #include <iostream>
-
-    int main() {
-        std::cout << "Hello World";
-        return 0;
-    }
-    ```
-    ````
-
-- use `[!code highlight]` to highlight a line.
-
-  ```ts
-  export function foo() {
-    console.log('Highlighted'); // [!code highlight]
-  }
-  ```
-
-- use `[!code word:xxx]` to highlight a word.
-
-  ```ts
-  export function foo() {
-    // [!code word:Hello]
-    const msg = 'Hello World';
-    console.log(msg);
-  }
-  ```
-
-- use `[!code --]` and `[!code ++]` to highlight a code diff.
-
-  ```ts
-  export function foo() {
-    const msg = 'Hello Word'; // [!code --]
-    const msg = 'Hello World'; // [!code ++]
-  }
-  ```
-
-- `showLineNumbers` - flag to show on the line numbers in the code block.
-
-  Example:
-
-  ````md
-  ```c++ showLineNumbers
-  #include <iostream>
-
-  int main() {
-      std::cout << "Hello World";
-      return 0;
-  }
-  ```
-  ````
-
-- `shouldWrap` - flag to enable code wrapping in the code block.
-
-  Example:
-
-  ````md
-  ```powershell shouldWrap
-  powershell -Command "Start-Process -FilePath powershell -Verb RunAs -ArgumentList '-NoProfile','-InputFormat None','-ExecutionPolicy Bypass','-Command ""iex (iwr -UseBasicParsing https://cli.configu.com/install.ps1)""'"
-  ```
-  ````
-
-- `filename="..."` - add a filename label above the code block.
-
-  Examples:
-
-  ````md
-  ```jsx filename="src/App.jsx"
-  export default function App() {
-    return <div>Hello</div>;
-  }
-  ```
-  ````
-
-  You can combine it with line highlighting and other flags:
-
-  ````md
-  ```jsx filename="src/App.jsx" {2} showLineNumbers shouldWrap
-  export default function App() {
-    return <div>Hello</div>;
-  }
-  ```
-  ````
-
-## Code Tabs
-
-To display code tabs, wrap all pieces of code with `<CodeTabs></CodeTabs>` and write labels of code tabs in order:
+The example runs in the browser. It carries a **Run** control that reports the
+*actual* output in a live region. Pair it with an expected-output block (below).
 
 ````md
-<CodeTabs labels={["Shell", "C++", "C#", "Java"]}>
-
-```bash {2-4}
-#!/bin/bash
-STR="Hello World!"
-echo $STR
+```sd
+umar = 25
+naalo = "Amanat"
+likh(umar)
+likh(naalo)
 ```
-
-```c++
-#include <iostream>
-
-int main() {
-    std::cout << "Hello World";
-    return 0;
-}
-```
-
-```csharp
-namespace HelloWorld
-{
-    class Hello {
-        static void Main(string[] args)
-        {
-            System.Console.WriteLine("Hello World");
-        }
-    }
-}
-```
-
-```java
-import java.io.*;
-
-class GFG {
-    public static void main (String[] args) {
-       System.out.println("Hello World");
-    }
-}
-```
-
-</CodeTabs>
 ````
 
-<details>
-<summary>Examples</summary>
+#### 2. `sd illustrative` — shape only, never runnable
 
-![Code tabs example](images/code-tabs-example.jpg)
-
-</details>
-
-## External Code
-
-The `ExternalCode` component allows embedding code content from external sources with syntax highlighting.
-
-### Usage
-
-```markdown
-<ExternalCode
-  url="https://raw.githubusercontent.com/example-org/example-repo/main/README.md"
-/>
-```
-
-### Props
-
-| Prop            | Type    | Default    | Description                                                   |
-| --------------- | ------- | ---------- | ------------------------------------------------------------- |
-| url             | string  | (required) | URL to the raw file                                           |
-| language        | string  | (optional) | Language for syntax highlighting (defaults to file extension) |
-| shouldWrap      | boolean | false      | Enables code wrapping in the code block                       |
-| showLineNumbers | boolean | false      | Shows line numbers in the code block                          |
-| className       | string  | ''         | Additional CSS classes to apply to the component              |
-
-### Best Practices
-
-1. Always use raw URLs from the GitHub repository (for example, `https://raw.githubusercontent.com/...`).
-2. Use the `language` prop when the file extension doesn't match the actual content type.
-
-## Tabs
-
-To display the tabs with content as image, video, code block, .etc, wrap the `TabItem` with `Tabs`
+Use it to show the *shape* of Sindlish without promising it runs. It renders
+with a dashed border and the label "Illustrative (not runnable)", and never
+gets a Run control. Prefer this when you want to convey the look of a language
+construct rather than a working example.
 
 ````md
-<Tabs labels={["Content", "CLI"]}>
-
-<TabItem>
-In your config v3 project, head to the `/metadata/databases/databases.yaml` file and add the database configuration as below.
-
-```bash showLineNumbers
-- name: <db_name>
-  kind: postgres
-  configuration:
-    connection_info:
-      database_url:
-        from_env: <DB_URL_ENV_VAR>
-    pool_settings:
-      idle_timeout: 180
-      max_connections: 50
-      retries: 1
-  tables: []
-  functions: []
+```sd illustrative
+agar x > 0:
+    likho "positive"
 ```
-
-Apply the Metadata by running:
-
-```bash
-hasura metadata apply
-```
-
-If you've spun up the Hasura Engine with Docker, you can access the Hasura Console by accessing it in a browser at the URL of your Hasura Engine instance, usually http://localhost:8080.
-
-<Admonition type="note">
-To access the Hasura Console via the URL the HASURA_GRAPHQL_ENABLE_CONSOLE environment variable or the `--enable-console` flag must be set to true.
-</Admonition>
-
-</TabItem>
-
-<TabItem>
-Alternatively, you can create the resource programmatically with an HTTP client.
-
-```bash
-curl --request POST \
-     --url https://api.example.com/v1/resources \
-     --header 'Accept: application/json' \
-     --header 'Content-Type: application/json' \
-     --data '
-{
-  "type": "read_only"
-}
-' | jq
-```
-
-</TabItem>
-
-</Tabs>
 ````
 
-## Admonition
+#### 3. `txt filename="Output"` — expected output
 
-To improve the documentation readability, one can leverage an Admonition custom component. Just wrap your piece of text with `<Admonition></Admonition>` and pass the type.
+The output you expect from the runnable `sd` block above it. It is always
+visible; pressing **Run** on the `sd` block verifies against it — Run never
+reveals the answer.
 
-There are 6 types of Admonition: `note`, `important`, `tip`, `info`, `warning`, `comingSoon`; the default is `note`.
+````md
+```txt filename="Output"
+25
+Amanat
+```
+````
 
-You may also specify an optional title with prop `title`.
+Plain `txt` (without a filename) is also accepted and gets the label
+"Expected output".
 
-Example:
+#### 4. `bash` — shell
+
+For terminal commands. Rendered as a shell block, not runnable.
+
+````md
+```bash
+npm run dev
+```
+````
+
+Anything else (for example `js`, `python`, `yaml`) is a mistake in docs
+authoring. It still renders as plain code so a page never breaks, but
+`npm run check:examples` and review should catch it.
+
+**Filenames.** Adding `filename="..."` to any of the four fences shows a label
+above the block and gives it an accessible name. Without an authored filename,
+the block has no label and no accessible name — nothing is invented.
+
+### Admonition
+
+Asides and callouts. Available types: `note`, `important`, `tip`, `info`,
+`warning`, `comingSoon` (default `note`). An optional `title` overrides the
+heading text.
 
 ```md
-<Admonition type="note">
-Highlights information that users should take into account, even when skimming.
-</Admonition>
-
-<Admonition type="important">
-Crucial information necessary for users to succeed.
-</Admonition>
-
-<Admonition type="tip">
-Optional information to help a user be more successful.
-</Admonition>
-
-<Admonition type="info">
-Information that helps users understand the things better.
-</Admonition>
-
-<Admonition type="warning">
-Critical content demanding immediate user attention due to potential risks.
-</Admonition>
-
-<Admonition type="comingSoon">
-Information about features that are coming soon.
+<Admonition type="warning" title="Breaking change">
+The old endpoint is deprecated.
 </Admonition>
 ```
 
-<details>
-<summary>Examples</summary>
+### Steps
 
-![Admonition example](images/admonition-example.jpg)
-
-</details>
-
-## Callout
-
-A highlighted block for supplementary information the reader should notice but that doesn't fit the urgency of an `Admonition`. Use it for tips, best practices, or "good to know" context.
-
-```md
-<Callout>
-
-Your callout content here. Supports paragraphs, lists, and inline code.
-
-</Callout>
-```
-
-To override the default label, pass a `title` prop:
-
-```md
-<Callout title="Before you start">
-
-Make sure you have Node.js 18+ installed.
-
-</Callout>
-```
-
-| Prop       | Type   | Default        | Description                         |
-| ---------- | ------ | -------------- | ----------------------------------- |
-| `children` | node   | (required)     | Content rendered inside the callout |
-| `title`    | string | `Good to know` | Label displayed in the header       |
-
-### When to use Callout vs Admonition
-
-- **Callout** — supplementary context, best practices, or neutral "good to know" information.
-- **Admonition** — warnings, important notices, tips with urgency, or coming-soon flags. Use when the information could cause user error if missed.
-
-## CTA
-
-This is a simple block with title, description text and one CTA button that accomplish certain actions.
-
-```md
-<CTA />
-```
-
-Check the example for default data of CTA block
-
-<details>
-<summary>Example</summary>
-
-![CTA example](images/cta-example.jpg)
-
-</details>
-
-To change text in CTA block, you can pass to the component props `title`, `description`, `buttonText`, `buttonUrl`:
-
-```md
-<CTA title="Try Sindlish!" description="Sindlish lets you write code in your mother tongue. Sign up for a free account to get started." buttonText="Sign Up" buttonUrl="https://example.com/signup" />
-```
-
-## Steps
-
-To display numbered steps, wrap the content with `Steps` component.  
-Steps will be splitted by `h2` headings.
+Numbered procedure. Split the content with `##` headings — each `##` starts a
+new step.
 
 ```md
 <Steps>
 
-## Step 1: Create the Initial Schema
+## Install
 
-First, create a new database called `people` on the `main` branch and add some sample data to it.
+Run the installer.
 
-## Step 2: Create a development branch
+## Verify
 
-Create a new development branch off of `main`. This branch will be an exact, isolated copy of `main`.
+Run `npm run build`.
 
 </Steps>
 ```
 
-<details>
-<summary>Example</summary>
-
-![Steps example](images/steps-example.jpg)
-
-</details>
-
-## Sticky Table
-
-Use `StickyTable` for large markdown tables where readers need the header to remain visible while scrolling through the table. Regular markdown tables already get the default docs table styling; only wrap tables that need this sticky header behavior.
-
-```md
-<StickyTable>
-
-| Extension | PG14 | PG15 | Notes |
-| --------- | ---: | ---: | ----- |
-| pgvector  |  0.8 |  0.8 | Vector search support |
-| postgis   |  3.3 |  3.5 | Geospatial support |
-
-</StickyTable>
-```
-
-### Notes
-
-- Use `StickyTable` only around a single markdown table.
-- Keep the table in markdown so it remains easy to edit in one place.
-- The component preserves the normal horizontal table scroll and adds a floating header for long tables.
-- Pass `className` to `StickyTable` to apply classes to the underlying table, for example `<StickyTable className="min-w-[900px]">`.
-
-## Two Column Layout
-
-The `TwoColumnLayout` component creates a two-column layout for tutorial pages and reference documentation. Use `TwoColumnLayout.Step` for numbered tutorial steps or `TwoColumnLayout.Item` for default items. Nested content blocks should be wrapped with `TwoColumnLayout.Block`.
-
-> **Note:** Pages using `TwoColumnLayout` should include `layout: wide` prop to hide the right sidebar (Table of Contents) and provide more space for the two-column layout.
-
-Check [TwoColumnLayout examples](https://example.com/docs/components/two-column-layout) for usage examples.
-
-````md
-<TwoColumnLayout>
-
-<TwoColumnLayout.Step title="Install dependencies">
-<TwoColumnLayout.Block>
-
-Install the required packages for your project.
-
-</TwoColumnLayout.Block>
-<TwoColumnLayout.Block label="Terminal">
-
-```bash
-npm install sindlish-sdk
-```
-
-</TwoColumnLayout.Block>
-</TwoColumnLayout.Step>
-
-<TwoColumnLayout.Item title="Sign in with email" method="auth.signIn.email()" id="signin-email">
-<TwoColumnLayout.Block>
-
-Authenticate a user with their email and password.
-
-</TwoColumnLayout.Block>
-<TwoColumnLayout.Block>
-
-```typescript
-await client.auth.signIn.email({
-  email: 'user@example.com',
-  password: 'password123',
-});
-```
-
-</TwoColumnLayout.Block>
-</TwoColumnLayout.Item>
-
-<TwoColumnLayout.Footer>
-<Admonition type="note">
-Additional information that spans both columns
-</Admonition>
-</TwoColumnLayout.Footer>
-
-</TwoColumnLayout>
-````
-
-**Components:**
-
-- `TwoColumnLayout.Step` - Numbered step with `title` prop (for tutorials)
-- `TwoColumnLayout.Item` - Default item with `title`, `method`, and `id` prop
-- `TwoColumnLayout.Block` - Nested content block with optional `label` prop
-- `TwoColumnLayout.Footer` - Full-width content at the bottom of a step
-
-<details>
-<summary>Examples</summary>
-
-![Two Column Layout example](images/two-column-layout-example.jpg)
-
-Example with steps:
-
-![Two Column Layout example](images/two-column-layout-steps-example.jpg)
-
-</details>
-
-## Feature List
-
-To display a list of features, use the `FeatureList` component.
-Features will be splitted by `h2` and `h3` headings.
-
-```md
-<FeatureList>
-
-### Agent creates an app
-
-A vibe coder imagines an app. Your agent builds it, full-stack.
-
-### Gets a working runtime instantly, with no friction
-
-The platform provisions the runtime behind the scenes.
-
-</FeatureList>
-```
-
-You can pass `icons` prop to the `FeatureList` component to display icons for each feature.
-
-List of available icons (extendable): `src/components/shared/feature-list/icon/icon.jsx`.
-
-```md
-<FeatureList icons={['agent', 'speedometer']}>
-```
-
-<details>
-<summary>Example</summary>
-
-![Feature List example](images/feature-list-example.jpg)
-
-</details>
-
-## Checklist
-
-To display a checklist, use the `CheckList` component with `CheckItem` items inside.
-
-```md
-<CheckList title="Checklist title">
-
-<CheckItem title="Check item 1" href="#check-item-1">
-  Check item 1 description
-</CheckItem>
-
-<CheckItem title="Check item 2" href="#check-item-2">
-  Check item 2 description
-</CheckItem>
-
-</CheckList>
-```
-
-### Notes
-
-- Checklist options saved in the browser local storage.
-- Checklists with the same `title` will use the same local storage between pages.
-- If you don't pass `title`, the id will be generated from the page `slug`.
-- The best practice is to use `CheckList` with the `Steps` component on the page.
-
-<details>
-<summary>Example</summary>
-
-![Checklist example](images/checklist-example.jpg)
-
-</details>
-
-## Images
-
-The images should be sourced in `public/docs` directory and be used in `.md` with the relative path, that begins with a `/` slash
-
-Example file structure:
-
-```md
-├── public
-│ ├── docs
-│ │ ├── conceptual-guides
-│ │ ├── sindlish_architecture_2.png // put images in a directory with the same name as the .md file
-├── content
-│ ├── docs
-│ │ ├── conceptual-guides
-│ │ ├── architecture-overview.md
-```
-
-To display images using Markdown syntax, use the following syntax: `![alt text](image url)`. Example content in `architecture-overview.md`:
-
-```md
-![Sindlish architecture diagram](/docs/conceptual-guides/sindlish_architecture_2.png)
-```
-
-If you need an image without border to show an annotated piece of UI, use the `"no-border"` attribute as in the example below:
-
-```md
-![Sindlish architecture diagram](/docs/conceptual-guides/sindlish_architecture_2.png 'no-border')
-```
-
-With this approach, all images on your doc pages will be displayed both on the production and GitHub preview.
-
-## Definition list
-
-Custom `mdx` component that makes possible using [extended markdown syntax for descriptions lists](https://www.markdownguide.org/extended-syntax/#definition-lists). Fully [WCAG-compliant](https://www.w3.org/TR/WCAG20-TECHS/H40.html). It provides an accessible way to make term lists, and it's a generally good way to add structure to a text when a writer needs more than bullets and less than headings.
-
-The usage is pretty [straightforward](https://www.markdownguide.org/extended-syntax/#definition-lists):
-
-```md
-[comment]: <> (other content here)
-
-<DefinitionList>
-[comment]: <> (required new line)
-Scenario executor
-: First definition
-: Second definition
-
-Soak test
-: First and only definition
-
-Smoke test
-Another term for smoke test
-: First definition for both terms
-: Second definition for both terms
-: ...n definition for both terms
-
-[Stress test](/)
-: First and **only** definition for both terms with additional markup <br/> Read more: [link](/)
-
-[comment]: <> (other content here)
-</DefinitionList>
-
-[comment]: <> (other content here)
-```
-
-### Acceptable markup for term
-
-- `*italic*`
-- `[link](/)`
-- `**strong**` - but that doesn't make sense, by default terms appearance is already bold
-- `inlineCode` - but it doesn't alter it's change in this context
-
-### Constraints
-
-- using emojis in `dt` is prohibited, as it potentially can mess up with `id` attribute, and `href` at anchor. We can not be sure which range will be used to display a particular symbol (depends on editor OS) and if it is going to be stripped.
-- if there are multiple terms for a given set of descriptions, only the first one will have an `id` and an `anchor`
-- make absolutely sure your `dt` text content is unique across the page to avoid `id` collisions
-
-### Acceptable markup for description
-
-- everything for term
-- emojis
-- any inline html
-- line breaks `<br/>` (recommended way to separate visually something inside a single description)
-
-<details>
-<summary>Examples</summary>
-
-![Definition list example](images/definition-list-example.jpg)
-
-</details>
-
-## Detail Icon Cards
-
-`DetailIconCards` is a custom MDX component that displays data in a card format. Each card contains icon, title, href and description. This layout is especially useful for presenting grouped information in a visually pleasing and easy-to-understand way.
-
-```md
-<DetailIconCards>
-
-<a href="https://example.com/docs/concepts/getting-started" description="Collaborate on open-source projects" icon="github">Headless vector search</a>
-
-<a href="https://example.com/docs/concepts/getting-started" description="Collaborate on open-source projects" icon="github">Open AI completions</a>
-
-</DetailIconCards>
-```
-
-List of available icons in folder: /website/src/components/pages/doc/detail-icon-cards/images
-
-## Shared MDX components
-
-Create a markdown file in folder `content/docs/shared-content/`, add to `sharedMdxComponents` the name of component and the path to component.
-
-```js
-const sharedMdxComponents = {
-  // ConponentName: 'shared-content/component-filename'
-  NeedHelp: 'shared-content/need-help',
-};
-
-export default sharedMdxComponents;
-```
-
-Insert a shared markdown and render inline.
-
-```md
-## Resources
-
-- [Open AI tiktoken source code on GitHub](https://github.com/openai/tiktoken)
-- [pg_tiktoken source code on GitHub](https://github.com/kelvich/pg_tiktoken)
-
-<NeedHelp/>
-```
-
-You can pass props to the shared component:
-
-```md
-<ComponentWithProps text="The pgvector extension" />
-```
-
-`component-with-props.md`
-
-```md
-<Admonition type="note" title="Test component with props">
-  {text}
-</Admonition>
-```
-
-## CopyPrompt
-
-A reusable MDX component that shows a "copy prompt" box and lets users copy curated llm prompts from a file with one click.
-
-**Usage:**
-
-```mdx
-<CopyPrompt
-  src="/prompts/serverless-driver-prompt.md"
-  displayText="Use this pre-built prompt to get started faster."
-  buttonText="Copy prompt"
-/>
-```
-
-`src` prop is mandatory. `displayText` and `buttonText` are optional, if you want to override the defaults.
-
-| Prop          | Type   | Default                                            | Description                                         |
-| ------------- | ------ | -------------------------------------------------- | --------------------------------------------------- |
-| `src`         | string | (required)                                         | Path to the markdown file or prompt content to copy |
-| `displayText` | string | "Use this pre-built prompt to get started faster." | CTA text shown on the left                          |
-| `buttonText`  | string | "Copy prompt"                                      | Button label                                        |
-
-### Where to place prompt files
-
-Prompt markdown files should be placed in the `public/prompts/` directory of your project. This allows them to be fetched at runtime by the `CopyPrompt` component using a path like `/prompts/your-prompt-file.md`.
-
-**Example:**
-
-- Place your prompt file at: `public/prompts/serverless-driver-guardrail-prompt.md`
-- Reference it in your MDX:
-
-  ```mdx
-  <CopyPrompt src="/prompts/serverless-driver-guardrail-prompt.md" />
-  ```
+## The admission rule
+
+Every component in this vocabulary is a permanent maintenance cost: it must be
+styled, made accessible, kept working across the docs pipeline, and understood
+by every author. So the bar for adding one is high.
+
+**A new MDX component may be admitted only when all of the following hold:**
+
+1. **It cannot be expressed in plain Markdown.** Tables, images, links,
+   blockquotes, lists, and headings (including the fine-grained `h4`) already
+   have Markdown or built-in support. A component that only wraps these is
+   rejected.
+2. **It appears on at least three real pages at the time of admission.** No
+   speculative components. If the need is one-off, write it in prose.
+3. **It is reachable and named for assistive technology** — visible focus,
+   keyboard operable, and given an accessible name where it is a landmark.
+4. **It is added to `getComponents` in
+   `src/components/shared/content/content.jsx`,** documented here, and covered
+   by a unit test under `src/components/shared/` or `src/lib/`.
+
+**Removing a component** is the inverse and is always allowed: grep for
+importers, migrate the pages to Markdown, delete the component, and update this
+document. Content that used a removed component should be rewritten, not
+silently dropped.
 
 ## Contributing
 

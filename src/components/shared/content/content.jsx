@@ -3,57 +3,29 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import PropTypes from 'prop-types';
 import remarkGfm from 'remark-gfm';
 
-import Callout from 'components/pages/doc/callout';
-import ChatOptions from 'components/pages/doc/chat-options';
-import CheckItem from 'components/pages/doc/check-item';
-import CheckList from 'components/pages/doc/check-list';
-import CodeTabs from 'components/pages/doc/code-tabs';
-import CommunityBanner from 'components/pages/doc/community-banner';
-import DefinitionList from 'components/pages/doc/definition-list';
-import DetailIconCards from 'components/pages/doc/detail-icon-cards';
 import DocsLink from 'components/pages/doc/docs-link';
-import DocsList from 'components/pages/doc/docs-list';
-import InfoBlock from 'components/pages/doc/info-block';
-import LinkPreview from 'components/pages/doc/link-preview';
-import PromptCards from 'components/pages/doc/prompt-cards';
 import Steps from 'components/pages/doc/steps';
-import StickyTable from 'components/pages/doc/sticky-table';
-import Tabs from 'components/pages/doc/tabs';
-import TabItem from 'components/pages/doc/tabs/tab-item';
-import TechCards from 'components/pages/doc/tech-cards';
-import TwoColumnLayout from 'components/pages/doc/two-column-layout';
-import Video from 'components/pages/doc/video';
-import YoutubeIframe from 'components/pages/doc/youtube-iframe';
 import Admonition from 'components/shared/admonition';
 import AnchorHeading from 'components/shared/anchor-heading';
-import Button from 'components/shared/button';
 import CodeBlock from 'components/shared/code-block';
-import CopyPrompt from 'components/shared/copy-prompt';
-import DocCta from 'components/shared/doc-cta';
-import ExternalCode from 'components/shared/external-code';
-import GradientBorder from 'components/shared/gradient-border';
 import ImageZoom from 'components/shared/image-zoom';
-import MegaLink from 'components/shared/mega-link';
 import Mermaid from 'components/shared/mermaid';
-import RequestForm from 'components/shared/request-form';
 import getCodeProps from 'lib/rehype-code-props';
 import { cn } from 'utils/cn';
 
-import FeatureList from '../feature-list';
-import QuickLinks from '../quick-links';
-import QuoteBlock from '../quote-block';
-
-const getHeadingComponent = (heading, withoutAnchorHeading) => {
-  if (withoutAnchorHeading) {
-    return heading;
-  }
-  return AnchorHeading(heading);
-};
-
-const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTemplate) => ({
-  h2: getHeadingComponent('h2', withoutAnchorHeading),
-  h3: getHeadingComponent('h3', withoutAnchorHeading),
-  h4: getHeadingComponent('h4', withoutAnchorHeading),
+/**
+ * The complete MDX component surface for docs pages (issue #50).
+ *
+ * Authors write exactly two components — `<Admonition>` and `<Steps>` —
+ * plus the four code fences parsed in lib/fences.js. Everything else is
+ * plain Markdown rendered through the mappings below. The admission rule
+ * (what may join this map, and the process for removing entries) lives in
+ * content/docs/README.md.
+ */
+const getComponents = () => ({
+  h2: AnchorHeading('h2'),
+  h3: AnchorHeading('h3'),
+  h4: AnchorHeading('h4'),
   table: (props) => (
     <div className="table-wrapper">
       <table {...props} />
@@ -85,102 +57,26 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
     const unoptimizedPreserveAlpha =
       typeof src === 'string' && /^\/docs\/.+\.(png|gif)$/i.test(src);
 
-    // No zoom on PostgreSQLTutorial Images
-    if (!isPostgres) {
-      return (
-        <ImageZoom src={src}>
-          <Image
-            className={cn(
-              className,
-              { 'no-border': title === 'no-border' },
-              isTemplate && 'rounded-lg'
-            )}
-            src={src}
-            width={704}
-            height={447}
-            style={{ width: '100%', height: '100%' }}
-            title={title !== 'no-border' ? title : undefined}
-            unoptimized={unoptimizedPreserveAlpha}
-            {...rest}
-          />
-          {isTemplate && <GradientBorder className="rounded-lg" withBlend />}
-        </ImageZoom>
-      );
-    }
-
-    return src.includes('?') ? (
-      // Authors can use anchor tags to make images float right/left
-      <Image
-        className={cn(
-          className,
-          {
-            'no-border':
-              title === 'no-border' || src.includes('alignleft') || src.includes('alignright'),
-          },
-          { 'float-right clear-left p-4 grayscale filter': src.includes('alignright') },
-          { 'float-left clear-right p-4 grayscale filter': src.includes('alignleft') }
-        )}
-        src={src.split('?')[0]}
-        width={100}
-        height={100}
-        style={{ width: 'auto', height: 'auto', maxWidth: '128px', maxHeight: '128px' }}
-        title={title !== 'no-border' ? title : undefined}
-        {...rest}
-      />
-    ) : (
-      <Image
-        className={cn(className, { 'no-border': title === 'no-border' })}
-        src={src}
-        width={200}
-        height={100}
-        style={{ width: 'auto', height: 'auto' }}
-        title={title !== 'no-border' ? title : undefined}
-        {...rest}
-      />
+    return (
+      <ImageZoom src={src}>
+        <Image
+          className={cn(className, { 'no-border': title === 'no-border' })}
+          src={src}
+          width={704}
+          height={447}
+          style={{ width: '100%', height: '100%' }}
+          title={title !== 'no-border' ? title : undefined}
+          unoptimized={unoptimizedPreserveAlpha}
+          {...rest}
+        />
+      </ImageZoom>
     );
   },
-  Button,
-  YoutubeIframe,
-  DefinitionList,
-  FeatureList,
   Admonition,
-  Callout,
-  CodeTabs,
-  DetailIconCards,
-  TechCards,
-  PromptCards,
-  CommunityBanner,
-  QuickLinks,
-  QuoteBlock,
-  Tabs,
-  TabItem,
-  InfoBlock,
-  LinkPreview,
-  DocsList,
-  // TODO: revert to CTA: isTemplate ? CtaBlock : DocCta when design is ready
-  CTA: (props) => <DocCta isTemplate={isTemplate} {...props} />,
-  Video,
   Steps,
-  TwoColumnLayout,
-  ChatOptions,
-  StickyTable,
-  CheckList,
-  CheckItem,
-  ExternalCode: (props) => <ExternalCode {...props} />,
-  MegaLink,
-  CopyPrompt,
-  RequestForm,
 });
 
-const Content = ({
-  className = null,
-  content,
-  asHTML = false,
-  withoutAnchorHeading = false,
-  isReleaseNote = false,
-  isPostgres = false,
-  isTemplate = false,
-}) => {
+const Content = ({ className = null, content, asHTML = false }) => {
   const rootClassName = cn(
     'prose-doc post-content prose dark:prose-invert xs:prose-code:break-words',
     className
@@ -193,7 +89,7 @@ const Content = ({
   return (
     <div className={rootClassName}>
       <MDXRemote
-        components={getComponents(withoutAnchorHeading, isReleaseNote, isPostgres, isTemplate)}
+        components={getComponents()}
         source={content}
         options={{
           mdxOptions: {
@@ -214,10 +110,6 @@ Content.propTypes = {
   className: PropTypes.string,
   content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   asHTML: PropTypes.bool,
-  withoutAnchorHeading: PropTypes.bool,
-  isReleaseNote: PropTypes.bool,
-  isPostgres: PropTypes.bool,
-  isTemplate: PropTypes.bool,
 };
 
 export default Content;

@@ -7,6 +7,8 @@ Validate `content/**/*.md` against authoritative sources. Each check is self-con
 ```bash
 npm run check:docs              # all vitest-based checks
 npm run check:examples          # run every .sd example against the real interpreter
+npm run check:interpreter       # fail when the bundled interpreter is stale
+npm run check:grammar           # fail when the committed TextMate grammar drifts
 ```
 
 Exits non-zero on any validation error.
@@ -17,6 +19,15 @@ Exits non-zero on any validation error.
   through the bundled interpreter (`public/interpreter/`), asserts expected
   output where declared, and times out runaway blocks. Wired as
   `npm run check:examples`.
+- `interpreter-staleness/` — compares the bundled interpreter
+  (`public/interpreter/`) with its canonical source
+  ([`Sindlish/Sindlish`](https://github.com/Sindlish/Sindlish) `interpreter/`)
+  and fails on any difference. Wired as `npm run check:interpreter`; CI fetches
+  the canonical tree with `fetch-canonical.sh`. See its own README.
+- `grammar-drift/` — re-runs the interpreter's own grammar generator against
+  the bundled interpreter (`public/interpreter/`) and fails when the output
+  differs from the committed `src/lib/grammars/sindlish.tmLanguage.json`. Wired
+  as `npm run check:grammar`; needs Python 3. See its own README.
 
 ## Add a new check
 

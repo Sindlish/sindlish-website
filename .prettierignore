@@ -8,6 +8,9 @@ package.json
 package-lock.json
 public/
 
+# generated TextMate grammar: keep it byte-for-byte generator output
+src/lib/grammars/sindlish.tmLanguage.json
+
 # content files
 content/docs/postgresql/query-reference.md
 content/docs/functions/json_extract_path.md

@@ -1,6 +1,6 @@
 ---
 title: MDX Conversion Test Page
-subtitle: Exercises every component the processor handles
+summary: Exercises every component the processor handles
 enableTableOfContents: true
 ---
 

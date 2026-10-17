@@ -1,10 +1,17 @@
-'use client';
-import { m, LazyMotion, domAnimation } from 'framer-motion';
-
-import Button from 'components/shared/button';
+import ActionLink from 'components/shared/action-link';
 import Container from 'components/shared/container';
 import Layout from 'components/shared/layout';
+import Mascot from 'components/shared/mascot';
 import LINKS from 'constants/links';
+import MASCOT_LINES from 'constants/mascot-lines';
+
+// Release URLs and file names are exact. Do not tidy the double slash: the
+// artifact path GitHub serves is spelled that way.
+const RELEASE_VERSION = 'v0.1.1';
+const RELEASE_DOWNLOAD_BASE =
+  'https://github.com/Sindlish/Sindlish/releases/latest/download//';
+const RELEASES_URL = 'https://github.com/Sindlish/Sindlish/releases';
+
 const PLATFORMS = [
   {
     name: 'Windows',
@@ -37,129 +44,107 @@ const PLATFORMS = [
     ],
   },
 ];
+
 const DownloadPage = () => (
-  <Layout isHeaderSticky isHeaderStickyOverlay theme="black">
-    <LazyMotion features={domAnimation}>
-      <section className="relative bg-black-pure safe-paddings text-white">
-        <Container
-          className="relative z-10 pt-40 pb-32 xl:pt-32 xl:pb-24 lg:pt-28 lg:pb-20 md:pt-24 md:pb-16"
-          size="1600"
-        >
-          {/* Header */}
-          <m.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+  <Layout isHeaderSticky isHeaderStickyOverlay>
+    <section className="border-b border-border bg-surface-page">
+      <Container
+        className="flex flex-wrap items-center gap-x-16 gap-y-10 py-24 lg:py-16 md:py-12"
+        size="1088"
+      >
+        <div className="min-w-[280px] flex-1">
+          <p className="font-mono text-xs tracking-widest text-text-muted uppercase">Download</p>
+          <h1 className="mt-3 text-5xl leading-tight font-semibold tracking-tight text-text-primary xl:text-4xl lg:text-3xl">
+            Get Sindlish {RELEASE_VERSION}
+          </h1>
+          <p className="mt-5 max-w-xl text-xl leading-snug text-text-secondary lg:text-lg">
+            Install the interpreter for your platform, then run your first program. The current
+            release is {RELEASE_VERSION}.
+          </p>
+        </div>
+        <Mascot variant="point" size={110} line={MASCOT_LINES.download} />
+      </Container>
+    </section>
+
+    <section className="border-b border-border bg-surface-page">
+      <Container className="py-12" size="1088">
+        <div className="max-w-2xl border-l-2 border-brand bg-surface-raised px-5 py-4">
+          <p className="font-mono text-xs tracking-widest text-text-muted uppercase">
+            Release notice
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            This is the current {RELEASE_VERSION} release. The binaries are not yet verified by the
+            platform vendors, so your system may report them as risky. All Sindlish source code is
+            open and available to audit on GitHub. The Linux and macOS builds are still
+            experimental, and your feedback helps us make them dependable.
+          </p>
+        </div>
+      </Container>
+    </section>
+
+    <section className="border-b border-border bg-surface-page">
+      <Container className="py-16" size="1088">
+        <h2 className="text-2xl font-semibold tracking-tight text-text-primary">
+          Choose your platform
+        </h2>
+        <div className="mt-8 grid grid-cols-3 gap-6 lg:grid-cols-1">
+          {PLATFORMS.map(({ name, arch, file, instructions }) => (
+            <article
+              key={name}
+              className="flex flex-col border border-border bg-surface-raised"
+            >
+              <header className="border-b border-border px-6 py-5">
+                <h3 className="text-xl font-semibold text-text-primary">{name}</h3>
+                <span className="mt-1 block font-mono text-xs tracking-widest text-text-muted uppercase">
+                  {arch}
+                </span>
+              </header>
+              <ol className="flex-1 space-y-3 px-6 py-5 text-sm text-text-secondary">
+                {instructions.map((instruction) => (
+                  <li key={instruction}>{instruction}</li>
+                ))}
+              </ol>
+              <div className="p-6 pt-0">
+                <ActionLink
+                  href={`${RELEASE_DOWNLOAD_BASE}${file}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full"
+                  variant="primary"
+                >
+                  {`Download for ${name}`}
+                </ActionLink>
+              </div>
+            </article>
+          ))}
+        </div>
+      </Container>
+    </section>
+
+    <section className="bg-surface-page">
+      <Container className="flex flex-wrap items-start gap-8 py-12" size="1088">
+        <div className="min-w-[280px] flex-1">
+          <h2 className="text-xl font-semibold text-text-primary">Need help?</h2>
+          <p className="mt-2 text-sm text-text-secondary">
+            Read the docs, or check the changelog for the full release notes.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-4">
+          <ActionLink href={LINKS.docsHome} variant="secondary">
+            Documentation
+          </ActionLink>
+          <ActionLink
+            href={RELEASES_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="secondary"
           >
-            <span className="text-sm font-medium tracking-wider text-[#E02424] uppercase">
-              Download
-            </span>
-            <h1 className="mt-3 text-[52px] leading-tight font-bold tracking-tighter xl:text-4xl lg:text-[32px] sm:text-[28px]">
-              Get Sindlish <span className="text-gray-new-40">v0.1.1</span>
-            </h1>
-            <p className="mt-4 max-w-xl text-xl leading-snug tracking-extra-tight text-gray-new-60 lg:text-lg">
-              The latest release of the Sindlish interpreter. Download the binary for your platform
-              and start coding in your mother tongue.
-            </p>
-          </m.div>
-          {/* Alpha Notice */}
-          <m.div
-            className="mt-10 max-w-2xl rounded-none border border-[#E02424]/30 bg-[#E02424]/5 px-5 py-4"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="size-2 animate-pulse rounded-none bg-[#E02424]" />
-              <span className="font-bold text-[#E02424]">Release Notice</span>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-gray-new-60">
-              This is the current v0.1.1 release. <strong>Important:</strong> These binaries are
-              currently unverified by platform vendors (Windows, Apple, etc.), so your system may
-              flag them as risky. Rest assured,{' '}
-              <strong>all Sindlish source code is completely open-source</strong> and available for
-              audit on GitHub. Furthermore, Linux and macOS builds are experimental and may behave
-              unexpectedly; we welcome your feedback to help us stabilize them!
-            </p>
-          </m.div>
-          {/* Platform Cards */}
-          <div className="mt-16 grid grid-cols-3 gap-6 lg:max-w-lg lg:grid-cols-1">
-            {PLATFORMS.map(({ name, arch, file, instructions }, index) => (
-              <m.div
-                className="group flex flex-col rounded-none border border-gray-new-20 bg-[#0A0A0B] transition-colors hover:border-gray-new-30"
-                key={name}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-              >
-                {/* Card Header */}
-                <div className="flex items-center justify-between border-b border-gray-new-20 p-6">
-                  <div>
-                    <h3 className="text-2xl font-bold tracking-tighter">{name}</h3>
-                    <span className="mt-1 block text-xs font-bold tracking-widest text-gray-new-50 uppercase">
-                      {arch}
-                    </span>
-                  </div>
-                  <div className="flex size-10 items-center justify-center rounded-none bg-[#E02424]/10">
-                    <span className="text-lg font-bold text-[#E02424]">↓</span>
-                  </div>
-                </div>
-                {/* Instructions */}
-                <div className="flex flex-1 flex-col p-6">
-                  <ol className="flex-1 space-y-3">
-                    {instructions.map((step, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm text-gray-new-60">
-                        <span className="flex size-5 shrink-0 items-center justify-center rounded-none border border-gray-new-20 text-[10px] font-bold text-gray-new-40">
-                          {i + 1}
-                        </span>
-                        <span className="font-mono text-xs leading-relaxed">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                  <Button
-                    className="mt-6 w-full justify-center"
-                    to={`https://github.com/Sindlish/Sindlish/releases/latest/download//${file}`}
-                    target="_blank"
-                    theme="white-filled"
-                    size="new"
-                  >
-                    Download for {name}
-                  </Button>
-                </div>
-              </m.div>
-            ))}
-          </div>
-          {/* Bottom Links */}
-          <m.div
-            className="mt-16 flex items-center gap-8 border-t border-gray-new-20 pt-8 md:flex-col md:items-start md:gap-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-          >
-            <div className="flex-1">
-              <h4 className="text-lg font-bold tracking-tighter">Need help?</h4>
-              <p className="mt-1 text-sm text-gray-new-50">
-                Read the docs or check the changelog for the full release notes.
-              </p>
-            </div>
-            <div className="flex gap-4">
-              <Button to={LINKS.docsHome} theme="outlined" size="xxs" className="h-9 px-5">
-                Documentation
-              </Button>
-              <Button
-                to="https://github.com/Sindlish/Sindlish/releases"
-                target="_blank"
-                theme="outlined"
-                size="xxs"
-                className="h-9 px-5"
-              >
-                GitHub Releases
-              </Button>
-            </div>
-          </m.div>
-        </Container>
-      </section>
-    </LazyMotion>
+            GitHub Releases
+          </ActionLink>
+        </div>
+      </Container>
+    </section>
   </Layout>
 );
+
 export default DownloadPage;
