@@ -8,6 +8,9 @@ const getExcerpt = require('./get-excerpt');
 const getPostSlugs = async (pathname) => {
   const files = await glob.sync(`${pathname}/**/*.md`, {
     ignore: ['**/README.md', '**/unused/**', '**/shared-content/**', '**/GUIDE_TEMPLATE.md'],
+    // Slugs are URL segments, so force forward slashes regardless of platform
+    // (glob returns backslashes on Windows, which breaks the replace() below).
+    posix: true,
   });
   // glob returns platform-native separators (backslashes on Windows); normalise
   // them to forward slashes before stripping the route prefix so slugs are

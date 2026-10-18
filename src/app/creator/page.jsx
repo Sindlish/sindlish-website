@@ -5,8 +5,11 @@ import { useEffect, useState } from 'react';
 
 import ActionLink from 'components/shared/action-link';
 import Container from 'components/shared/container';
+import JsonLd from 'components/shared/json-ld';
 import Layout from 'components/shared/layout';
 import Mascot from 'components/shared/mascot';
+import { getSiteUrl } from 'constants/seo-data';
+import { getPersonSchema } from 'lib/schema';
 
 const PROFILE_URL = 'https://api.github.com/users/AmanatAliPanhwer';
 
@@ -28,6 +31,7 @@ const CreatorPage = () => {
 
   return (
     <Layout isHeaderSticky isHeaderStickyOverlay>
+      <JsonLd id="creator-json-ld" data={getPersonSchema(getSiteUrl())} />
       <section className="border-b border-border bg-surface-page">
         <Container
           className="flex flex-wrap items-center gap-x-16 gap-y-10 py-24 lg:py-16 md:py-12"

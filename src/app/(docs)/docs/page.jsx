@@ -1,16 +1,11 @@
 import DocsIndex from 'components/pages/doc/docs-shell/docs-index';
-import LINKS from 'constants/links';
+import SEO_DATA from 'constants/seo-data';
 import { getNavigation } from 'utils/api-docs';
-import getMetadata from 'utils/get-metadata';
+import buildMetadata from 'utils/get-metadata';
 
 // The real /docs landing page: every page in the docs, grouped by pillar.
 // Server-rendered, no client JS beyond the shell — it reads with JS disabled.
-export const generateMetadata = () =>
-  getMetadata({
-    title: 'Documentation - Sindlish Docs',
-    description: 'Every page in the Sindlish documentation, grouped by pillar.',
-    pathname: LINKS.docs,
-  });
+export const metadata = buildMetadata(SEO_DATA.docs);
 
 const DocsHomePage = () => {
   const navigation = getNavigation();

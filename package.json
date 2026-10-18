@@ -12,7 +12,7 @@
     "dev": "next dev",
     "build": "next build",
     "dev:build": "next build",
-    "postbuild": "node src/scripts/copy-md-content.js && node src/scripts/generate-llms-index.js && node src/scripts/generate-llms-full.js && next-sitemap --config next-sitemap.config.js",
+    "postbuild": "node src/scripts/copy-md-content.js && node src/scripts/generate-llms-index.js && node src/scripts/generate-llms-full.js",
     "start": "next start",
     "format": "prettier --write --log-level warn --cache .",
     "fix": "eslint --fix --quiet --cache . && markdownlint --fix --ignore-path .gitignore .; prettier --write --log-level warn --cache .",

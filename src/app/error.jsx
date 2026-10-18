@@ -21,6 +21,7 @@ const ErrorPage = ({ error, reset }) => {
   return (
     <>
       <title>{SEO_DATA.error.title}</title>
+      <meta name="robots" content="noindex" />
 
       <Layout isClient>
         <QuietPage {...RUNTIME_ERROR}>

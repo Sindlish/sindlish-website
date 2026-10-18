@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 
-// Mock the modules - must be at the top before imports
+// Mock next/server - must be set up before the module under test is imported.
 vi.mock('next/server', () => ({
   NextResponse: class MockNextResponse extends Response {
     constructor(body, init) {
@@ -11,289 +11,118 @@ vi.mock('next/server', () => ({
     static next() {
       return { type: 'next', headers: new Headers() };
     }
-
-    static redirect(url) {
-      return { type: 'redirect', url };
-    }
   },
 }));
 
-// Mock fetch globally — default returns a safe no-op response so the
-// markdown fetch never throws or consumes the targeted mockResolvedValueOnce
-// set up by individual tests.
-global.fetch = vi.fn(() => Promise.resolve({ ok: true }));
+// Default fetch is a safe no-op so unrelated tests never hit the network.
+global.fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve('') }));
 
-// Ensure SITE_URL is defined so the error-fallback redirect doesn't throw
 process.env.NEXT_PUBLIC_DEFAULT_SITE_URL = 'https://sindlish.org';
 
-// Now import middleware after all mocks are set up
-let middleware;
+let proxy;
 
-describe('Middleware - AI Agent Integration Tests', () => {
+const createMockRequest = (pathname, accept = '', userAgent = 'Mozilla/5.0') => ({
+  nextUrl: {
+    pathname,
+    origin: 'https://sindlish.org',
+    href: `https://sindlish.org${pathname}`,
+  },
+  url: `https://sindlish.org${pathname}`,
+  headers: new Map([
+    ['accept', accept],
+    ['user-agent', userAgent],
+  ]),
+});
+
+const mockMarkdownFetch = (content = '# Test Markdown') => {
+  global.fetch.mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(content) });
+};
+
+describe('proxy - markdown twin negotiation', () => {
   beforeAll(async () => {
-    const middlewareModule = await import('./proxy.js');
-    middleware = middlewareModule.proxy;
+    ({ proxy } = await import('./proxy.js'));
   });
+
   beforeEach(() => {
     vi.clearAllMocks();
+    global.fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve('') }));
   });
 
-  const createMockRequest = (pathname, userAgent = '', accept = '') => ({
-    nextUrl: {
-      pathname,
-      origin: 'https://sindlish.org',
-      href: `https://sindlish.org${pathname}`,
-    },
-    url: `https://sindlish.org${pathname}`,
-    headers: new Map([
-      ['user-agent', userAgent],
-      ['accept', accept],
-    ]),
+  it('serves the markdown twin for Accept: text/markdown', async () => {
+    mockMarkdownFetch('# Introduction');
+    const response = await proxy(createMockRequest('/docs/introduction', 'text/markdown'));
+
+    expect(global.fetch).toHaveBeenCalledWith('https://sindlish.org/md/docs/introduction.md');
+    expect(response).toBeInstanceOf(Response);
+    expect(await response.text()).toContain('# Introduction');
+    expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(response.headers.get('X-Content-Source')).toBe('markdown');
+    expect(response.headers.get('X-Robots-Tag')).toBe('noindex');
+    expect(response.headers.get('Vary')).toBe('Accept');
+    expect(response.headers.get('Link')).toContain('rel="llms-txt"');
+    expect(response.headers.get('Link')).toContain('rel="llms-full-txt"');
   });
 
-  // Helper to mock a successful markdown fetch.
-  const mockMarkdownFetch = (content = '# Test Markdown') => {
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      text: () => Promise.resolve(content),
-    });
-  };
+  it('serves HTML (next) for a plain browser request and still advertises the twins', async () => {
+    const response = await proxy(createMockRequest('/docs/introduction', 'text/html'));
 
-  describe('Content routes - AI Agents should get markdown', () => {
-    const testCases = [
-      { name: 'Docs', path: '/docs/introduction' },
-      { name: 'Nested Docs', path: '/docs/get-started/installation' },
-    ];
-
-    testCases.forEach(({ name, path }) => {
-      it(`should serve markdown for ${name} (${path}) with AI User-Agent`, async () => {
-        const req = createMockRequest(path, 'Claude/1.0', 'text/html');
-        mockMarkdownFetch(`# ${name} Content`);
-
-        const response = await middleware(req);
-
-        expect(global.fetch).toHaveBeenCalled();
-        expect(response).toBeInstanceOf(Response);
-        const text = await response.text();
-        expect(text).toContain(`# ${name} Content`);
-        expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
-        expect(response.headers.get('X-Content-Source')).toBe('markdown');
-      });
-
-      it(`should serve markdown for ${name} (${path}) with Accept: text/plain`, async () => {
-        const req = createMockRequest(path, 'Mozilla/5.0', 'text/plain');
-        mockMarkdownFetch(`# ${name} Content`);
-
-        const response = await middleware(req);
-
-        expect(global.fetch).toHaveBeenCalled();
-        expect(response).toBeInstanceOf(Response);
-        const text = await response.text();
-        expect(text).toContain(`# ${name} Content`);
-      });
-
-      it(`should NOT serve markdown for ${name} (${path}) with regular browser request`, async () => {
-        const req = createMockRequest(
-          path,
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-          'text/html'
-        );
-
-        const response = await middleware(req);
-
-        expect(global.fetch).not.toHaveBeenCalled();
-        expect(response.type).toBe('next');
-      });
-    });
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(response.type).toBe('next');
+    expect(response.headers.get('Link')).toContain('rel="llms-txt"');
   });
 
-  describe('Error handling', () => {
-    it('should return agent-friendly 404 markdown when markdown fetch returns 404', async () => {
-      const req = createMockRequest('/docs/non-existent', 'Claude/1.0', 'text/html');
+  it('does not key off a known AI user-agent when Accept is HTML', async () => {
+    const response = await proxy(createMockRequest('/docs/introduction', 'text/html', 'Claude/1.0'));
 
-      global.fetch.mockResolvedValueOnce({ ok: false, status: 404 });
-
-      const response = await middleware(req);
-
-      expect(global.fetch).toHaveBeenCalled();
-      expect(response).toBeInstanceOf(Response);
-      expect(response.status).toBe(404);
-      expect(response.headers.get('X-Content-Source')).toBe('agent-404');
-      const text = await response.text();
-      expect(text).toContain('/docs/non-existent');
-      expect(text).toContain('/docs/llms.txt');
-      expect(text).toContain('/docs/llms-full.txt');
-    });
-
-    it('should use shorter cache TTL for agent 404 responses', async () => {
-      const req = createMockRequest('/docs/non-existent', 'Claude/1.0', 'text/html');
-
-      global.fetch.mockResolvedValueOnce({ ok: false, status: 404 });
-
-      const response = await middleware(req);
-
-      expect(response.status).toBe(404);
-      expect(response.headers.get('Cache-Control')).toBe('public, max-age=60, s-maxage=300');
-    });
-
-    it('should fallback to next() when markdown fetch throws error', async () => {
-      const req = createMockRequest('/docs/introduction', 'Claude/1.0', 'text/html');
-
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
-
-      const response = await middleware(req);
-
-      expect(response.type).toBe('next');
-    });
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(response.type).toBe('next');
   });
 
-  describe('Direct .md URL handling for non-agent requests', () => {
-    it('should serve markdown directly for existing .md URLs', async () => {
-      const req = createMockRequest(
-        '/docs/introduction/existing-doc.md',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-        'text/html'
-      );
-
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        text: () => Promise.resolve('# Existing doc'),
-      });
-
-      const response = await middleware(req);
-
-      expect(response).toBeInstanceOf(Response);
-      expect(response.status).toBe(200);
-      expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
-      expect(response.headers.get('X-Content-Source')).toBe('markdown');
-      expect(await response.text()).toContain('# Existing doc');
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it('should return markdown 404 page for non-agent .md URLs that do not exist', async () => {
-      const req = createMockRequest(
-        '/docs/introduction/foobar.md',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-        'text/html'
-      );
-
-      global.fetch.mockResolvedValueOnce({ ok: false, status: 404 });
-
-      const response = await middleware(req);
-
-      expect(response).toBeInstanceOf(Response);
-      expect(response.status).toBe(404);
-      expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
-      expect(response.headers.get('X-Content-Source')).toBe('md-404');
-      expect(await response.text()).toContain('/docs/introduction/foobar.md');
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it('should pass through static .md files under docs/ai/ without rewriting', async () => {
-      const req = createMockRequest(
-        '/docs/ai/skills/example/reference.md',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-        'text/html'
-      );
-
-      const response = await middleware(req);
-
+  it('does not negotiate markdown for */* or text/plain', async () => {
+    for (const accept of ['*/*', 'text/plain', 'application/json']) {
+      global.fetch.mockClear();
+      const response = await proxy(createMockRequest('/docs/introduction', accept));
       expect(global.fetch).not.toHaveBeenCalled();
       expect(response.type).toBe('next');
-    });
-
-    it('should pass through static .md files under docs/ai/ for AI agents too', async () => {
-      const req = createMockRequest(
-        '/docs/ai/skills/example/reference.md',
-        'Claude/1.0',
-        'text/html'
-      );
-
-      const response = await middleware(req);
-
-      expect(global.fetch).not.toHaveBeenCalled();
-      expect(response.type).toBe('next');
-    });
+    }
   });
 
-  describe('Response headers validation', () => {
-    it('should include correct cache headers for markdown responses', async () => {
-      const req = createMockRequest('/docs/introduction', 'Claude/1.0', 'text/html');
-      mockMarkdownFetch('# Test');
+  it('serves the twin for an explicit .md URL regardless of Accept', async () => {
+    mockMarkdownFetch('# Introduction');
+    const response = await proxy(createMockRequest('/docs/introduction.md', 'text/html'));
 
-      const response = await middleware(req);
-
-      expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600, s-maxage=86400');
-      expect(response.headers.get('X-Robots-Tag')).toBe('noindex');
-      expect(response.headers.get('X-LLMs-Txt')).toBe('/docs/llms.txt');
-    });
-
-    it('should set correct content type for markdown', async () => {
-      const req = createMockRequest('/docs/introduction', 'Claude/1.0', 'text/html');
-      mockMarkdownFetch('# Test');
-
-      const response = await middleware(req);
-
-      expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
-    });
+    expect(global.fetch).toHaveBeenCalledWith('https://sindlish.org/md/docs/introduction.md');
+    expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(await response.text()).toContain('# Introduction');
   });
 
-  describe('AI Agent patterns detection', () => {
-    const aiAgents = [
-      'ChatGPT-User',
-      'OpenAI',
-      'Claude',
-      'Anthropic',
-      'Cursor',
-      'Windsurf',
-      'Perplexity',
-      'GitHub-Copilot',
-    ];
+  it('returns an agent-friendly markdown 404 when the twin is missing', async () => {
+    global.fetch.mockResolvedValueOnce({ ok: false, status: 404 });
+    const response = await proxy(createMockRequest('/docs/non-existent', 'text/markdown'));
 
-    aiAgents.forEach((agent) => {
-      it(`should detect ${agent} as AI agent`, async () => {
-        const req = createMockRequest('/docs/introduction', agent, 'text/html');
-        mockMarkdownFetch('# Test');
-
-        const response = await middleware(req);
-
-        expect(global.fetch).toHaveBeenCalled();
-        expect(response).toBeInstanceOf(Response);
-      });
-    });
+    expect(response.status).toBe(404);
+    expect(response.headers.get('X-Content-Source')).toBe('md-404');
+    expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=60, s-maxage=300');
+    const text = await response.text();
+    expect(text).toContain('/docs/non-existent');
+    expect(text).toContain('/docs/llms.txt');
   });
 
-  describe('Accept header variations', () => {
-    const nonHtmlAccepts = ['text/plain', 'application/json', 'application/xml'];
+  it('falls back to next() when the twin fetch throws', async () => {
+    global.fetch.mockRejectedValueOnce(new Error('Network error'));
+    const response = await proxy(createMockRequest('/docs/introduction', 'text/markdown'));
 
-    nonHtmlAccepts.forEach((accept) => {
-      it(`should serve markdown with Accept: ${accept}`, async () => {
-        const req = createMockRequest('/docs/introduction', 'Mozilla/5.0', accept);
-        mockMarkdownFetch('# Test');
+    expect(response.type).toBe('next');
+  });
 
-        const response = await middleware(req);
-
-        expect(global.fetch).toHaveBeenCalled();
-        expect(response).toBeInstanceOf(Response);
-      });
-    });
-
-    it('should NOT serve markdown with Accept: text/html', async () => {
-      const req = createMockRequest('/docs/introduction', 'Mozilla/5.0', 'text/html');
-
-      const response = await middleware(req);
-
+  it('passes through non-page paths (llms.txt, og image) without fetching', async () => {
+    for (const path of ['/docs/llms.txt', '/docs/llms-full.txt', '/docs/og']) {
+      global.fetch.mockClear();
+      const response = await proxy(createMockRequest(path, 'text/markdown'));
       expect(global.fetch).not.toHaveBeenCalled();
       expect(response.type).toBe('next');
-    });
-
-    it('should NOT serve markdown with Accept: */*', async () => {
-      const req = createMockRequest('/docs/introduction', 'Mozilla/5.0', '*/*');
-
-      const response = await middleware(req);
-
-      expect(global.fetch).not.toHaveBeenCalled();
-      expect(response.type).toBe('next');
-    });
+      expect(response.headers.get('Link')).toContain('rel="llms-txt"');
+    }
   });
 });

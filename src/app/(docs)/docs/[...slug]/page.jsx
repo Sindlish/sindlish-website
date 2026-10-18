@@ -1,22 +1,31 @@
 /* eslint-disable react/prop-types */
+import path from 'node:path';
+
 import { notFound } from 'next/navigation';
 
 import Post from 'components/pages/doc/post';
-import VERCEL_URL from 'constants/base';
+import JsonLd from 'components/shared/json-ld';
 import { DOCS_DIR_PATH } from 'constants/content';
 import LINKS from 'constants/links';
-import JsonLd from 'components/shared/json-ld';
+import { getSiteUrl } from 'constants/seo-data';
+import { getArticleSchema } from 'lib/schema';
 import { getPostBySlug } from 'utils/api-content';
 import { getAllPosts, getNavigationLinks, getNavigation } from 'utils/api-docs';
+import { getFileLastModified } from 'utils/file-last-modified';
 import { getBreadcrumbs } from 'utils/get-breadcrumbs';
 import { getFlatSidebar } from 'utils/get-flat-sidebar';
-import getMetadata from 'utils/get-metadata';
+import buildMetadata from 'utils/get-metadata';
 
 const isUnusedOrSharedContent = (slug) =>
   slug.includes('unused/') ||
   slug.includes('shared-content/') ||
   slug.includes('README') ||
   slug.includes('GUIDE_TEMPLATE');
+
+const docsSourceModified = (slug) =>
+  getFileLastModified(
+    path.join(process.cwd(), 'content', 'docs', `${slug}.md`).split(path.sep).join('/')
+  ) || undefined;
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
@@ -52,14 +61,16 @@ export async function generateMetadata(props) {
   const category = breadcrumbs.length > 0 ? breadcrumbs[0].title : '';
   const encodedCategory = category && Buffer.from(category).toString('base64');
 
-  return getMetadata({
-    title: `${title} - Sindlish Docs`,
-    description: post.excerpt,
-    imagePath: `${VERCEL_URL}/docs/og?title=${encodedTitle}&category=${encodedCategory}`,
+  return buildMetadata({
+    title,
+    // Docs descriptions come from the authored summary; the excerpt generator is gone.
+    description: post?.data?.summary,
+    imagePath: `/docs/og?title=${encodedTitle}&category=${encodedCategory}`,
     pathname: `${LINKS.docs}/${currentSlug}`,
-    robotsNoindex: post?.data?.noindex ? 'noindex' : null,
+    markdownPath: `${LINKS.docs}/${currentSlug}.md`,
+    noindex: Boolean(post?.data?.noindex),
     type: 'article',
-    markdownPath: `/docs/${currentSlug}.md`,
+    modifiedTime: docsSourceModified(currentSlug),
   });
 }
 
@@ -80,19 +91,23 @@ const DocPost = async (props) => {
 
   const { data, content } = post;
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: data.title,
-    author: {
-      '@type': 'Organization',
-      name: 'Sindlish Team',
-    },
-  };
+  const encodedTitle = Buffer.from(data.title).toString('base64');
+  const breadcrumbs = getBreadcrumbs(currentSlug, flatSidebar);
+  const category = breadcrumbs.length > 0 ? breadcrumbs[0].title : '';
+  const encodedCategory = category && Buffer.from(category).toString('base64');
+
+  const jsonLd = getArticleSchema({
+    siteUrl: getSiteUrl(),
+    title: data.title,
+    description: data.summary,
+    pathname: `${LINKS.docs}/${currentSlug}`,
+    imagePath: `/docs/og?title=${encodedTitle}&category=${encodedCategory}`,
+    dateModified: docsSourceModified(currentSlug),
+  });
 
   return (
     <>
-      <JsonLd data={jsonLd} />
+      <JsonLd id="docs-json-ld" data={jsonLd} />
       <Post content={content} data={data} navigationLinks={navigationLinks} />
     </>
   );

@@ -4,6 +4,10 @@ import Layout from 'components/shared/layout';
 import Mascot from 'components/shared/mascot';
 import LINKS from 'constants/links';
 import MASCOT_LINES from 'constants/mascot-lines';
+import SEO_DATA from 'constants/seo-data';
+import buildMetadata from 'utils/get-metadata';
+
+export const metadata = buildMetadata(SEO_DATA.download);
 
 // Release URLs and file names are exact. Do not tidy the double slash: the
 // artifact path GitHub serves is spelled that way.

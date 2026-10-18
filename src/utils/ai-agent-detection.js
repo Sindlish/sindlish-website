@@ -1,43 +1,17 @@
-// AI Agent Detection Utility
-// Detects if a request is coming from an AI agent based on User-Agent header
+// Markdown twin resolution and content negotiation.
+//
+// Negotiation is pure `Accept: text/markdown`. There is no user-agent sniffing,
+// no agents.txt and no MCP: a client either asked for markdown or it did not.
+// The legacy `/llms/*.txt` redirects are gone; the llms.txt pair and its aliases
+// are kept as static files.
 
 import { CONTENT_ROUTES, EXCLUDED_ROUTES, EXCLUDED_FILES } from 'constants/content';
 
-export function isAIAgentRequest(request) {
-  const userAgent = request.headers.get('user-agent') || '';
-  const accept = request.headers.get('accept') || '';
-
-  // Primary detection: Accept header explicitly requests markdown or non-HTML formats
-  const requestsMarkdown = accept.includes('text/markdown');
-  const hasHtml = accept.includes('text/html');
-  const prefersNonHtml =
-    !hasHtml &&
-    (accept.includes('application/json') ||
-      accept.includes('text/plain') ||
-      accept.includes('application/xml'));
-
-  // Secondary detection: User-Agent patterns for known AI agents and their HTTP clients
-  const aiAgentPatterns = [
-    'chatgpt',
-    'openai',
-    'gpt',
-    'claude',
-    'anthropic',
-    'cursor',
-    'windsurf',
-    'perplexity',
-    'copilot',
-    'ai-agent',
-    'llm-agent',
-    'axios', // Used by Claude Code
-    'got', // Used by Cursor
-  ];
-
-  const hasAIAgentUserAgent = aiAgentPatterns.some((pattern) =>
-    userAgent.toLowerCase().includes(pattern)
-  );
-
-  return requestsMarkdown || prefersNonHtml || hasAIAgentUserAgent;
+// True only when the request explicitly negotiated markdown. `*/*` and
+// `text/html` do not count.
+export function prefersMarkdown(request) {
+  const accept = (request.headers.get('accept') || '').toLowerCase();
+  return accept.includes('text/markdown');
 }
 
 // Paths where the generic CONTENT_ROUTES resolver produces the wrong markdown
@@ -49,6 +23,11 @@ const CUSTOM_MARKDOWN_PATHS = {
 // Paths under content routes that are static files in public/ (not generated into public/md/).
 // The middleware should pass these through so Next.js serves them directly.
 const STATIC_DOC_PREFIXES = ['docs/ai/'];
+
+// Paths under a content route that resolve to a Next.js Route Handler rather
+// than a page (so they have no markdown twin and must never be negotiated).
+// Currently just the generated OG image: src/app/(docs)/docs/og/route.jsx.
+const NON_PAGE_DOC_PATHS = new Set(['docs/og']);
 
 // Convert URL path to markdown file path
 // Example: /docs/introduction -> /md/docs/introduction.md (maps to public/md/)
@@ -63,6 +42,8 @@ export function getMarkdownPath(pathname) {
   if (isExcluded) return null;
 
   if (STATIC_DOC_PREFIXES.some((prefix) => path.startsWith(prefix))) return null;
+
+  if (NON_PAGE_DOC_PATHS.has(path)) return null;
 
   // Normalize .md suffix so /branching.md matches the branching route
   const normalized = path.endsWith('.md') ? path.slice(0, -3) : path;
