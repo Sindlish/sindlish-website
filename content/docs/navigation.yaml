@@ -106,3 +106,12 @@
           slug: concepts/results
         - title: The type system
           slug: concepts/type-system
+
+- nav: Project
+  icon: extension
+  items:
+    - section: Releases
+      icon: book
+      items:
+        - title: Changelog
+          slug: changelog
