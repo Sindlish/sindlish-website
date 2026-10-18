@@ -1,0 +1,41 @@
+name: Build gates
+
+on:
+  pull_request:
+  push:
+    branches: ['main', 'rebuild']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-gates:
+    runs-on:
+      group: sindlish-protected-runner-group
+      labels: linux-ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The deterministic half of the blocking gates (issue #52):
+      # check:content-data, check:links (Gate 2), check:docs (Gate 3's spec,
+      # plus every other docs-checks vitest spec), check:nav (Gate 5),
+      # check:md-twins (T10) and check:a11y (the manual checklist's structure).
+      # Gate 1 runs in docs-examples.yml; Gate 4 arrives with #58.
+      - name: Run the build gates
+        run: npm run check

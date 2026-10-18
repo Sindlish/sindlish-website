@@ -19,6 +19,7 @@
     "lint": "npm run lint:js && npm run lint:md",
     "lint:js": "eslint .",
     "lint:md": "markdownlint --ignore-path .gitignore .",
+    "check": "npm run check:content-data && npm run check:links && npm run check:docs && npm run check:nav && npm run check:md-twins && npm run check:a11y",
     "check:broken-links": "linkinator --config linkinator.config.json",
     "check:content-data": "node scripts/validate-content-data.js",
     "prepare": "husky install || true",
@@ -27,10 +28,14 @@
     "test:unit:ui": "vitest --ui",
     "test:unit:run": "vitest run",
     "test:unit:coverage": "vitest run --coverage",
-    "check:docs": "vitest run scripts/docs-checks/**/__tests__/*.test.js",
+    "check:docs": "vitest run scripts/docs-checks",
     "check:examples": "python scripts/docs-checks/example-runner/run_examples.py",
     "check:interpreter": "node scripts/docs-checks/interpreter-staleness/check.js",
     "check:grammar": "node scripts/docs-checks/grammar-drift/check.js",
+    "check:links": "node scripts/docs-checks/internal-links/check.js",
+    "check:nav": "node scripts/docs-checks/nav-sync/check.js",
+    "check:md-twins": "node scripts/docs-checks/md-twins/check.js",
+    "check:a11y": "node scripts/docs-checks/a11y-checklist/check.js",
     "gen:assets": "node scripts/generate-identity-assets.js"
   },
   "dependencies": {
