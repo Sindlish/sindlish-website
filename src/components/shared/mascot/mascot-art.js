@@ -32,6 +32,19 @@ export const MASCOT_ART_AVAILABLE = Object.freeze([
   'thinking-error',
 ]);
 
+/**
+ * Intrinsic pixel size of an art variant, declared rather than probed. Every
+ * PNG ships at the same 2:3 portrait ratio, and `next/image` needs the real
+ * dimensions up front so it can reserve the box (no layout shift) and offer
+ * correctly sized candidates. The `mascot art honesty` test keeps this map
+ * truthful by comparing it against the bytes on disk.
+ */
+export const MASCOT_ART_DIMENSIONS = Object.freeze(
+  Object.fromEntries(
+    MASCOT_ART_AVAILABLE.map((variant) => [variant, { width: 1024, height: 1536 }])
+  )
+);
+
 /** Public path an art variant is expected to live at. */
 export function mascotArtPath(variant) {
   return `/images/mascot/mascot-${variant}.png`;

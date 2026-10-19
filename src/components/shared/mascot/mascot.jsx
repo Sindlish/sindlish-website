@@ -1,8 +1,9 @@
+import Image from 'next/image';
 import PropTypes from 'prop-types';
 
 import { cn } from 'utils/cn';
 
-import { MASCOT_VARIANTS, hasMascotArt, mascotArtPath } from './mascot-art';
+import { MASCOT_ART_DIMENSIONS, MASCOT_VARIANTS, hasMascotArt, mascotArtPath } from './mascot-art';
 
 /**
  * The art half of the mascot. Renders the PNG when it exists, otherwise a dashed
@@ -29,13 +30,16 @@ const MascotArt = ({ variant, size, alt = '', className = null }) => {
     );
   }
 
+  const { width, height } = MASCOT_ART_DIMENSIONS[variant];
+  const scaledWidth = Math.round((size * width) / height);
+
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- art dimensions are unknown until the PNGs land; a plain img keeps them free
-    <img
+    <Image
       src={mascotArtPath(variant)}
       alt={alt}
-      className={cn('block w-auto shrink-0', className)}
-      style={{ height: size }}
+      width={scaledWidth}
+      height={size}
+      className={cn('block h-auto w-auto shrink-0', className)}
     />
   );
 };
@@ -56,7 +60,14 @@ MascotArt.propTypes = {
  *
  * The mascot never animates here, so there is no reduced-motion branch to write.
  */
-const Mascot = ({ variant, size, alt = '', line = null, lineClassName = null, className = null }) => (
+const Mascot = ({
+  variant,
+  size,
+  alt = '',
+  line = null,
+  lineClassName = null,
+  className = null,
+}) => (
   <div className={cn('flex items-start gap-4', className)}>
     {line && (
       <p

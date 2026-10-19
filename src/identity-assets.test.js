@@ -3,7 +3,11 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { MASCOT_ART_AVAILABLE, MASCOT_VARIANTS } from 'components/shared/mascot/mascot-art';
+import {
+  MASCOT_ART_AVAILABLE,
+  MASCOT_ART_DIMENSIONS,
+  MASCOT_VARIANTS,
+} from 'components/shared/mascot/mascot-art';
 import getMetadata from 'utils/get-metadata';
 
 /*
@@ -151,6 +155,13 @@ describe('mascot art honesty', () => {
 
   it('keeps the master reference alongside the variants', () => {
     expect(existsSync(path.join(MASCOT_DIR, 'mascot-reference.png'))).toBe(true);
+  });
+
+  it('declares the intrinsic size each variant really ships', () => {
+    for (const variant of MASCOT_ART_AVAILABLE) {
+      const { buffer } = readPublic(path.join('images', 'mascot', `mascot-${variant}.png`));
+      expect(MASCOT_ART_DIMENSIONS[variant], `dimensions for ${variant}`).toEqual(pngSize(buffer));
+    }
   });
 
   it('never ships a mascot file for a variant the site does not know', () => {
