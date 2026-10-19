@@ -1,8 +1,6 @@
-import path from 'node:path';
-
 import { getSiteUrl } from 'constants/seo-data';
 import { getAllPosts } from 'utils/api-docs';
-import { getFileLastModified } from 'utils/file-last-modified';
+import { getDocsSourceLastModified } from 'utils/file-last-modified';
 
 // Native sitemap. The route inventory is explicit: `/`, the `/docs` index, every
 // real docs page, `/download` and `/creator`. `/search`, `/workbench` and the
@@ -13,11 +11,6 @@ import { getFileLastModified } from 'utils/file-last-modified';
 // never `new Date()`.
 export const dynamic = 'force-static';
 
-const contentModified = (slug) =>
-  getFileLastModified(
-    path.join(process.cwd(), 'content', 'docs', `${slug}.md`).split(path.sep).join('/')
-  ) || undefined;
-
 export default async function sitemap() {
   const siteUrl = getSiteUrl();
   const absolute = (pathname) => new URL(pathname, siteUrl).toString();
@@ -27,7 +20,7 @@ export default async function sitemap() {
     .filter((post) => post && !post.noindex && !post.isDraft)
     .map((post) => ({
       url: absolute(`/docs/${post.slug}`),
-      lastModified: contentModified(post.slug),
+      lastModified: getDocsSourceLastModified(post.slug),
       changeFrequency: 'monthly',
       priority: 0.7,
     }));

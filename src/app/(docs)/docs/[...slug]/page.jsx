@@ -1,6 +1,4 @@
 /* eslint-disable react/prop-types */
-import path from 'node:path';
-
 import { notFound } from 'next/navigation';
 
 import Post from 'components/pages/doc/post';
@@ -10,22 +8,16 @@ import LINKS from 'constants/links';
 import { getSiteUrl } from 'constants/seo-data';
 import { getArticleSchema } from 'lib/schema';
 import { getPostBySlug } from 'utils/api-content';
-import { getAllPosts, getNavigationLinks, getNavigation } from 'utils/api-docs';
-import { getFileLastModified } from 'utils/file-last-modified';
+import {
+  getAllPosts,
+  getNavigationLinks,
+  getNavigation,
+  isUnusedOrSharedContent,
+} from 'utils/api-docs';
+import { getDocsSourceLastModified } from 'utils/file-last-modified';
 import { getBreadcrumbs } from 'utils/get-breadcrumbs';
 import { getFlatSidebar } from 'utils/get-flat-sidebar';
 import buildMetadata from 'utils/get-metadata';
-
-const isUnusedOrSharedContent = (slug) =>
-  slug.includes('unused/') ||
-  slug.includes('shared-content/') ||
-  slug.includes('README') ||
-  slug.includes('GUIDE_TEMPLATE');
-
-const docsSourceModified = (slug) =>
-  getFileLastModified(
-    path.join(process.cwd(), 'content', 'docs', `${slug}.md`).split(path.sep).join('/')
-  ) || undefined;
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
@@ -70,7 +62,7 @@ export async function generateMetadata(props) {
     markdownPath: `${LINKS.docs}/${currentSlug}.md`,
     noindex: Boolean(post?.data?.noindex),
     type: 'article',
-    modifiedTime: docsSourceModified(currentSlug),
+    modifiedTime: getDocsSourceLastModified(currentSlug),
   });
 }
 
@@ -102,7 +94,7 @@ const DocPost = async (props) => {
     description: data.summary,
     pathname: `${LINKS.docs}/${currentSlug}`,
     imagePath: `/docs/og?title=${encodedTitle}&category=${encodedCategory}`,
-    dateModified: docsSourceModified(currentSlug),
+    dateModified: getDocsSourceLastModified(currentSlug),
   });
 
   return (
