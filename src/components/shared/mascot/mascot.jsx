@@ -39,7 +39,8 @@ const MascotArt = ({ variant, size, alt = '', className = null }) => {
       alt={alt}
       width={scaledWidth}
       height={size}
-      className={cn('block h-auto w-auto shrink-0', className)}
+      className={cn('block w-auto shrink-0', className)}
+      style={{ height: size }}
     />
   );
 };
