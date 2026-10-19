@@ -51,7 +51,6 @@ export default [
         ...globals.node,
         Atomics: 'readonly',
         SharedArrayBuffer: 'readonly',
-        zaraz: 'readonly',
       },
       parserOptions: {
         ecmaFeatures: { jsx: true },

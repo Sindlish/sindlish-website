@@ -14,7 +14,6 @@ import {
 } from 'constants/seo-data';
 import { CodeTabsProvider } from 'contexts/code-tabs-context';
 import { TabsProvider } from 'contexts/tabs-context';
-import { TopbarProvider } from 'contexts/topbar-context';
 import { getSiteStructuredData } from 'lib/schema';
 
 import { inter } from './fonts';
@@ -59,7 +58,9 @@ export const metadata = {
     description: DEFAULT_DESCRIPTION,
     url: siteUrl,
     siteName: SITE_NAME,
-    images: [{ url: DEFAULT_IMAGE_PATH, width: 1200, height: 630, type: 'image/png', alt: SITE_NAME }],
+    images: [
+      { url: DEFAULT_IMAGE_PATH, width: 1200, height: 630, type: 'image/png', alt: SITE_NAME },
+    ],
     type: 'website',
   },
   twitter: {
@@ -81,13 +82,11 @@ const RootLayout = ({ children }) => (
       <JsonLd id="site-json-ld" data={getSiteStructuredData(siteUrl)} />
       <SkipLink />
       <ThemeProvider>
-        <TopbarProvider>
-          <TabsProvider>
-            <CodeTabsProvider>
-              <MotionProvider>{children}</MotionProvider>
-            </CodeTabsProvider>
-          </TabsProvider>
-        </TopbarProvider>
+        <TabsProvider>
+          <CodeTabsProvider>
+            <MotionProvider>{children}</MotionProvider>
+          </CodeTabsProvider>
+        </TabsProvider>
       </ThemeProvider>
       <Analytics />
     </body>

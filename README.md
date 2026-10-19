@@ -128,7 +128,7 @@ Also, each component may include another component that follows all above listed
 component
 ├── nested-component
 │  ├── data
-│  │  └── nested-component-lottie-data.json
+│  │  └── nested-component-data.json
 │  ├── images
 │  │  ├── nested-component-image.jpg
 │  │  ├── nested-component-inline-svg.inline.svg
@@ -136,7 +136,7 @@ component
 │  ├── nested-component.js
 │  └── index.js
 ├── data
-│  └── component-lottie-data.json
+│  └── component-data.json
 ├── images
 │  ├── component-image.jpg
 │  ├── component-inline-svg.inline.svg

@@ -2,19 +2,17 @@
 
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
 import PropTypes from 'prop-types';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import Button from 'components/shared/button';
 import Link from 'components/shared/link';
 import LINKS from 'constants/links';
 import MENUS from 'constants/menus';
-import { TopbarContext } from 'contexts/topbar-context';
 import useMobileMenu from 'hooks/use-mobile-menu';
 import ChevronIcon from 'icons/chevron-down-thin.inline.svg';
 import { cn } from 'utils/cn';
 
 import Burger from '../burger';
-import MenuBanner from '../menu-banner';
 
 const ANIMATION_DURATION = 0.2;
 
@@ -22,7 +20,6 @@ const MobileMenuItem = ({ text, to, sections, ...otherProps }) => {
   const [isMenuItemOpen, setIsMenuItemOpen] = useState();
   const Tag = sections ? Button : Link;
   const hasSubmenu = sections?.length > 0;
-  const isProduct = text === 'Product';
 
   const handleMenuItemClick = () => {
     if (sections) {
@@ -40,7 +37,6 @@ const MobileMenuItem = ({ text, to, sections, ...otherProps }) => {
       <Tag
         className="relative flex w-full items-center py-7 text-2xl leading-none font-medium tracking-extra-tight sm:py-5 sm:text-xl"
         to={to}
-        tagName="Mobile Menu"
         handleClick={handleMenuItemClick}
         {...otherProps}
       >
@@ -73,7 +69,6 @@ const MobileMenuItem = ({ text, to, sections, ...otherProps }) => {
                               className="grid gap-y-2 text-[13px] leading-tight tracking-snug text-gray-new-40 dark:text-gray-new-60"
                               to={to}
                               isExternal={isExternal}
-                              tagName="MobileMenu"
                             >
                               <span className="text-lg leading-none font-medium tracking-extra-tight text-black-pure dark:text-white sm:text-base">
                                 {title}
@@ -87,7 +82,6 @@ const MobileMenuItem = ({ text, to, sections, ...otherProps }) => {
                     </li>
                   ))}
                 </ul>
-                {isProduct && <MenuBanner />}
               </m.div>
             )}
           </AnimatePresence>
@@ -126,7 +120,6 @@ const mobileMenuItems = [
 
 const MobileMenu = ({ isDocPage = false, docPageType: _docPageType = null }) => {
   const { isMobileMenuOpen, toggleMobileMenu } = useMobileMenu();
-  const { hasTopbar } = useContext(TopbarContext);
 
   return (
     <>
@@ -142,7 +135,6 @@ const MobileMenu = ({ isDocPage = false, docPageType: _docPageType = null }) => 
         <nav className="fixed inset-0 z-40 hidden flex-col justify-between bg-white safe-paddings dark:bg-black-pure lg:flex">
           <div
             className={cn('relative h-full pt-14 pb-[101px] sm:pb-[125px]', {
-              'pt-[96px]': hasTopbar,
               'pb-[148px] sm:pb-[172px]': isDocPage,
             })}
           >
@@ -162,7 +154,6 @@ const MobileMenu = ({ isDocPage = false, docPageType: _docPageType = null }) => 
                 to={LINKS.login}
                 theme="transparent"
                 size="xxs"
-                tagName="MobileMenu"
               >
                 Log in
               </Button>
@@ -171,7 +162,6 @@ const MobileMenu = ({ isDocPage = false, docPageType: _docPageType = null }) => 
                 to={LINKS.signup}
                 theme="white-filled-multi"
                 size="xxs"
-                tagName="MobileMenu"
               >
                 Sign up
               </Button>

@@ -78,8 +78,8 @@ describe('getMarkdownPath', () => {
       expect(result).toBeNull();
     });
 
-    it('should return null for /use-cases/ai-agents', () => {
-      const result = getMarkdownPath('/use-cases/ai-agents');
+    it('should return null for /creator', () => {
+      const result = getMarkdownPath('/creator');
       expect(result).toBeNull();
     });
 
@@ -134,13 +134,13 @@ describe('getMarkdownPath', () => {
       expect(result).toBeNull();
     });
 
-    it('should return null for /use-cases/multi-tb', () => {
-      const result = getMarkdownPath('/use-cases/multi-tb');
+    it('should return null for /multi-tb', () => {
+      const result = getMarkdownPath('/multi-tb');
       expect(result).toBeNull();
     });
 
-    it('should return null for /use-cases/serverless-apps', () => {
-      const result = getMarkdownPath('/use-cases/serverless-apps');
+    it('should return null for /serverless-apps', () => {
+      const result = getMarkdownPath('/serverless-apps');
       expect(result).toBeNull();
     });
   });

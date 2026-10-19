@@ -5,11 +5,9 @@ import { forwardRef } from 'react';
 
 import Link from 'components/shared/link';
 import { cn } from 'utils/cn';
-import getNodeText from 'utils/get-node-text';
-import sendGtagEvent from 'utils/send-gtag-event';
 
 const styles = {
-   base: 'inline-flex cursor-pointer items-center justify-center leading-none! text-center whitespace-nowrap rounded-none transition-colors duration-200',
+  base: 'inline-flex cursor-pointer items-center justify-center leading-none! text-center whitespace-nowrap rounded-none transition-colors duration-200',
   size: {
     lg: 'text-base h-12 px-[54px] lg:h-11 lg:px-11 lg:text-sm font-semibold',
     'lg-new':
@@ -60,8 +58,6 @@ const Button = forwardRef(
       to = null,
       size = null,
       theme = null,
-      tagName = null,
-      analyticsOnHover = false,
       handleClick = null,
       withArrow = false,
       children,
@@ -79,27 +75,13 @@ const Button = forwardRef(
 
     const Tag = to || withArrow ? Link : 'button';
 
-    const handleAnalytics = (eventType = 'clicked') => {
-      if (!tagName) return;
-
-      sendGtagEvent(`Button ${eventType}`, {
-        style: theme,
-        text: getNodeText(children),
-        tag_name: tagName,
-      });
-    };
-
     return (
       <Tag
         ref={ref}
         className={className}
         to={to}
         {...(withArrow ? { withArrow } : {})}
-        onClick={() => {
-          if (handleClick) handleClick();
-          handleAnalytics('clicked');
-        }}
-        onMouseEnter={analyticsOnHover ? () => handleAnalytics('hovered') : undefined}
+        onClick={handleClick}
         {...otherProps}
       >
         {children}
@@ -116,8 +98,6 @@ Button.propTypes = {
   size: PropTypes.oneOf(Object.keys(styles.size)),
   theme: PropTypes.oneOf(Object.keys(styles.theme)),
   children: PropTypes.node.isRequired,
-  tagName: PropTypes.string,
-  analyticsOnHover: PropTypes.bool,
   handleClick: PropTypes.func,
   withArrow: PropTypes.bool,
 };

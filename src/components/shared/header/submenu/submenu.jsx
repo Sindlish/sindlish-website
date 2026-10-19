@@ -5,8 +5,6 @@ import Link from 'components/shared/link';
 import MENUS from 'constants/menus.js';
 import { cn } from 'utils/cn';
 
-import MenuBanner from '../menu-banner';
-
 const Submenu = ({
   activeMenuIndex,
   containerHeight,
@@ -34,7 +32,6 @@ const Submenu = ({
       {MENUS.header.map((menu, index) => {
         const isActive = activeMenuIndex === index;
         const sections = menu.sections || [];
-        const isProduct = menu.text === 'Product';
 
         return (
           <div
@@ -79,8 +76,6 @@ const Submenu = ({
                               className={`group ${submenuLinkClassName} -mx-1 -my-3 grid min-w-[224px] gap-y-2 rounded px-1 py-3 text-[13px] leading-tight tracking-snug text-gray-new-40 dark:text-gray-new-60`}
                               to={to}
                               isExternal={isExternal}
-                              tagName="Navigation"
-                              tagText={title}
                               role="menuitem"
                               tabIndex={isActive ? 0 : -1}
                               onKeyDown={handleSubmenuNavigation(index)}
@@ -96,16 +91,6 @@ const Submenu = ({
                     </li>
                   ))}
                 </ul>
-                {isProduct && (
-                  <MenuBanner
-                    linkProps={{
-                      className: submenuLinkClassName,
-                      role: 'menuitem',
-                      tabIndex: isActive ? 0 : -1,
-                      onKeyDown: handleSubmenuNavigation(index),
-                    }}
-                  />
-                )}
               </Container>
             )}
           </div>
