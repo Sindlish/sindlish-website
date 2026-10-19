@@ -26,7 +26,7 @@ function extractCodeIdentifiers(markdown) {
     }
     if (inFence) {
       const lang = fenceLang;
-      if (lang === 'sd' || lang === 'sindlish') {
+      if (lang === 'sd') {
         const re = /[A-Za-z_\u0600-\u06FF][A-Za-z0-9_\u0600-\u06FF]*/g;
         let m;
         while ((m = re.exec(line)) !== null) {
@@ -91,29 +91,31 @@ function extractProse(markdown) {
 
 function buildSearchIndex(posts) {
   // posts: [{ slug, title, summary, content }]
-  const docs = posts
-    .filter(Boolean)
-    .map((p) => {
-      const slug = p.slug || '';
-      const url = `/docs/${slug}`;
-      const title = p.title || '';
-      const summary = p.summary || '';
-      const content = p.content || '';
-      const prose = [title, summary, extractProse(content)].filter(Boolean).join(' ');
-      const code = Array.from(
-        new Set([...extractCodeIdentifiers(content), ...extractCodeIdentifiers(summary), ...extractCodeIdentifiers(title)])
-      );
-      const headings = extractHeadings(content);
-      return {
-        slug,
-        url,
-        title,
-        summary,
-        prose,
-        code,
-        headings,
-      };
-    });
+  const docs = posts.filter(Boolean).map((p) => {
+    const slug = p.slug || '';
+    const url = `/docs/${slug}`;
+    const title = p.title || '';
+    const summary = p.summary || '';
+    const content = p.content || '';
+    const prose = [title, summary, extractProse(content)].filter(Boolean).join(' ');
+    const code = Array.from(
+      new Set([
+        ...extractCodeIdentifiers(content),
+        ...extractCodeIdentifiers(summary),
+        ...extractCodeIdentifiers(title),
+      ])
+    );
+    const headings = extractHeadings(content);
+    return {
+      slug,
+      url,
+      title,
+      summary,
+      prose,
+      code,
+      headings,
+    };
+  });
   return { version: 1, docs };
 }
 

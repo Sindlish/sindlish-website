@@ -28,9 +28,16 @@ const POSTS = [
     slug: 'reference/keywords',
     title: 'Keywords',
     summary: 'Every keyword and what it means.',
-    content: ['## Types', '', '`lafz` is the word for text.', '', '```sd', 'likh("hi")', '```', ''].join(
-      '\n'
-    ),
+    content: [
+      '## Types',
+      '',
+      '`lafz` is the word for text.',
+      '',
+      '```sd',
+      'likh("hi")',
+      '```',
+      '',
+    ].join('\n'),
   },
   {
     slug: 'reference/operators',
@@ -51,6 +58,11 @@ describe('extractCodeIdentifiers', () => {
     expect(ids).toContain('x');
     // bash fences are not Sindlish code identifiers
     expect(ids).not.toContain('npm');
+  });
+
+  it('does not treat the retired `sindlish` fence alias as runnable', () => {
+    const ids = extractCodeIdentifiers(['```sindlish', 'lafz alag', '```'].join('\n'));
+    expect(ids).toEqual([]);
   });
 });
 

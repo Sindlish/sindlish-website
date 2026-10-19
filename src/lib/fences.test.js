@@ -85,5 +85,11 @@ describe('parseFence', () => {
       expect(parseFence('SD', 'illustrative').kind).toBe(FENCE_KIND.ILLUSTRATIVE);
       expect(parseFence('TXT', 'filename="Output"').kind).toBe(FENCE_KIND.OUTPUT);
     });
+
+    it('falls the retired shell aliases back to plain blocks', () => {
+      for (const lang of ['sh', 'shell', 'console']) {
+        expect(parseFence(lang).kind, lang).toBe(FENCE_KIND.PLAIN);
+      }
+    });
   });
 });
