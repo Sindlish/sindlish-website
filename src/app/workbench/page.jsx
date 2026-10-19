@@ -10,7 +10,7 @@ export const generateMetadata = () =>
     title: 'Workbench - Sindlish',
     description: 'Read the Sindlish docs and run Sindlish side by side.',
     pathname: LINKS.workbench,
-    robotsNoindex: 'noindex',
+    noindex: true,
   });
 
 const WorkbenchPage = () => <WorkbenchPane slug={DOCS_HOME_SLUG} />;

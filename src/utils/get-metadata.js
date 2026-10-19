@@ -10,7 +10,12 @@ import {
 //
 // - `metadataBase` is always the single canonical origin (`NEXT_PUBLIC_DEFAULT_SITE_URL`).
 //   A preview/branch URL is never used: previews are noindexed with no canonical.
-// - `canonical` is `metadataBase + pathname`, emitted only in production.
+// - `canonical` is `metadataBase + pathname`, emitted only in production and only
+//   for a page that owns its URL. A noindexed page emits no canonical by default;
+//   it opts in (`canonical: true`) only when another URL owns it, as the workbench
+//   docs pane does by pointing at its matching `/docs/*` page.
+// - `noindex` (not the retired `robotsNoindex`) is the switch that turns indexing
+//   off: `robots: { index: false }`.
 // - The root title template (`%s - Sindlish`) is declared once in the root layout;
 //   `title` here is a plain page title unless the caller passes `{ absolute }`.
 // - Docs descriptions come from the authored `summary` frontmatter; there is no
@@ -35,6 +40,7 @@ function buildMetadata({
   authors = null,
   markdownPath = null,
   noindex = false,
+  canonical = !noindex,
 } = {}) {
   const siteUrl = getSiteUrl();
   const canonicalUrl = toAbsoluteUrl(pathname, siteUrl);
@@ -46,7 +52,7 @@ function buildMetadata({
     title,
     description,
     alternates: {
-      canonical: indexable ? canonicalUrl : undefined,
+      canonical: isProduction() && canonical ? canonicalUrl : undefined,
       types: markdownPath ? { 'text/markdown': toAbsoluteUrl(markdownPath, siteUrl) } : undefined,
     },
     manifest: '/manifest.json',
