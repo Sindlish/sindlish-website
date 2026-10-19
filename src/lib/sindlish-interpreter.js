@@ -195,3 +195,246 @@ sys.stderr = sys.__stderr__
     return `Error: ${err.message}`;
   }
 };
+
+/**
+ * ---------------------------------------------------------------------------
+ * The language server (T9 / issue #56).
+ * ---------------------------------------------------------------------------
+ *
+ * FINDING: the canonical repository's pygls language server
+ * (`github.com/Sindlish/Sindlish`, `vscode-extension/server/server.py`) does
+ * NOT live inside the `interpreter/` tree this site bundles, so it ships
+ * nowhere near the workbench — and pygls' stdio transport cannot run inside a
+ * browser even if it did. Rather than fake completions, the driver below
+ * mirrors that server's `_validate`, `completions`, `hover` and `definition`
+ * handlers step for step, against the very same interpreter modules the
+ * server itself drives (Lexer -> Parser -> Resolver -> Compiler, KEYWORDS,
+ * SimpleBuiltins, resolver symbols, SindhiBaseError). Every semantic decision
+ * still belongs to the interpreter; this is a transport shim, not a fork of
+ * the language. The seam stays single: the language server, the docs Run
+ * button and the workbench Run all execute through this one file.
+ *
+ * If the language repo later publishes a browser-reachable server, this
+ * section shrinks to a plain client.
+ */
+
+// Mirrors vscode-extension/server/server.py; keep the two in step.
+const SINDLISH_LS_DRIVER = String.raw`
+import json
+import re
+
+from interpreter import Compiler, Lexer, Parser, Resolver
+from interpreter.errors import SindhiBaseError
+from interpreter.frontend.keywords import KEYWORDS
+from interpreter.runtime.builtins import SimpleBuiltins
+
+# The native method map of the canonical pygls server, verbatim.
+_NATIVE_METHODS = {
+    "vada": "Convert to uppercase",
+    "nanda": "Convert to lowercase",
+    "hata": "Remove whitespace",
+    "badla": "Replace text",
+    "shamil": "Check if contains",
+    "wadha": "Add element to list",
+    "kadh": "Remove and return element",
+    "saaf": "Clear all elements",
+    "ulat": "Reverse the list",
+    "tartib": "Sort the list",
+    "mela": "Union of sets",
+    "farq": "Difference of sets",
+    "lazmi": "Unwrap value or panic",
+    "bachao": "Provide fallback for error",
+    "ok": "Check if success",
+    "ghalti": "Check if error",
+}
+
+
+def _diag_from_error(e, source):
+    # Mirrors the canonical server's _report_diagnostic.
+    if isinstance(e, SindhiBaseError) and e.line is not None:
+        line = e.line
+        col = e.column if e.column is not None else 1
+        start_char = col - 1
+        end_char = col
+        lines = source.split("\n")
+        if 0 < line <= len(lines):
+            error_line = lines[line - 1]
+            match = re.search(r"[a-zA-Z0-9_]+", error_line[start_char:])
+            if match:
+                end_char = start_char + match.end()
+            else:
+                end_char = len(error_line)
+        return {
+            "range": {
+                "start": {"line": line - 1, "character": start_char},
+                "end": {"line": line - 1, "character": max(start_char + 1, end_char)},
+            },
+            "message": e.details,
+            "source": "Sindlish",
+            "severity": 1,
+        }
+    msg = re.sub(r"\x1b\[[0-9;]*m", "", str(e))
+    lines = [l.strip() for l in msg.split("\n") if l.strip()]
+    core_msg = lines[0] if lines else "Unknown Error"
+    line = 1
+    m = re.search(r"Line (\d+)", msg, re.IGNORECASE)
+    if m:
+        line = int(m.group(1))
+    line = max(line - 1, 0)
+    return {
+        "range": {
+            "start": {"line": line, "character": 0},
+            "end": {"line": line, "character": 100},
+        },
+        "message": core_msg,
+        "source": "Sindlish",
+        "severity": 1,
+    }
+
+
+def _validate(source):
+    # Mirrors the canonical server's _validate, minus the publish and the
+    # state stored on the server object (this driver is stateless).
+    diagnostics = []
+    resolver = None
+    try:
+        tokens = Lexer(source).generate_tokens()
+        ast = Parser(tokens, source).parse()
+        resolver = Resolver(source)
+        resolver.resolve(ast)
+        Compiler(source).compile(ast)
+    except Exception as e:
+        diagnostics.append(_diag_from_error(e, source))
+    symbols = []
+    if resolver is not None:
+        for sym in resolver.symbols:
+            sym_type = sym.get("type")
+            symbols.append(
+                {
+                    "name": sym["name"],
+                    "kind": sym["kind"],
+                    "line": sym["line"],
+                    "col": sym["col"],
+                    "type": getattr(sym_type, "name", None),
+                }
+            )
+    return diagnostics, symbols
+
+
+def ls_analyze(source):
+    diagnostics, symbols = _validate(source)
+    return json.dumps({"diagnostics": diagnostics, "symbols": symbols})
+
+
+def ls_completions(source, line, character):
+    # Mirrors the canonical server's completions handler.
+    _diagnostics, symbols = _validate(source)
+    items = []
+    for k in KEYWORDS:
+        items.append({"label": k, "kind": "Keyword"})
+    for f in SimpleBuiltins().get_all():
+        items.append({"label": f, "kind": "Function", "detail": "Built-in Function"})
+    for sym in symbols:
+        kind = "Function" if sym["kind"] == "function" else "Variable"
+        items.append(
+            {
+                "label": sym["name"],
+                "kind": kind,
+                "detail": "Local %s (line %s)" % (sym["kind"], sym["line"]),
+            }
+        )
+    lines = source.split("\n")
+    if 0 <= line < len(lines):
+        before_cursor = lines[line][:character]
+        if before_cursor.endswith("."):
+            method_items = [
+                {"label": m_name, "kind": "Method", "detail": "Native Method: " + doc}
+                for m_name, doc in _NATIVE_METHODS.items()
+            ]
+            return json.dumps({"items": method_items})
+    return json.dumps({"items": items})
+
+
+def ls_hover(source, line, character):
+    # Mirrors the canonical server's hover handler.
+    _diagnostics, symbols = _validate(source)
+    for sym in symbols:
+        if sym["line"] == line + 1:
+            start = sym["col"] - 1
+            end = start + len(sym["name"])
+            if start <= character <= end:
+                type_info = (sym["type"] or "any").lower()
+                tick = chr(96)
+                content = (
+                    "**%s** (%s)\n\nType: " % (sym["name"], sym["kind"])
+                    + tick
+                    + type_info
+                    + tick
+                )
+                return json.dumps({"content": content})
+    return "null"
+
+
+def ls_definition(source, line, character):
+    # Mirrors the canonical server's definition handler.
+    _diagnostics, symbols = _validate(source)
+    lines = source.split("\n")
+    if not (0 <= line < len(lines)):
+        return "null"
+    line_content = lines[line]
+    word = None
+    for m in re.finditer(r"\b[a-zA-Z_][a-zA-Z0-9_]*\b", line_content):
+        if m.start() <= character <= m.end():
+            word = m.group()
+            break
+    if not word:
+        return "null"
+    for sym in symbols:
+        if sym["name"] == word:
+            return json.dumps(
+                {
+                    "line": sym["line"] - 1,
+                    "character": sym["col"] - 1,
+                    "length": len(sym["name"]),
+                }
+            )
+    return "null"
+`;
+
+let languageServiceReady = false;
+
+const callLanguageService = async (fn, args, onProgress = () => {}) => {
+  const pyodide = await initSindlish(onProgress);
+  if (!languageServiceReady) {
+    pyodide.runPython(SINDLISH_LS_DRIVER);
+    languageServiceReady = true;
+  }
+  for (const [name, value] of Object.entries(args)) pyodide.globals.set(name, value);
+  const raw = pyodide.runPython(`${fn}(${Object.keys(args).join(', ')})`);
+  return raw ? JSON.parse(raw) : null;
+};
+
+const toServerPosition = (position) => ({
+  js_line: position.lineNumber - 1,
+  js_char: position.column - 1,
+});
+
+/**
+ * Run the language server's validation pass over `code`.
+ * Resolves `{ diagnostics, symbols }`; diagnostics use LSP-shaped ranges
+ * (0-based line/character) with `severity: 1` (Error), source "Sindlish".
+ */
+export const sindlishAnalyze = (code, onProgress) =>
+  callLanguageService('ls_analyze', { js_source: code }, onProgress);
+
+/** Completions at `position` ({ lineNumber, column }, 1-based, Monaco-style). */
+export const sindlishCompletions = (code, position, onProgress) =>
+  callLanguageService('ls_completions', { js_source: code, ...toServerPosition(position) }, onProgress);
+
+/** Hover content at `position`, or null. */
+export const sindlishHover = (code, position, onProgress) =>
+  callLanguageService('ls_hover', { js_source: code, ...toServerPosition(position) }, onProgress);
+
+/** Definition of the symbol at `position`: { line, character, length } or null. */
+export const sindlishDefinition = (code, position, onProgress) =>
+  callLanguageService('ls_definition', { js_source: code, ...toServerPosition(position) }, onProgress);

@@ -9,6 +9,7 @@ import { initSindlish, runSindlish } from 'lib/sindlish-interpreter';
 import { cn } from 'utils/cn';
 
 import { DEFAULT_CODE } from './default-code';
+import WorkbenchMonaco from './workbench-monaco';
 
 const NARROW_QUERY = '(max-width: 63.9375rem)';
 
@@ -18,16 +19,15 @@ const NARROW_QUERY = '(max-width: 63.9375rem)';
 const looksLikeError = (html) => /\berror\b|ghalti/i.test((html || '').replace(/<[^>]+>/g, ''));
 
 /**
- * The editor pane: a textarea host over the one interpreter seam (issue #54).
- *
- * Monaco is T9 (#56); this ticket owns the split, the run contract and the
- * states, so the editor is deliberately a plain textarea. Everything the run
- * needs — boot, run, output, reset and share — is here.
+ * The editor pane: Monaco over the real Sindlish language server (T9 /
+ * issue #56), hosted by WorkbenchMonaco. Everything the run needs — boot,
+ * run, output, reset and share — is here; the code surface itself lazy-loads
+ * and falls back to a plain textarea, so this pane never goes dead.
  */
 export const WorkbenchEditor = () => {
   const { code, setCode, loadedAt } = useWorkbench();
   const { isCopied, handleCopy } = useCopyToClipboard(3000);
-  const textareaRef = useRef(null);
+  const editorRef = useRef(null);
 
   // boot is a real state: the bundled interpreter can load, be loading, or fail.
   const [bootStatus, setBootStatus] = useState('loading'); // loading | ready | error
@@ -66,7 +66,7 @@ export const WorkbenchEditor = () => {
     if (!loadedAt) return;
     setOutput({ kind: 'notice', html: 'Loaded into the editor. Press Run.' });
     if (typeof window !== 'undefined' && window.matchMedia(NARROW_QUERY).matches) {
-      textareaRef.current?.focus();
+      editorRef.current?.focus();
     }
   }, [loadedAt]);
 
@@ -161,20 +161,7 @@ export const WorkbenchEditor = () => {
       </div>
 
       <div className="min-h-[140px] flex-1">
-        <label className="sr-only" htmlFor="workbench-code">
-          Sindlish code
-        </label>
-        <textarea
-          autoCapitalize="off"
-          autoCorrect="off"
-          className="h-full w-full resize-none border-0 bg-transparent p-4 font-mono text-sm leading-[1.7] whitespace-pre text-text-primary outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
-          id="workbench-code"
-          onChange={(event) => setCode(event.target.value)}
-          ref={textareaRef}
-          spellCheck={false}
-          value={code}
-          wrap="off"
-        />
+        <WorkbenchMonaco onChange={setCode} ref={editorRef} value={code} />
       </div>
 
       <div className="flex h-[240px] min-h-0 shrink-0 flex-col border-t border-border">
