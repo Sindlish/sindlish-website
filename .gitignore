@@ -99,3 +99,10 @@ package-lock.json
 .evals/
 content/blog
 public/pyodide/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.cache/ms-playwright/
