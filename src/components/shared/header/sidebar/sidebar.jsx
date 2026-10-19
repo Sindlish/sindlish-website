@@ -6,7 +6,6 @@ import LINKS from 'constants/links';
 import GitHubIcon from 'icons/github.inline.svg';
 import { cn } from 'utils/cn';
 
-
 const SOCIALS = [
   {
     id: 'github',
@@ -32,7 +31,6 @@ const Sidebar = ({ isDocs, className }) => (
           to={to}
           target="_blank"
           rel="noopener noreferrer"
-          tagName="Header"
         >
           <Icon
             width={18}
@@ -42,22 +40,12 @@ const Sidebar = ({ isDocs, className }) => (
                 'text-gray-new-20 transition-colors group-hover:text-gray-new-30 dark:text-gray-new-90 dark:group-hover:text-gray-new-80'
             )}
           />
-          {!isDocs && (
-            <span className="text-sm leading-none tracking-extra-tight">
-              {label}
-            </span>
-          )}
+          {!isDocs && <span className="text-sm leading-none tracking-extra-tight">{label}</span>}
         </Link>
       ))}
     </div>
     <div className={cn('flex', isDocs ? 'gap-x-2' : 'gap-x-3.5')}>
-      <Button
-        className="h-9 px-[18px]"
-        to={LINKS.download}
-        theme="white-filled-multi"
-        size="xxs"
-        tagName="Header"
-      >
+      <Button className="h-9 px-[18px]" to={LINKS.download} theme="white-filled-multi" size="xxs">
         Download
       </Button>
     </div>

@@ -18,7 +18,6 @@ const SidebarCta = ({
         theme="primary"
         size="xs"
         to={cta_url}
-        tagName="Sidebar"
       >
         {cta_text}
       </Button>

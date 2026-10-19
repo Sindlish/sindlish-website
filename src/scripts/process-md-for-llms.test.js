@@ -378,7 +378,7 @@ Content before.
 
 <ComputeCalculator />
 
-<UseCaseContext />
+<ProgramForm type="agent" />
 
 <SqlToRestConverter />
 
@@ -388,7 +388,7 @@ Content after.
       expect(result).toContain('Content after.');
       expect(result).not.toContain('<LogosSection');
       expect(result).not.toContain('<ComputeCalculator');
-      expect(result).not.toContain('<UseCaseContext');
+      expect(result).not.toContain('<ProgramForm');
       expect(result).not.toContain('<SqlToRestConverter');
     });
 
@@ -723,7 +723,6 @@ See [CONN_MAX_AGE](https://example.com).
         'SqlToRestConverter',
         'LogosSection',
         'ComputeCalculator',
-        'UseCaseContext',
       ];
 
       for (const name of componentNames) {

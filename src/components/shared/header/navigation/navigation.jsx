@@ -262,7 +262,6 @@ const Navigation = () => {
                 aria-controls={hasSubmenu ? `submenu-${index}` : undefined}
                 to={to}
                 theme="black"
-                tagName="Navigation"
                 onKeyDown={(e) => handleMenuKeyDown(e, hasSubmenu, index)}
                 onClick={handleMenuClick(hasSubmenu, index)}
               >

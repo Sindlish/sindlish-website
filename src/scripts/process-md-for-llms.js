@@ -86,7 +86,7 @@ const IGNORED_COMPONENTS = [
   'SqlToRestConverter', // Interactive app
   'LogosSection', // Decorative logos
   'ComputeCalculator', // Interactive widget
-  'UseCaseContext', // Repetitive boilerplate
+  'ProgramForm', // Interactive signup form
 ];
 
 // ESM modules loaded dynamically
@@ -966,29 +966,6 @@ const componentHandlers = {
     }
 
     return linkNode;
-  },
-
-  /**
-   * ProgramForm -> hardcoded text based on form type
-   * <ProgramForm type="agent" />
-   */
-  ProgramForm(node) {
-    const formType = getAttr(node, 'type') || '';
-
-    if (formType === 'agent') {
-      return {
-        type: 'paragraph',
-        children: [
-          {
-            type: 'link',
-            url: `${BASE_URL}/use-cases/ai-agents`,
-            children: [{ type: 'text', value: 'Apply for the Agent Plan' }],
-          },
-        ],
-      };
-    }
-
-    return null; // Remove for other form types
   },
 
   /**

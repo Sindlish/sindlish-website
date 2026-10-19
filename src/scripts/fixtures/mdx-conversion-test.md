@@ -331,8 +331,6 @@ Beginners can pick it up quickly.
 
 <ComputeCalculator />
 
-<UseCaseContext />
-
 ## HTML passthrough
 
 <details>
