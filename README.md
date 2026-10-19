@@ -6,6 +6,7 @@
 - [Usage](#usage)
   - [Learn more](#learn-more)
   - [Build the website](#deploy-on-vercel)
+  - [Testing](#testing)
 - [Project Structure](#project-structure)
 - [Code Style](#code-style)
   - [ESLint](#eslint)
@@ -59,6 +60,37 @@ npm run build
 
 ```bash
 npm run start
+```
+
+### Testing
+
+The E2E suite uses Playwright and runs against a fresh production build
+(`npm run build && npm run start`), not the dev server:
+
+```bash
+npm test
+```
+
+It covers the key routes, the no-JavaScript docs floor, server-rendered search,
+metadata/sitemap/robots, the markdown twins, the workbench and Monaco, axe
+scans, and visual regression.
+
+Visual baselines live in `tests/e2e/__screenshots__` and are blocking. When an
+intentional UI change alters a screenshot, review the diff and re-record:
+
+```bash
+npm run test:e2e:update
+```
+
+Commit the updated PNGs with the change. The suite fixes the viewport, colour
+scheme, motion and fonts, but glyph rasterisation can still differ between
+operating systems, so check the diff instead of blind-updating.
+
+Unit tests and the docs checks are separate:
+
+```bash
+npm run test:unit:run
+npm run check
 ```
 
 ### Checks broken links

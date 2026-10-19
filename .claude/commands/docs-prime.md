@@ -49,7 +49,7 @@ website/
 - **Styling**: Tailwind CSS
 - **Dev server**: `npm run dev` (http://localhost:3000)
 - **Production build**: `npm run build`
-- **Testing**: `npm run test` (Cypress for E2E)
+- **Testing**: `npm test` (Playwright E2E against the production build)
 
 ### Navigation Hierarchy
 
