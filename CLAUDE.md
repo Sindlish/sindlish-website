@@ -19,7 +19,7 @@ This is the Sindlish programming language's marketing website and documentation 
 - **Search:** Build-time generated index (`src/generated/search-index.json`, produced by `src/scripts/generate-search-index.js`)
 - **Animations:** Framer Motion
 - **Code Highlighting:** Shiki
-- **Testing:** Vitest for unit tests, Cypress for E2E tests
+- **Testing:** Vitest for unit tests, Playwright for E2E tests
 
 ## Instrumentation
 
@@ -71,7 +71,8 @@ npm run format           # Run Prettier only (subset of fix)
 ### Testing
 
 ```bash
-npm run test             # Open Cypress
+npm run test             # Run the Playwright E2E suite against the production build
+npm run test:e2e:update  # Re-record visual-regression baselines
 npm run check:broken-links -- https://sindlish.org  # Check for broken links
 ```
 
