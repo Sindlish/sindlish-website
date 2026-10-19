@@ -154,6 +154,16 @@ const ansiToHtml = (text) => {
   }
   return result;
 };
+
+/**
+ * Whether captured run output reports a failure. The interpreter reports errors
+ * as text in the captured stdout/stderr — tagged `ghalti` or containing
+ * "error" — so the Run contract reads that text rather than a status code. The
+ * docs Run button and the workbench share this one heuristic.
+ */
+export const looksLikeError = (html) =>
+  /\berror\b|ghalti/i.test(String(html || '').replace(/<[^>]+>/g, ''));
+
 export const runSindlish = async (code, onProgress = () => {}) => {
   const pyodide = await initSindlish(onProgress);
   // Normalize line endings to avoid \r issues

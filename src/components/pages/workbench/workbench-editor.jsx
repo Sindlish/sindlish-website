@@ -5,18 +5,13 @@ import { useEffect, useRef, useState } from 'react';
 import { MascotArt } from 'components/shared/mascot';
 import { useWorkbench } from 'contexts/workbench-context';
 import useCopyToClipboard from 'hooks/use-copy-to-clipboard';
-import { initSindlish, runSindlish } from 'lib/sindlish-interpreter';
+import { initSindlish, looksLikeError, runSindlish } from 'lib/sindlish-interpreter';
 import { cn } from 'utils/cn';
 
 import { DEFAULT_CODE } from './default-code';
 import WorkbenchMonaco from './workbench-monaco';
 
 const NARROW_QUERY = '(max-width: 63.9375rem)';
-
-// The interpreter's own error channel is plain text in the captured output, so
-// the run contract reports failure as text (see lib/sindlish-interpreter). The
-// same heuristic the docs Run button uses decides whether to raise the mascot.
-const looksLikeError = (html) => /\berror\b|ghalti/i.test((html || '').replace(/<[^>]+>/g, ''));
 
 /**
  * The editor pane: Monaco over the real Sindlish language server (T9 /
