@@ -35,7 +35,7 @@ export async function generateMetadata(props) {
   // The pane is noindex; its canonical points at the matching /docs/* page.
   return getMetadata({
     title: `${post.data.title} - Sindlish`,
-    description: post.excerpt,
+    description: post.data.summary,
     pathname: `${LINKS.docs}/${slug}`,
     noindex: true,
     canonical: true,
