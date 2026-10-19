@@ -22,20 +22,11 @@ const itemHasSlug = (item, slug) => {
   return false;
 };
 
-const pillarHasSlug = (pillar, slug) => {
-  if (!slug || !pillar) return false;
-  if (pillar.slug === slug) return true;
-  if (Array.isArray(pillar.items)) {
-    return pillar.items.some((item) => itemHasSlug(item, slug));
-  }
-  return false;
-};
-
 export const findCurrentPillarIndex = (navigation = [], currentPath = '') => {
   const currentSlug = slugFromPath(currentPath);
   if (!currentSlug) return -1;
 
-  return navigation.findIndex((pillar) => pillarHasSlug(pillar, currentSlug));
+  return navigation.findIndex((pillar) => itemHasSlug(pillar, currentSlug));
 };
 
 export const getPillarSections = (items = []) => {
