@@ -25,19 +25,20 @@ export async function generateMetadata(props) {
       title: 'Workbench - Sindlish',
       description: 'Read the Sindlish docs and run Sindlish side by side.',
       pathname: LINKS.workbench,
-      robotsNoindex: 'noindex',
+      noindex: true,
     });
   }
 
   const post = getPostBySlug(slug, DOCS_DIR_PATH);
-  if (!post) return getMetadata({ pathname: LINKS.workbench, robotsNoindex: 'noindex' });
+  if (!post) return getMetadata({ pathname: LINKS.workbench, noindex: true });
 
   // The pane is noindex; its canonical points at the matching /docs/* page.
   return getMetadata({
     title: `${post.data.title} - Sindlish`,
-    description: post.excerpt,
+    description: post.data.summary,
     pathname: `${LINKS.docs}/${slug}`,
-    robotsNoindex: 'noindex',
+    noindex: true,
+    canonical: true,
     type: 'article',
   });
 }

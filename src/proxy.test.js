@@ -72,7 +72,9 @@ describe('proxy - markdown twin negotiation', () => {
   });
 
   it('does not key off a known AI user-agent when Accept is HTML', async () => {
-    const response = await proxy(createMockRequest('/docs/introduction', 'text/html', 'Claude/1.0'));
+    const response = await proxy(
+      createMockRequest('/docs/introduction', 'text/html', 'Claude/1.0')
+    );
 
     expect(global.fetch).not.toHaveBeenCalled();
     expect(response.type).toBe('next');

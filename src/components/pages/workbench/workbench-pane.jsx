@@ -5,7 +5,7 @@ import DocsIndex from 'components/pages/doc/docs-shell/docs-index';
 import Post from 'components/pages/doc/post';
 import { DOCS_DIR_PATH } from 'constants/content';
 import { getPostBySlug } from 'utils/api-content';
-import { getNavigation, getNavigationLinks } from 'utils/api-docs';
+import { getNavigation, getNavigationLinks, isUnusedOrSharedContent } from 'utils/api-docs';
 import { getFlatSidebar } from 'utils/get-flat-sidebar';
 
 /**
@@ -17,12 +17,6 @@ import { getFlatSidebar } from 'utils/get-flat-sidebar';
  * component: it reads the corpus from disk at build/request time.
  */
 export const WORKBENCH_DOCS_BASE_PATH = '/workbench/docs/';
-
-const isUnusedOrSharedContent = (slug) =>
-  slug.includes('unused/') ||
-  slug.includes('shared-content/') ||
-  slug.includes('README') ||
-  slug.includes('GUIDE_TEMPLATE');
 
 export const WorkbenchPane = ({ slug = '' }) => {
   const navigation = getNavigation();

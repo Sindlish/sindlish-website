@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useWorkbench } from 'contexts/workbench-context';
 import useCopyToClipboard from 'hooks/use-copy-to-clipboard';
 import { FENCE_KIND } from 'lib/fences';
-import { runSindlish } from 'lib/sindlish-interpreter';
+import { looksLikeError, runSindlish } from 'lib/sindlish-interpreter';
 import { cn } from 'utils/cn';
 
 import CheckIcon from './images/check.inline.svg';
@@ -167,9 +167,7 @@ const CodeBlockWrapper = ({
             <pre
               className={cn(
                 'overflow-x-auto font-mono text-sm whitespace-pre',
-                /\berror\b|ghalti/i.test(result.replace(/<[^>]+>/g, ''))
-                  ? 'text-err'
-                  : 'text-text-primary'
+                looksLikeError(result) ? 'text-err' : 'text-text-primary'
               )}
               dangerouslySetInnerHTML={{ __html: result }}
             />

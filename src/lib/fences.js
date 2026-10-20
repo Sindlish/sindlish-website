@@ -94,7 +94,7 @@ export function parseFence(language, meta = '') {
     };
   }
 
-  if (lang === 'bash' || lang === 'sh' || lang === 'shell' || lang === 'console') {
+  if (lang === 'bash') {
     return {
       ...base,
       kind: FENCE_KIND.SHELL,

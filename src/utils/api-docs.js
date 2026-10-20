@@ -32,6 +32,15 @@ const getAllPosts = async () => {
     .filter((item) => process.env.NEXT_PUBLIC_VERCEL_ENV !== 'production' || !item.isDraft);
 };
 
+// Slugs that exist on disk but are not real pages: `unused/` and
+// `shared-content/` feed includes, and README/GUIDE_TEMPLATE are templates.
+// Both the docs route and the workbench pane refuse them the same way.
+const isUnusedOrSharedContent = (slug) =>
+  slug.includes('unused/') ||
+  slug.includes('shared-content/') ||
+  slug.includes('README') ||
+  slug.includes('GUIDE_TEMPLATE');
+
 const getNavigation = () =>
   jsYaml.load(fs.readFileSync(`${process.cwd()}/${DOCS_DIR_PATH}/navigation.yaml`, 'utf8'));
 
@@ -54,4 +63,5 @@ module.exports = {
   getNavigation,
   getNavigationLinks,
   getAllPosts,
+  isUnusedOrSharedContent,
 };

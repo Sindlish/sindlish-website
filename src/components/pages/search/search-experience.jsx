@@ -4,6 +4,8 @@ import NextLink from 'next/link';
 import PropTypes from 'prop-types';
 import { useMemo, useState } from 'react';
 
+import Mascot from 'components/shared/mascot';
+import { SEARCH_EMPTY } from 'constants/quiet-pages';
 import searchIndex from 'generated/search-index.json';
 import { searchDocs } from 'utils/search-index';
 
@@ -121,9 +123,13 @@ export const SearchExperience = ({ initialQuery = '' }) => {
       )}
 
       {trimmedQuery && results.length === 0 && (
-        <p className="text-sm leading-normal text-text-secondary">
-          Nothing matched “{trimmedQuery}”. Every page is one link away in the docs index.
-        </p>
+        <div className="flex flex-wrap items-center gap-x-10 gap-y-6">
+          <p className="min-w-[240px] flex-1 text-sm leading-normal text-text-secondary">
+            Nothing matched “{trimmedQuery}”. Every page is one link away in the docs index.
+          </p>
+          {/* Documented empty state: the mascot is present but silent (decorative). */}
+          <Mascot {...SEARCH_EMPTY.mascot} />
+        </div>
       )}
 
       <p className="mt-8 text-sm text-text-secondary">

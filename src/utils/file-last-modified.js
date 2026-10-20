@@ -75,4 +75,14 @@ function getFileLastModified(absPath) {
   return value;
 }
 
-module.exports = { getFileLastModified };
+/**
+ * Last commit date of a docs source file (`content/docs/<slug>.md`), or
+ * `undefined` when git cannot answer. The sitemap `lastmod` and the docs
+ * `dateModified` both read from this one deterministic source.
+ */
+function getDocsSourceLastModified(slug) {
+  const absPath = normalize(path.join(root, 'content', 'docs', `${slug}.md`));
+  return getFileLastModified(absPath) || undefined;
+}
+
+module.exports = { getFileLastModified, getDocsSourceLastModified };
