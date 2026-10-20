@@ -3,7 +3,7 @@
 exports[`MDX to Markdown Conversion > Component conversion test page (snapshot) > should convert every component without raw MDX leaks 1`] = `
 "# MDX Conversion Test Page
 
-Exercises every component the processor handles
+> Exercises every component the processor handles
 
 ## Admonition variants
 
@@ -182,8 +182,6 @@ Sindlish code reads like natural language.
 Beginners can pick it up quickly.
 
 ## ProgramForm
-
-[Apply for the Agent Plan](https://sindlish.org/use-cases/ai-agents)
 
 ## Shared content components
 

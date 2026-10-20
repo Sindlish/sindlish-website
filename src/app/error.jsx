@@ -3,12 +3,14 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 
-import Hero from 'components/pages/error/hero';
+import QuietPage from 'components/pages/quiet';
+import { ActionButton } from 'components/shared/action-link';
 import Layout from 'components/shared/layout';
+import { RUNTIME_ERROR } from 'constants/quiet-pages';
 import SEO_DATA from 'constants/seo-data';
 
-/* 
-  NOTE: 
+/*
+  NOTE:
   This page is needed to handle unexpected errors and display fallback UI.
 */
 const ErrorPage = ({ error, reset }) => {
@@ -19,13 +21,12 @@ const ErrorPage = ({ error, reset }) => {
   return (
     <>
       <title>{SEO_DATA.error.title}</title>
+      <meta name="robots" content="noindex" />
 
       <Layout isClient>
-        <Hero
-          title="Page is broken..."
-          text="Sorry, the page you are looking for is broken. Please try again later, we'll fix it soon!"
-          reset={reset}
-        />
+        <QuietPage {...RUNTIME_ERROR}>
+          <ActionButton onClick={reset}>Try again</ActionButton>
+        </QuietPage>
       </Layout>
     </>
   );

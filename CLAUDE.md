@@ -13,22 +13,30 @@ This is the Sindlish programming language's marketing website and documentation 
 
 ## Tech Stack
 
-- **Framework:** Next.js 14 (React 18, App Router)
+- **Framework:** Next.js 16 (React 19, App Router)
 - **Styling:** Tailwind CSS with custom components
 - **Content:** MDX for documentation (in `content/` directory)
-- **Search:** Algolia for documentation search
-- **Animations:** GSAP, Framer Motion, Rive
+- **Search:** Build-time generated index (`src/generated/search-index.json`, produced by `src/scripts/generate-search-index.js`)
+- **Animations:** Framer Motion
 - **Code Highlighting:** Shiki
-- **Testing:** Cypress for E2E tests
+- **Testing:** Vitest for unit tests, Playwright for E2E tests
+
+## Instrumentation
+
+The only analytics on this site is **Vercel Analytics** — first-party and cookieless. There is no consent banner and no third-party tag manager.
+
+- Exactly one `<Analytics />` mount, in the root layout (`src/app/layout.jsx`). It records page views only.
+- No custom events, and no `window.zaraz`/gtag helper: the old `send-gtag-event` helper has been deleted.
+- No PostHog, Segment, HubSpot, Spline, Rive, or Lottie code may be reintroduced.
+- If a future task appears to need an event or a second provider, stop and reopen the instrumentation decision (#40) before adding one.
 
 ## Project Structure
 
 ```text
 website/
-├── content/              # All markdown content
+├── content/              # Markdown content and configuration
 │   ├── docs/            # Technical documentation
-│   ├── changelog/       # Product updates
-│   └── guides/          # How-to guides
+│   └── config/          # Content configuration
 ├── src/
 │   ├── app/             # Next.js app router pages
 │   ├── components/      # React components
@@ -38,7 +46,6 @@ website/
 │   ├── utils/           # Helper functions
 │   └── styles/          # Global CSS
 ├── public/              # Static assets
-│   └── docs/            # Documentation images
 ```
 
 Multiple team members clone this repo to different local paths. Never hardcode a local path in documentation or scripts.
@@ -64,7 +71,8 @@ npm run format           # Run Prettier only (subset of fix)
 ### Testing
 
 ```bash
-npm run test             # Open Cypress
+npm run test             # Run the Playwright E2E suite against the production build
+npm run test:e2e:update  # Re-record visual-regression baselines
 npm run check:broken-links -- https://sindlish.org  # Check for broken links
 ```
 
@@ -447,17 +455,17 @@ Use `/simple-content` for edits to existing pages, shorter additions, or when yo
 
 ## Build Process
 
-1. `predev`/`prebuild`: Generates docs icons config
+1. `predev`/`prebuild`: Generates docs icons config and the search index
 2. `build`: Next.js build
-3. `postbuild`: Copies docs MD files and generates sitemaps
+3. `postbuild`: Copies docs MD files and generates the LLM indexes (`llms.txt`, `llms-full.txt`)
 
 ## Notes for AI Assistants
 
 - Documentation-heavy site -- search before creating
-- Do not modify `src/` components, CSS, or site structure without explicit instruction; a web team actively maintains the frontend
+- `src/` is the frontend: change it when your task requires it, matching the surrounding patterns. Do not restructure shared components, CSS, or routes opportunistically
 - Do not modify `node_modules/` or generated files
 - Run `npm run fix` before every commit
-- The codebase uses both `pages/` and `app/` directory (migration in progress)
+- The codebase uses the App Router only (`src/app/`); there is no `pages/` directory
 - Images are optimized via Next.js Image component
 - Accessibility matters -- follow WCAG guidelines
 - For writing style and component details, `content/docs/README.md` and `content/docs/community/` are the authoritative sources

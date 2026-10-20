@@ -73,6 +73,9 @@ public/docs/llms-full.txt
 public/pricing.md
 src/utils/data/github-stars.generated.json
 
+# ignore generated search index
+src/generated/search-index.json
+
 # Mac files
 .DS_Store
 
@@ -95,3 +98,11 @@ package-lock.json
 # Evals directory (test validation for documentation)
 .evals/
 content/blog
+public/pyodide/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.cache/ms-playwright/

@@ -414,7 +414,7 @@ function buildTests() {
     { note: 'homepage is not a CONTENT_ROUTE' }
   );
 
-  const nonContentRoutes = ['/download', '/playground', '/creator'];
+  const nonContentRoutes = ['/download', '/workbench', '/creator'];
 
   for (const path of nonContentRoutes) {
     add(

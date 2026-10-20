@@ -5,7 +5,6 @@ import { includeIgnoreFile } from '@eslint/compat';
 import js from '@eslint/js';
 import nextPlugin from '@next/eslint-plugin-next';
 import prettierConfig from 'eslint-config-prettier/flat';
-import cypressPlugin from 'eslint-plugin-cypress/flat';
 import importPlugin from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import react from 'eslint-plugin-react';
@@ -37,11 +36,6 @@ export default [
   },
 
   {
-    ...cypressPlugin.configs.recommended,
-    files: ['cypress/**/*.{js,jsx}'],
-  },
-
-  {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
@@ -51,7 +45,6 @@ export default [
         ...globals.node,
         Atomics: 'readonly',
         SharedArrayBuffer: 'readonly',
-        zaraz: 'readonly',
       },
       parserOptions: {
         ecmaFeatures: { jsx: true },

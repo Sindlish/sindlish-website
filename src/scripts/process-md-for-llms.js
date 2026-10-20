@@ -86,7 +86,7 @@ const IGNORED_COMPONENTS = [
   'SqlToRestConverter', // Interactive app
   'LogosSection', // Decorative logos
   'ComputeCalculator', // Interactive widget
-  'UseCaseContext', // Repetitive boilerplate
+  'ProgramForm', // Interactive signup form
 ];
 
 // ESM modules loaded dynamically
@@ -969,29 +969,6 @@ const componentHandlers = {
   },
 
   /**
-   * ProgramForm -> hardcoded text based on form type
-   * <ProgramForm type="agent" />
-   */
-  ProgramForm(node) {
-    const formType = getAttr(node, 'type') || '';
-
-    if (formType === 'agent') {
-      return {
-        type: 'paragraph',
-        children: [
-          {
-            type: 'link',
-            url: `${BASE_URL}/use-cases/ai-agents`,
-            children: [{ type: 'text', value: 'Apply for the Agent Plan' }],
-          },
-        ],
-      };
-    }
-
-    return null; // Remove for other form types
-  },
-
-  /**
    * ExternalCode -> fetch code from GitHub and display as code block
    * <ExternalCode url="https://raw.githubusercontent.com/..." />
    * Security: Only allows github.com and raw.githubusercontent.com
@@ -1712,13 +1689,9 @@ async function processFile(inputPath, pageUrl, rootDir) {
   if (frontmatter.title) {
     output += `# ${frontmatter.title}\n\n`;
   }
-  if (frontmatter.subtitle) {
-    output += `${frontmatter.subtitle}\n\n`;
+  if (frontmatter.summary) {
+    output += `> ${frontmatter.summary}\n\n`;
   }
-  // TODO: Enable when summary frontmatter is added consistently across all content routes
-  // if (frontmatter.summary) {
-  //   output += `> ${frontmatter.summary}\n\n`;
-  // }
 
   output += `${markdown.trim()}\n`;
 
@@ -2041,6 +2014,71 @@ async function processDirectory(inputDir, outputDir, baseContentDir, rootDir) {
   }
 }
 
+// Directory names and root files under a content route that are not pages and
+// therefore must not be expected to have a markdown twin. Mirrors the ignores in
+// `getPostSlugs` (utils/api-content.js), which defines the rendered page set.
+const TWIN_NON_PAGE_DIRS = ['unused', 'shared-content'];
+const TWIN_NON_PAGE_FILES = ['README.md', 'GUIDE_TEMPLATE.md'];
+
+/**
+ * Collect the page slugs (relative, without `.md`) under a content route.
+ */
+async function collectPageSlugs(dir, base, acc = []) {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      if (TWIN_NON_PAGE_DIRS.includes(entry.name)) continue;
+      await collectPageSlugs(path.join(dir, entry.name), base, acc);
+    } else if (entry.name.endsWith('.md') && !TWIN_NON_PAGE_FILES.includes(entry.name)) {
+      const rel = path.relative(base, path.join(dir, entry.name)).split(path.sep).join('/');
+      acc.push(rel.replace(/\.md$/, ''));
+    }
+  }
+
+  return acc;
+}
+
+/**
+ * Build-time twin-completeness check.
+ *
+ * Every page served from a content route must have a generated markdown twin in
+ * public/md/. A page that renders over HTTP but 404s as markdown is a discovery
+ * hole for agents, so this fails the build instead of shipping silently.
+ *
+ * @param {string} rootDir - Project root
+ * @param {string} outputDir - Absolute path to public/md/
+ * @param {Record<string,string>} contentRoutes - route key -> content dir (e.g. docs -> content/docs)
+ * @returns {Promise<number>} number of verified twins
+ */
+async function verifyTwins(rootDir, outputDir, contentRoutes) {
+  const missing = [];
+  let checked = 0;
+
+  for (const [route, srcPath] of Object.entries(contentRoutes)) {
+    const base = path.join(rootDir, srcPath);
+    if (!fsSync.existsSync(base)) continue;
+
+    const slugs = await collectPageSlugs(base, base);
+
+    for (const slug of slugs) {
+      checked++;
+      const twin = path.join(outputDir, route, `${slug}.md`);
+      if (!fsSync.existsSync(twin)) {
+        missing.push(`${route}/${slug}`);
+      }
+    }
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `BUILD FAILED: ${missing.length} content page(s) missing a markdown twin: ${missing.join(', ')}`
+    );
+  }
+
+  return checked;
+}
+
 /**
  * Process all content routes (for postbuild integration)
  */
@@ -2075,6 +2113,10 @@ async function processAllContent(contentRoutes, rootDir) {
     throw err;
   }
 
+  // Build-time twin completeness: every rendered content page must have a twin.
+  const verifiedTwins = await verifyTwins(rootDir, outputDir, contentRoutes);
+  console.log(`Verified markdown twins for ${verifiedTwins} content pages.`);
+
   printBuildSummary(rootDir);
 
   if (processingErrors.length > 0) {
@@ -2089,6 +2131,8 @@ module.exports = {
   processFile,
   processDirectory,
   processAllContent,
+  verifyTwins,
+  collectPageSlugs,
   loadDependencies,
   clearState,
   printBuildSummary,

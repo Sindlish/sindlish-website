@@ -49,7 +49,6 @@ import TerraformIcon from 'icons/docs/sidebar/terraform.inline.svg';
 import TutorialIcon from 'icons/docs/sidebar/tutorial.inline.svg';
 import TwinIcon from 'icons/docs/sidebar/twin.inline.svg';
 import UpgradeIcon from 'icons/docs/sidebar/upgrade.inline.svg';
-import UseCaseIcon from 'icons/docs/sidebar/use-case.inline.svg';
 import VerceIcon from 'icons/docs/sidebar/vercel.inline.svg';
 import VersionIcon from 'icons/docs/sidebar/version.inline.svg';
 import WorkflowsIcon from 'icons/docs/sidebar/workflows.inline.svg';
@@ -104,7 +103,6 @@ const icons = {
   tutorial: TutorialIcon,
   twin: TwinIcon,
   upgrade: UpgradeIcon,
-  'use-case': UseCaseIcon,
   vercel: VerceIcon,
   version: VersionIcon,
   workflows: WorkflowsIcon,

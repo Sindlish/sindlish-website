@@ -10,6 +10,7 @@ const DocsNotFoundPage = () => (
       content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"
     />
     <title>{SEO_DATA[404].title}</title>
+    <meta name="robots" content="noindex" />
 
     <Layout>
       <Hero

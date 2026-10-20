@@ -23,8 +23,6 @@ const DefaultNavigationLink = ({ link, basePath, isNext = false, showLabel = tru
         'group flex w-1/2 min-w-0 flex-col gap-3 sm:w-full',
         isNext ? 'ml-auto items-end' : 'items-start sm:hidden'
       )}
-      tagName="DocsPagination"
-      tagText={`${isNext ? 'Next' : 'Previous'}: ${link.title}`}
     >
       <span className="flex items-center gap-1 text-[13px] leading-none font-normal tracking-extra-tight text-gray-new-50">
         {showLabel && (link.index || (isNext ? 'Next' : 'Previous'))}{' '}
@@ -50,8 +48,6 @@ const BranchingNavigationLink = ({ link, basePath, isNext = false, showLabel = t
         'group flex w-1/2 max-w-[336px] min-w-0 items-center justify-between gap-6 border border-gray-new-20 py-4 pr-4 pl-5 lg:max-w-full sm:w-full sm:max-w-full sm:pr-5',
         isNext ? 'ml-auto flex-row pr-4 sm:pr-5' : 'flex-row-reverse pl-4 sm:hidden'
       )}
-      tagName="DocsPagination"
-      tagText={`${isNext ? 'Next' : 'Previous'}: ${link.title}`}
     >
       <span
         className={cn(

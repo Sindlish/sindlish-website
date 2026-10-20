@@ -134,14 +134,13 @@ See existing handlers in the code for examples of each pattern.
 | CommunityBanner                                                                        | Text + link                                                                                      |
 | PromptCards                                                                            | List of AI coding prompt links                                                                   |
 | CTA                                                                                    | Title, description (HTML links converted via `parseHtmlWithLinks`), command, button link         |
-| ProgramForm                                                                            | Hardcoded text for form types                                                                    |
 
 **Shared content components** (load templates from `content/docs/shared-content/`):
 FeatureBeta, FeatureBetaProps (`{feature_name}`), EarlyAccess, EarlyAccessProps, AgentSkillsTip, MCPTools, LinkAPIKey, LRNotice, ComingSoon, PrivatePreview, PrivatePreviewEnquire, PublicPreview, LRBeta, MigrationAssistant, NextSteps, NewPricing, AzureRegionsDeprecation, ConsumptionAccountApiDeprecation
 
 **HTML elements**: `<a>` -> markdown link (wrapped in paragraph when block-level), `<details>/<summary>` -> preserved as HTML, `<p>` -> paragraph, `<br/>` -> preserved
 
-**Ignored (UI-only)**: CopyPrompt, NeedHelp, Comment, Video, UserButton, RequestForm, Suspense, SqlToRestConverter, LogosSection, ComputeCalculator, UseCaseContext
+**Ignored (UI-only)**: CopyPrompt, NeedHelp, Comment, Video, UserButton, RequestForm, Suspense, SqlToRestConverter, LogosSection, ComputeCalculator, ProgramForm
 
 **Unknown components**: Components with children become `**[ComponentName]:** content`. Self-closing components get attributes extracted as `name: value` pairs. Warning logged to console.
 
@@ -167,7 +166,7 @@ The old system used `public/llms/` for hand-maintained `.txt` files; that's depr
 
 ## Build & Verification
 
-Postbuild (`package.json`): `copy-md-content.js && generate-llms-index.js && next-sitemap...`
+Postbuild (`package.json`): `copy-md-content.js && generate-llms-index.js && generate-llms-full.js`
 
 The processor verifies files were generated in `processAllContent()` -- if zero `.md` files exist in the output directory, the build fails with `process.exit(1)`.
 

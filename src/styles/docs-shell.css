@@ -1,0 +1,25 @@
+/*
+ * The docs content column (issue #51).
+ *
+ * These rules are deliberately left UNLAYERED, so they outrank everything in
+ * `@layer components` from ./doc-content.css. The measure is 66ch, centred in
+ * the space the 268px sidebar leaves over. With a sidebar there is no viewport
+ * edge to break out to, so code blocks, tables and admonitions instead gain a
+ * fixed 28px on each side — removed again at the <=1024px collapse, where the
+ * content runs the full width of the window.
+ */
+.docs-measure {
+  width: 100%;
+  max-width: 66ch;
+  margin-inline: auto;
+}
+
+.docs-measure .prose > :is(.code-block, .table-wrapper, .admonition) {
+  margin-inline: -28px;
+}
+
+@media (max-width: 63.9375rem) {
+  .docs-measure .prose > :is(.code-block, .table-wrapper, .admonition) {
+    margin-inline: 0;
+  }
+}

@@ -8,8 +8,6 @@ import ArrowRightIcon from 'icons/arrow-right.inline.svg';
 import ExternalIcon from 'icons/external.inline.svg';
 import GlossaryIcon from 'icons/glossary.inline.svg';
 import { cn } from 'utils/cn';
-import getNodeText from 'utils/get-node-text';
-import sendGtagEvent from 'utils/send-gtag-event';
 
 const underlineCommonStyles =
   'relative cursor-pointer transition-colors duration-500 before:absolute before:-bottom-1.5 before:left-0 before:h-1.5 before:w-full before:transition-all before:duration-500 hover:before:bottom-full hover:before:opacity-0 before:pointer-events-none';
@@ -68,8 +66,6 @@ const Link = forwardRef(
       withArrow = false,
       arrowClassName = null,
       icon = null,
-      tagName = null,
-      tagText = null,
       children,
       prefetch = undefined,
       isExternal = false,
@@ -87,16 +83,6 @@ const Link = forwardRef(
     );
 
     const Icon = icons[icon];
-
-    const handleClick = () => {
-      if (!tagName) return;
-      sendGtagEvent('Link Clicked', {
-        style: theme,
-        text: tagText || getNodeText(children),
-        tag_name: tagName,
-        destination: to,
-      });
-    };
 
     const content = (
       <>
@@ -120,7 +106,7 @@ const Link = forwardRef(
     // TODO: remove this when we upgrade to latest version of Next.js
     if (to?.includes('#')) {
       return (
-        <a className={className} href={to} ref={ref} onClick={handleClick} {...props}>
+        <a className={className} href={to} ref={ref} {...props}>
           {content}
         </a>
       );
@@ -128,14 +114,7 @@ const Link = forwardRef(
 
     if (to?.startsWith('/')) {
       return (
-        <NextLink
-          className={className}
-          href={to}
-          ref={ref}
-          prefetch={prefetch}
-          onClick={handleClick}
-          {...props}
-        >
+        <NextLink className={className} href={to} ref={ref} prefetch={prefetch} {...props}>
           {content}
         </NextLink>
       );
@@ -146,7 +125,6 @@ const Link = forwardRef(
         className={className}
         href={to}
         ref={ref}
-        onClick={handleClick}
         {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
         {...props}
       >
@@ -168,8 +146,6 @@ Link.propTypes = {
   arrowClassName: PropTypes.string,
   icon: PropTypes.oneOf(Object.keys(icons)),
   prefetch: PropTypes.bool,
-  tagName: PropTypes.string,
-  tagText: PropTypes.string,
   isExternal: PropTypes.bool,
 };
 

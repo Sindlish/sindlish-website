@@ -1,140 +1,36 @@
 import { describe, it, expect } from 'vitest';
 
-import { isAIAgentRequest, getMarkdownPath, buildAgent404Response } from './ai-agent-detection';
+import { prefersMarkdown, getMarkdownPath, buildAgent404Response } from './ai-agent-detection';
 
-describe('isAIAgentRequest', () => {
-  // Helper to create mock request objects
-  const createMockRequest = (userAgent = '', accept = '') => ({
-    headers: new Map([
-      ['user-agent', userAgent],
-      ['accept', accept],
-    ]),
+describe('prefersMarkdown', () => {
+  // Pure Accept negotiation: no user-agent input at all.
+  const createMockRequest = (accept = '') => ({
+    headers: new Map([['accept', accept]]),
   });
 
-  describe('User-Agent detection', () => {
-    const aiAgentPatterns = [
-      'ChatGPT-User',
-      'OpenAI',
-      'GPT',
-      'Claude',
-      'Anthropic',
-      'Cursor',
-      'Windsurf',
-      'Perplexity',
-      'GitHub-Copilot',
-      'ai-agent',
-      'llm-agent',
-      'axios',
-      'got',
-    ];
-
-    aiAgentPatterns.forEach((pattern) => {
-      it(`should detect AI agent with User-Agent containing "${pattern}"`, () => {
-        const req = createMockRequest(`Mozilla/5.0 ${pattern}/1.0`, 'text/html');
-        expect(isAIAgentRequest(req)).toBe(true);
-      });
-
-      it(`should detect AI agent with User-Agent containing lowercase "${pattern.toLowerCase()}"`, () => {
-        const req = createMockRequest(`Mozilla/5.0 ${pattern.toLowerCase()}/1.0`, 'text/html');
-        expect(isAIAgentRequest(req)).toBe(true);
-      });
-    });
-
-    it('should not detect regular browser User-Agent', () => {
-      const req = createMockRequest(
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'text/html'
-      );
-      expect(isAIAgentRequest(req)).toBe(false);
-    });
+  it('is true only when Accept includes text/markdown', () => {
+    expect(prefersMarkdown(createMockRequest('text/markdown'))).toBe(true);
+    expect(prefersMarkdown(createMockRequest('text/markdown, text/html, */*'))).toBe(true);
+    expect(prefersMarkdown(createMockRequest('TEXT/MARKDOWN'))).toBe(true);
   });
 
-  describe('Accept header detection', () => {
-    it('should detect AI agent when Accept includes text/markdown', () => {
-      const req = createMockRequest('Mozilla/5.0', 'text/markdown');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-
-    it('should detect AI agent when Accept includes text/markdown with text/html', () => {
-      const req = createMockRequest('Mozilla/5.0', 'text/markdown, text/html, */*');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-
-    it('should detect AI agent when Accept is text/plain without text/html', () => {
-      const req = createMockRequest('Mozilla/5.0', 'text/plain');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-
-    it('should detect AI agent when Accept is application/json without text/html', () => {
-      const req = createMockRequest('Mozilla/5.0', 'application/json');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-
-    it('should detect AI agent when Accept is application/xml without text/html', () => {
-      const req = createMockRequest('Mozilla/5.0', 'application/xml');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-
-    it('should NOT detect AI agent when Accept includes text/html without markdown', () => {
-      const req = createMockRequest('Mozilla/5.0', 'text/html,application/json');
-      expect(isAIAgentRequest(req)).toBe(false);
-    });
-
-    it('should NOT detect AI agent when Accept is only text/html', () => {
-      const req = createMockRequest('Mozilla/5.0', 'text/html');
-      expect(isAIAgentRequest(req)).toBe(false);
-    });
-
-    it('should NOT detect AI agent with generic Accept header', () => {
-      const req = createMockRequest('Mozilla/5.0', '*/*');
-      expect(isAIAgentRequest(req)).toBe(false);
-    });
+  it('is false for HTML, wildcard, and non-markdown accepts', () => {
+    expect(prefersMarkdown(createMockRequest('text/html'))).toBe(false);
+    expect(prefersMarkdown(createMockRequest('text/html,application/json'))).toBe(false);
+    expect(prefersMarkdown(createMockRequest('*/*'))).toBe(false);
+    expect(prefersMarkdown(createMockRequest('text/plain'))).toBe(false);
+    expect(prefersMarkdown(createMockRequest('application/json'))).toBe(false);
+    expect(prefersMarkdown(createMockRequest(''))).toBe(false);
   });
 
-  describe('Combined detection', () => {
-    it('should detect AI agent with both AI User-Agent and non-HTML Accept', () => {
-      const req = createMockRequest('Claude/1.0', 'text/plain');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-
-    it('should detect AI agent with AI User-Agent even with HTML Accept', () => {
-      const req = createMockRequest('Claude/1.0', 'text/html');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-  });
-
-  describe('Real-world AI tools detection', () => {
-    it('should detect Claude Code with axios User-Agent and text/markdown Accept', () => {
-      const req = createMockRequest('axios/1.8.4', 'text/markdown, text/html, */*');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-
-    it('should detect Cursor with got User-Agent', () => {
-      const req = createMockRequest('got (https://github.com/sindresorhus/got)', '*/*');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-
-    it('should detect any tool requesting text/markdown even with regular User-Agent', () => {
-      const req = createMockRequest('Mozilla/5.0', 'text/markdown, */*');
-      expect(isAIAgentRequest(req)).toBe(true);
-    });
-  });
-
-  describe('Edge cases', () => {
-    it('should handle missing User-Agent header', () => {
-      const req = createMockRequest('', 'text/html');
-      expect(isAIAgentRequest(req)).toBe(false);
-    });
-
-    it('should handle missing Accept header', () => {
-      const req = createMockRequest('Mozilla/5.0', '');
-      expect(isAIAgentRequest(req)).toBe(false);
-    });
-
-    it('should handle both headers missing', () => {
-      const req = createMockRequest('', '');
-      expect(isAIAgentRequest(req)).toBe(false);
-    });
+  it('never keys off a user-agent, even a known AI one', () => {
+    const request = {
+      headers: new Map([
+        ['user-agent', 'Claude/1.0'],
+        ['accept', 'text/html'],
+      ]),
+    };
+    expect(prefersMarkdown(request)).toBe(false);
   });
 });
 
@@ -182,14 +78,19 @@ describe('getMarkdownPath', () => {
       expect(result).toBeNull();
     });
 
-    it('should return null for /use-cases/ai-agents', () => {
-      const result = getMarkdownPath('/use-cases/ai-agents');
+    it('should return null for /creator', () => {
+      const result = getMarkdownPath('/creator');
       expect(result).toBeNull();
     });
 
     it('should return null for index pages /guides and /branching', () => {
       expect(getMarkdownPath('/guides')).toBeNull();
       expect(getMarkdownPath('/branching')).toBeNull();
+    });
+
+    it('should return null for the /docs/og route handler (no markdown twin)', () => {
+      expect(getMarkdownPath('/docs/og')).toBeNull();
+      expect(getMarkdownPath('/docs/og/')).toBeNull();
     });
   });
 
@@ -233,13 +134,13 @@ describe('getMarkdownPath', () => {
       expect(result).toBeNull();
     });
 
-    it('should return null for /use-cases/multi-tb', () => {
-      const result = getMarkdownPath('/use-cases/multi-tb');
+    it('should return null for /multi-tb', () => {
+      const result = getMarkdownPath('/multi-tb');
       expect(result).toBeNull();
     });
 
-    it('should return null for /use-cases/serverless-apps', () => {
-      const result = getMarkdownPath('/use-cases/serverless-apps');
+    it('should return null for /serverless-apps', () => {
+      const result = getMarkdownPath('/serverless-apps');
       expect(result).toBeNull();
     });
   });

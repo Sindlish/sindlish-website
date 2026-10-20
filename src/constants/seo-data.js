@@ -1,55 +1,49 @@
-import LINKS from './links';
+// The live SEO surface. Everything the inherited template carried for the Neon
+// blog (about, blog, guides, categories, RSS, the Postgres canonical hack) is
+// gone; only the routes the rebuilt site actually ships remain.
 
-export const DEFAULT_IMAGE_PATH = '/images/social-previews/index.jpg';
+export const DEFAULT_IMAGE_PATH = '/images/og/default.png';
+export const SITE_NAME = 'Sindlish';
+
+// The root title template is `%s - Sindlish`; `/` uses this absolute title.
+export const DEFAULT_TITLE = 'Sindlish - The First Sindhi Programming Language';
+export const DEFAULT_DESCRIPTION =
+  'Write code in Sindhi. Sindlish is the first programming language that lets you code using Sindhi keywords, bringing software development to millions of Sindhi speakers.';
+
+// One canonical origin. Preview/branch URLs are never used for canonical links:
+// a non-production deployment is noindexed with no canonical at all.
+export const getSiteUrl = () =>
+  process.env.NEXT_PUBLIC_DEFAULT_SITE_URL || 'https://sindlish.org';
+
+export const isProduction = () =>
+  (process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV) === 'production';
 
 export default {
   index: {
-    title: 'Sindlish — The First Sindhi Programming Language',
-    description:
-      'Write code in Sindhi. Sindlish is the first programming language that lets you code using Sindhi keywords, bringing software development to millions of Sindhi speakers.',
-    pathname: '',
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    pathname: '/',
   },
-  about: {
-    title: 'About — Sindlish',
-    description:
-      'Learn about the Sindlish programming language project and the mission to bring coding to the Sindhi community.',
+  docs: {
+    title: 'Documentation',
+    description: 'Every page in the Sindlish documentation, grouped by pillar.',
+    pathname: '/docs',
   },
-
-  aboutUs: {
-    title: 'About Us — Sindlish',
-    description:
-      'Meet the team behind Sindlish, the first programming language designed for Sindhi speakers.',
-    pathname: LINKS.aboutUs,
+  creator: {
+    title: 'The creator',
+    description: 'Who builds Sindlish, read live from GitHub.',
+    pathname: '/creator',
   },
-  blog: {
-    title: 'Blog — Sindlish',
+  download: {
+    title: 'Download',
     description:
-      'Read updates, tutorials, and announcements about the Sindlish programming language.',
-    imagePath: '/images/social-previews/blog.jpg',
-    pathname: LINKS.blog,
-  },
-  guides: {
-    title: 'Guides — Sindlish',
-    description: 'Learn how to use Sindlish with our step-by-step guides.',
-    pathname: LINKS.guides,
+      'Install the Sindlish interpreter for Windows, Linux and macOS, then run your first program.',
+    pathname: '/download',
   },
   error: {
-    title: 'Page Is Broken — Sindlish',
+    title: 'Something went wrong',
   },
   404: {
-    title: 'Page Not Found — Sindlish',
+    title: 'Page not found',
   },
-};
-
-export const getBlogCategoryDescription = (category) => {
-  switch (category) {
-    case 'tutorials':
-      return 'Step-by-step tutorials for learning Sindlish programming language. From beginner to advanced.';
-    case 'updates':
-      return 'Stay updated on the latest Sindlish language features, releases, and improvements.';
-    case 'community':
-      return 'Join the Sindlish community. Share your projects, ask questions, and connect with other Sindhi developers.';
-    default:
-      return 'Read the latest from the Sindlish programming language blog.';
-  }
 };

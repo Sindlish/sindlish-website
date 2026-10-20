@@ -7,8 +7,6 @@ import { useState } from 'react';
 
 import LINKS from 'constants/links';
 import useContextMenu from 'hooks/use-context-menu';
-import logoDarkSvg from 'images/logo-dark.svg';
-import logoLightSvg from 'images/logo-light.svg';
 import { cn } from 'utils/cn';
 
 import Link from '../link';
@@ -17,10 +15,7 @@ import CheckIcon from './images/check.inline.svg';
 
 const copySvgToClipboard = async () => {
   try {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    const logoToUse = isDarkMode ? logoDarkSvg : logoLightSvg;
-
-    const response = await fetch(logoToUse);
+    const response = await fetch('/images/sindlish-logo.svg');
     const svgContent = await response.text();
     copyToClipboard(svgContent);
   } catch (error) {

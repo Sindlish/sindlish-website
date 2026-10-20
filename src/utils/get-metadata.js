@@ -1,81 +1,96 @@
-import SEO_DATA, { DEFAULT_IMAGE_PATH } from 'constants/seo-data';
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_IMAGE_PATH,
+  getSiteUrl,
+  isProduction,
+  SITE_NAME,
+} from 'constants/seo-data';
 
-const DEFAULT_TITLE = SEO_DATA.index.title;
-const DEFAULT_DESCRIPTION = SEO_DATA.index.description;
+// One canonical URL scheme for the whole site.
+//
+// - `metadataBase` is always the single canonical origin (`NEXT_PUBLIC_DEFAULT_SITE_URL`).
+//   A preview/branch URL is never used: previews are noindexed with no canonical.
+// - `canonical` is `metadataBase + pathname`, emitted only in production and only
+//   for a page that owns its URL. A noindexed page emits no canonical by default;
+//   it opts in (`canonical: true`) only when another URL owns it, as the workbench
+//   docs pane does by pointing at its matching `/docs/*` page.
+// - `noindex` (not the retired `robotsNoindex`) is the switch that turns indexing
+//   off: `robots: { index: false }`.
+// - The root title template (`%s - Sindlish`) is declared once in the root layout;
+//   `title` here is a plain page title unless the caller passes `{ absolute }`.
+// - Docs descriptions come from the authored `summary` frontmatter; there is no
+//   excerpt generator.
+// - Docs keep the dynamic `/docs/og` card; every other route uses the one default
+//   image slot, `public/images/og/default.png` (1200x630, PNG).
 
-export default function getMetadata({
+const toAbsoluteUrl = (path, siteUrl) => {
+  if (!path) return undefined;
+  if (path.startsWith('http')) return path;
+  return new URL(path, siteUrl).toString();
+};
+
+function buildMetadata({
   title,
-  description,
-  keywords,
-  robotsNoindex,
-  rssPathname = null,
-  pathname,
-  category = null,
+  description = DEFAULT_DESCRIPTION,
+  pathname = '/',
+  imagePath = DEFAULT_IMAGE_PATH,
   type = 'website',
   publishedTime = null,
-  authors = [],
-  imagePath = DEFAULT_IMAGE_PATH,
-  isPostgres = false,
-  currentSlug = null,
+  modifiedTime = null,
+  authors = null,
   markdownPath = null,
-}) {
-  const SITE_URL =
-    process.env.VERCEL_ENV === 'preview'
-      ? `https://${process.env.VERCEL_BRANCH_URL}`
-      : process.env.NEXT_PUBLIC_DEFAULT_SITE_URL;
-  const canonicalUrl = SITE_URL + pathname;
-  const imageUrl = imagePath?.startsWith('http') ? imagePath : SITE_URL + imagePath;
-
-  const metaImageUrl = imagePath ? imageUrl : `${SITE_URL}${DEFAULT_IMAGE_PATH}`;
-  const metaTitle = title || DEFAULT_TITLE;
-  const metaDescription = description || DEFAULT_DESCRIPTION;
-
-  const siteName = 'Sindlish';
-  const robots = robotsNoindex === 'noindex' ? { index: false } : null;
+  noindex = false,
+  canonical = !noindex,
+} = {}) {
+  const siteUrl = getSiteUrl();
+  const canonicalUrl = toAbsoluteUrl(pathname, siteUrl);
+  const imageUrl = toAbsoluteUrl(imagePath, siteUrl);
+  const indexable = isProduction() && !noindex;
 
   return {
-    metadataBase: new URL(SITE_URL),
-    title: metaTitle,
-    description: metaDescription,
+    metadataBase: new URL(siteUrl),
+    title,
+    description,
     alternates: {
-      canonical: isPostgres
-        ? `https://www.postgresql.org/docs/16/${currentSlug}.html`
-        : canonicalUrl,
-      types: {
-        'application/rss+xml': rssPathname ? `${SITE_URL}${rssPathname}` : null,
-        'text/markdown': markdownPath ? `${SITE_URL}${markdownPath}` : null,
-      },
+      canonical: isProduction() && canonical ? canonicalUrl : undefined,
+      types: markdownPath ? { 'text/markdown': toAbsoluteUrl(markdownPath, siteUrl) } : undefined,
     },
     manifest: '/manifest.json',
-    keywords: Array.from(new Set(keywords?.split(',').map((keyword) => keyword.trim()))).join(', '), // Remove duplicates
-    robots,
+    robots: { index: indexable, follow: indexable },
     icons: {
       icon: [
-        { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
+        { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+        { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/favicon.ico', sizes: 'any' },
       ],
-      apple: [
-        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-        { url: '/apple-touch-icon-152x152.png', sizes: '152x152', type: 'image/png' },
-        { url: '/apple-touch-icon-120x120.png', sizes: '120x120', type: 'image/png' },
-      ],
+      apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     },
     openGraph: {
-      title: metaTitle,
-      description: metaDescription,
+      title,
+      description,
       url: canonicalUrl,
-      siteName,
+      siteName: SITE_NAME,
       images: [
         {
-          url: metaImageUrl,
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          type: 'image/png',
+          alt: SITE_NAME,
         },
       ],
       type,
       publishedTime,
+      modifiedTime,
       authors,
     },
-    category,
     twitter: {
       card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
     },
   };
 }
+
+export default buildMetadata;

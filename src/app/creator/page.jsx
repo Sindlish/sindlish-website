@@ -1,171 +1,174 @@
 'use client';
-import { m, LazyMotion, domAnimation } from 'framer-motion';
+
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import Button from 'components/shared/button';
+
+import ActionLink from 'components/shared/action-link';
 import Container from 'components/shared/container';
+import JsonLd from 'components/shared/json-ld';
 import Layout from 'components/shared/layout';
-import GitHubIcon from 'icons/github.inline.svg';
+import Mascot from 'components/shared/mascot';
+import { getSiteUrl } from 'constants/seo-data';
+import { getPersonSchema } from 'lib/schema';
+
+const PROFILE_URL = 'https://api.github.com/users/AmanatAliPanhwer';
+
 const CreatorPage = () => {
   const [user, setUser] = useState(null);
+
   useEffect(() => {
-    fetch('https://api.github.com/users/AmanatAliPanhwer')
+    fetch(PROFILE_URL)
       .then((res) => res.json())
       .then(setUser)
       .catch(() => {});
   }, []);
+
+  const stats = [
+    ['Repos', user?.public_repos],
+    ['Followers', user?.followers],
+    ['Following', user?.following],
+  ];
+
   return (
-    <Layout isHeaderSticky isHeaderStickyOverlay theme="black">
-      <LazyMotion features={domAnimation}>
-        <section className="safe-paddings relative bg-black-pure text-white">
-          <Container
-            className="relative z-10 pt-40 pb-32 xl:pt-32 xl:pb-24 lg:pt-28 lg:pb-20 md:pt-24 md:pb-16"
-            size="1600"
-          >
-            {/* Header */}
-            <m.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <span className="text-sm font-medium uppercase tracking-wider text-[#E02424]">
-                The Creator
-              </span>
-              <h1 className="mt-3 text-[52px] font-bold leading-tight tracking-tighter xl:text-4xl lg:text-[32px] sm:text-[28px]">
-                Behind Sindlish
-              </h1>
-            </m.div>
-            {/* Profile Card */}
-            {user && (
-              <m.div
-                className="mt-16 flex items-start gap-16 lg:flex-col lg:gap-12"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {/* Left: Avatar + Stats Card */}
-                <div className="w-[360px] shrink-0 rounded-none border border-gray-new-20 bg-[#0A0A0B] lg:w-full lg:max-w-md">
-                  {/* Avatar Header */}
-                  <div className="flex items-center gap-5 border-b border-gray-new-20 p-6">
-                    <Image
-                      src={user.avatar_url}
-                      alt={`${user.name} Avatar`}
-                      width={64}
-                      height={64}
-                      className="rounded-none border border-gray-new-20"
-                    />
-                    <div>
-                      <h2 className="text-xl font-bold tracking-tighter">
-                        {user.name || 'Amanat Ali Panhwer'}
-                      </h2>
-                      <span className="text-sm text-gray-new-50">@{user.login}</span>
-                    </div>
-                  </div>
-                  {/* Stats */}
-                  <div className="grid grid-cols-3 divide-x divide-gray-new-20 border-b border-gray-new-20">
-                    <div className="flex flex-col items-center py-5">
-                      <span className="text-2xl font-bold text-white">{user.public_repos}</span>
-                      <span className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-new-50">
-                        Repos
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-center py-5">
-                      <span className="text-2xl font-bold text-white">{user.followers}</span>
-                      <span className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-new-50">
-                        Followers
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-center py-5">
-                      <span className="text-2xl font-bold text-white">{user.following}</span>
-                      <span className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-new-50">
-                        Following
-                      </span>
-                    </div>
-                  </div>
-                  {/* Details */}
-                  <div className="space-y-3 p-6">
-                    {user.location && (
-                      <div className="flex items-center gap-3 text-sm text-gray-new-60">
-                        <span className="text-gray-new-40">📍</span>
-                        <span>{user.location}</span>
-                      </div>
-                    )}
-                    {user.company && (
-                      <div className="flex items-center gap-3 text-sm text-gray-new-60">
-                        <span className="text-gray-new-40">🏢</span>
-                        <span>{user.company}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-3 text-sm text-gray-new-60">
-                      <span className="text-gray-new-40">📅</span>
-                      <span>Joined {new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
-                    </div>
-                  </div>
-                  {/* Action */}
-                  <div className="border-t border-gray-new-20 p-6">
-                    <Button
-                      className="w-full justify-center gap-2"
-                      to={user.html_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      theme="white-filled"
-                      size="new"
-                    >
-                      <GitHubIcon className="size-4" />
-                      Follow on GitHub
-                    </Button>
-                  </div>
+    <Layout isHeaderSticky isHeaderStickyOverlay>
+      <JsonLd id="creator-json-ld" data={getPersonSchema(getSiteUrl())} />
+      <section className="border-b border-border bg-surface-page">
+        <Container
+          className="flex flex-wrap items-center gap-x-16 gap-y-10 py-24 lg:py-16 md:py-12"
+          size="1088"
+        >
+          <div className="min-w-[280px] flex-1">
+            <p className="font-mono text-xs tracking-widest text-text-muted uppercase">
+              The creator
+            </p>
+            <h1 className="mt-3 text-5xl leading-tight font-semibold tracking-tight text-text-primary xl:text-4xl lg:text-3xl">
+              Behind Sindlish
+            </h1>
+            <p className="mt-5 max-w-xl text-xl leading-snug text-text-secondary lg:text-lg">
+              Who builds Sindlish, read live from GitHub.
+            </p>
+          </div>
+          <Mascot variant="standing-neutral" size={110} />
+        </Container>
+      </section>
+
+      {user && (
+        <section className="bg-surface-page">
+          <Container className="flex flex-wrap items-start gap-12 py-16" size="1088">
+            <div className="w-[360px] shrink-0 border border-border bg-surface-raised lg:w-full lg:max-w-md">
+              <div className="flex items-center gap-5 border-b border-border p-6">
+                <Image
+                  src={user.avatar_url}
+                  alt=""
+                  width={64}
+                  height={64}
+                  className="shrink-0 border border-border"
+                />
+                <div>
+                  <h2 className="text-xl font-semibold text-text-primary">
+                    {user.name || 'Amanat Ali Panhwer'}
+                  </h2>
+                  <span className="text-sm text-text-muted">{`@${user.login}`}</span>
                 </div>
-                {/* Right: Bio + Mission */}
-                <div className="flex-1">
-                  <p className="text-xl leading-relaxed tracking-tight text-gray-new-60 lg:text-lg">
-                    {user.bio ||
-                      'Python developer with 5 years of experience in AI, machine learning, and automation.'}
+              </div>
+
+              <div className="grid grid-cols-3 divide-x divide-border border-b border-border text-center">
+                {stats.map(([label, value]) => (
+                  <div className="px-4 py-5" key={label}>
+                    <span className="block text-2xl font-semibold text-text-primary">{value}</span>
+                    <span className="mt-1 block text-xs font-medium tracking-widest text-text-muted uppercase">
+                      {label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <dl className="flex flex-col gap-3 p-6 text-sm text-text-secondary">
+                {user.location && (
+                  <div className="flex gap-3">
+                    <dt className="text-text-muted">Location</dt>
+                    <dd>{user.location}</dd>
+                  </div>
+                )}
+                {user.company && (
+                  <div className="flex gap-3">
+                    <dt className="text-text-muted">Company</dt>
+                    <dd>{user.company}</dd>
+                  </div>
+                )}
+                <div className="flex gap-3">
+                  <dt className="text-text-muted">Joined</dt>
+                  <dd>
+                    {new Date(user.created_at).toLocaleDateString('en-US', {
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="border-t border-border p-6">
+                <ActionLink
+                  href={user.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full"
+                  variant="primary"
+                >
+                  Follow on GitHub
+                </ActionLink>
+              </div>
+            </div>
+
+            <div className="min-w-[280px] flex-1">
+              {user.bio && (
+                <p className="text-lg leading-relaxed text-text-secondary">{user.bio}</p>
+              )}
+
+              <div className="mt-10 flex flex-col gap-8">
+                <section>
+                  <h3 className="font-mono text-xs tracking-widest text-text-muted uppercase">
+                    The mission
+                  </h3>
+                  <p className="mt-3 text-text-secondary">
+                    Sindlish began with a plain question: why should programming be closed to
+                    English speakers? The language brings software development closer to the more
+                    than 30 million native Sindhi speakers by letting them write code in their own
+                    mother tongue, which removes the overhead of translating thought into a new
+                    language.
                   </p>
-                  <div className="mt-12 space-y-10">
-                    <div>
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-[#E02424]">
-                        The Mission
-                      </h3>
-                      <p className="mt-3 text-lg leading-relaxed text-gray-new-50">
-                        Sindlish was born from a simple question: why should programming be exclusive
-                        to English speakers? The language is designed to bring software development
-                        closer to 30+ million native Sindhi speakers by letting them code in their
-                        mother tongue — removing the cognitive overhead of translating thought to
-                        code.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-[#E02424]">
-                        The Architecture
-                      </h3>
-                      <p className="mt-3 text-lg leading-relaxed text-gray-new-50">
-                        Under the hood, Sindlish is powered by a professional-grade stack-based
-                        Bytecode Virtual Machine inspired by CPython, featuring a native object model
-                        with protocol-based dispatch, a hybrid typing system, and Rust-inspired error
-                        handling.
-                      </p>
-                    </div>
-                    <div className="rounded-none border border-gray-new-20 bg-[#0A0A0B] p-6">
-                      <div className="flex items-center gap-3">
-                        <div className="size-2 rounded-none bg-green-500 animate-pulse" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-new-40">
-                          Currently Working On
-                        </span>
-                      </div>
-                      <p className="mt-3 text-sm text-gray-new-60">
-                        Sindlish v0.2.0 — Adding class definitions, inheritance, and a standard
-                        module system.
-                      </p>
-                    </div>
+                </section>
+
+                <section>
+                  <h3 className="font-mono text-xs tracking-widest text-text-muted uppercase">
+                    The architecture
+                  </h3>
+                  <p className="mt-3 text-text-secondary">
+                    Under the hood, Sindlish runs on a stack-based bytecode virtual machine modelled
+                    on CPython, with a native object model and protocol-based dispatch, a hybrid
+                    typing system, and Rust-inspired error handling.
+                  </p>
+                </section>
+
+                <section className="border border-border bg-surface-raised p-6">
+                  <div className="flex items-center gap-3">
+                    <span aria-hidden="true" className="size-1.5 bg-ok" />
+                    <h3 className="font-mono text-xs tracking-widest text-text-muted uppercase">
+                      Currently working on
+                    </h3>
                   </div>
-                </div>
-              </m.div>
-            )}
+                  <p className="mt-3 text-sm text-text-secondary">
+                    Sindlish v0.2.0, adding class definitions, inheritance, and a standard module
+                    system.
+                  </p>
+                </section>
+              </div>
+            </div>
           </Container>
         </section>
-      </LazyMotion>
+      )}
     </Layout>
   );
 };
+
 export default CreatorPage;
