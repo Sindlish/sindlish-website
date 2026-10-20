@@ -1,12 +1,12 @@
 'use client';
 
-import searchIndex from 'generated/search-index.json';
 import NextLink from 'next/link';
 import PropTypes from 'prop-types';
 import { useMemo, useState } from 'react';
 
 import Mascot from 'components/shared/mascot';
 import { SEARCH_EMPTY } from 'constants/quiet-pages';
+import searchIndex from 'generated/search-index.json';
 import { searchDocs } from 'utils/search-index';
 
 const syncUrl = (query) => {
